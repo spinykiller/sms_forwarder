@@ -37,13 +37,16 @@ public class SMSForwardService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "SMS Forward Service started");
+        Log.d(TAG, "SMS Forward Service started with startId: " + startId);
         
         // Start as foreground service with notification
         startForeground(NOTIFICATION_ID, createNotification());
         
         // Set up periodic restart using AlarmManager as additional backup
         setupServiceRestartAlarm();
+        
+        // Schedule additional periodic checks for reliability
+        scheduleAdditionalChecks();
         
         // Return START_STICKY to ensure the service is restarted if killed
         return START_STICKY;
@@ -74,6 +77,32 @@ public class SMSForwardService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    private void scheduleAdditionalChecks() {
+        try {
+            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            
+            // Schedule multiple checks at different intervals for maximum reliability
+            long[] intervals = {5 * 60 * 1000, 15 * 60 * 1000, 30 * 60 * 1000}; // 5min, 15min, 30min
+            
+            for (int i = 0; i < intervals.length; i++) {
+                Intent intent = new Intent(this, BootReceiver.class);
+                intent.setAction("com.enixcoda.smsforward.PERIODIC_CHECK");
+                
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                    this, 10 + i, intent, 
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                );
+                
+                alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, 
+                    SystemClock.elapsedRealtime() + intervals[i], intervals[i], pendingIntent);
+                
+                Log.d(TAG, "Scheduled additional check #" + (i+1) + " every " + (intervals[i]/60000) + " minutes");
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error scheduling additional checks: " + e.getMessage(), e);
+        }
     }
 
     @Override
