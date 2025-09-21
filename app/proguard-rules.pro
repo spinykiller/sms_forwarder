@@ -9,17 +9,56 @@
 
 # Add any project specific keep options here:
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# Keep SMS Forward classes
+-keep class com.enixcoda.smsforward.** { *; }
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# Keep BroadcastReceiver classes
+-keep class * extends android.content.BroadcastReceiver {
+    public <methods>;
+}
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# Keep Service classes
+-keep class * extends android.app.Service {
+    public <methods>;
+}
+
+# Keep Activity classes
+-keep class * extends android.app.Activity {
+    public <methods>;
+}
+
+# Keep Preference classes
+-keep class * extends androidx.preference.Preference {
+    public <methods>;
+}
+
+# Remove debug information
+-renamesourcefileattribute SourceFile
+-dontwarn **
+
+# Optimize aggressively
+-optimizations !code/simplification/arithmetic,!code/simplification/cast,!field/*,!class/merging/*
+-optimizationpasses 5
+-allowaccessmodification
+-dontpreverify
+
+# Remove unused code
+-dontwarn android.support.**
+-dontwarn androidx.**
+-dontwarn com.google.android.material.**
+
+# Keep only necessary attributes
+-keepattributes *Annotation*
+-keepattributes Signature
+-keepattributes InnerClasses
+-keepattributes EnclosingMethod
+
+# Remove logging in release builds
+-assumenosideeffects class android.util.Log {
+    public static boolean isLoggable(java.lang.String, int);
+    public static int v(...);
+    public static int i(...);
+    public static int w(...);
+    public static int d(...);
+    public static int e(...);
+}

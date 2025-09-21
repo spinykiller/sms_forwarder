@@ -9,26 +9,67 @@ android {
         versionName "1.0.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+    
     buildTypes {
+        debug {
+            minifyEnabled false
+            shrinkResources false
+            debuggable true
+        }
         release {
-            minifyEnabled = true
-            shrinkResources = true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.debug
+            
+            // Additional optimizations
+            zipAlignEnabled true
+            debuggable false
+            jniDebuggable false
+            renderscriptDebuggable false
+            pseudoLocalesEnabled false
         }
     }
+    
+    // Enable resource shrinking
+    buildFeatures {
+        buildConfig false
+    }
+    
+    // Optimize APK
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/*.kotlin_module'
+        exclude 'META-INF/*.version'
+        exclude 'META-INF/proguard/*'
+        exclude 'META-INF/com.android.tools/**'
+        exclude 'META-INF/androidx.**'
+        exclude 'META-INF/com.google.**'
+    }
+    
     namespace 'com.enixcoda.smsforward'
 }
 
 dependencies {
-    implementation 'com.sun.mail:android-mail:1.6.4'
-    implementation 'com.sun.mail:android-activation:1.6.4'
+    // Core Android libraries (minimal set)
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.10.0'
     implementation 'androidx.preference:preference:1.2.1'
-    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.14.0'
-
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    
+    // Material Design (only if needed for UI)
+    implementation 'com.google.android.material:material:1.10.0'
+    
+    // Remove unnecessary dependencies:
+    // - com.sun.mail:android-mail (not used)
+    // - com.sun.mail:android-activation (not used) 
+    // - com.fasterxml.jackson.core:jackson-annotations (not used)
+    
+    // Test dependencies (only for debug builds)
+    debugImplementation 'junit:junit:4.13.2'
+    debugImplementation 'androidx.test.ext:junit:1.1.5'
+    debugImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }

@@ -6,8 +6,8 @@
     <string name="header_sms">Forward via SMS</string>
     <string name="enable_sms">Enable SMS</string>
     <string name="key_target_sms">key_sms_target</string>
-    <string name="target_title_sms">Target phone number</string>
-    <string name="target_summary_sms">example: +86 10000</string>
+    <string name="target_title_sms">Target phone numbers</string>
+    <string name="target_summary_sms">Multiple numbers separated by commas\nexample: +86 10000, +1 5551234567</string>
 
     <!-- Telegram -->
     <string name="key_enable_telegram">key_enable_telegram</string>
@@ -25,4 +25,19 @@
     <string name="key_target_web">key_target_web</string>
     <string name="target_title_web">Target Web URL</string>
     <string name="target_summary_web">Example: https://site.com/api\nThis app will send POST request on receive SMS, request body example:\n{ "from": "10000", "message": "Hello" }</string>
+
+    <!-- System -->
+    <string name="header_system">System Settings</string>
+    <string name="key_permission_status">key_permission_status</string>
+    <string name="title_permission_status">Permission Status</string>
+    <string name="summary_permission_status">Check and manage app permissions</string>
+    <string name="key_battery_optimization">key_battery_optimization</string>
+    <string name="title_battery_optimization">Battery Optimization</string>
+    <string name="summary_battery_optimization">Disable battery optimization to ensure SMS forwarding works reliably</string>
+    <string name="key_autostart_settings">key_autostart_settings</string>
+    <string name="title_autostart_settings">Auto-start Settings</string>
+    <string name="summary_autostart_settings">Enable auto-start for MIUI/Poco devices</string>
+    <string name="key_autostart_status">key_autostart_status</string>
+    <string name="title_autostart_status">Auto-start Status</string>
+    <string name="summary_autostart_status">Check auto-start permission status</string>
 </resources>
