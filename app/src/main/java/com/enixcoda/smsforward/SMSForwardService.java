@@ -168,7 +168,7 @@ public class SMSForwardService extends Service {
         return new NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("SMS Forward")
             .setContentText(statusText)
-            .setSmallIcon(R.mipmap.ic_launcher)
+            .setSmallIcon(R.drawable.ic_notification) // Use proper notification icon
             .setContentIntent(pendingIntent)
             .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_MIN) // Changed to MIN

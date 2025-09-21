@@ -5,6 +5,20 @@ All notable changes to SMS Forwarder will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.4] - 2024-09-21
+
+### 🔔 Notification Improvements
+- **Fixed Notification Icon** - Now uses proper notification-specific icon instead of app launcher icon
+- **Professional Notification Design** - White/transparent notification icon for better visibility
+- **Consistent Visual Identity** - Notification icon matches the app's professional design
+- **Better User Experience** - Clear notification appearance in status bar and notification panel
+
+### 🔧 Technical Improvements
+- **Notification Icon Assets** - Created proper notification icons for all densities (24px to 96px)
+- **White/Transparent Design** - Notification icons follow Android design guidelines
+- **Optimized Assets** - Minimal file sizes for faster loading
+- **Cross-Platform Compatibility** - Works perfectly on all Android versions
+
 ## [1.0.3] - 2024-09-21
 
 ### 🎨 UI Improvements
