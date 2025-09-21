@@ -68,4 +68,34 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory
+        app:title="@string/header_system"
+        app:iconSpaceReserved="false">
+
+        <Preference
+            android:key="@string/key_permission_status"
+            android:title="@string/title_permission_status"
+            android:summary="@string/summary_permission_status"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            android:key="@string/key_battery_optimization"
+            android:title="@string/title_battery_optimization"
+            android:summary="@string/summary_battery_optimization"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            android:key="@string/key_autostart_settings"
+            android:title="@string/title_autostart_settings"
+            android:summary="@string/summary_autostart_settings"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            android:key="@string/key_autostart_status"
+            android:title="@string/title_autostart_status"
+            android:summary="@string/summary_autostart_status"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>
