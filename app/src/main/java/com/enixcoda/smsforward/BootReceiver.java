@@ -22,21 +22,21 @@ public class BootReceiver extends BroadcastReceiver {
         String action = intent.getAction();
         Log.d(TAG, "BootReceiver received action: " + action);
         
+        // Handle all boot-related actions
         if (Intent.ACTION_BOOT_COMPLETED.equals(action) || 
             Intent.ACTION_MY_PACKAGE_REPLACED.equals(action) ||
             Intent.ACTION_PACKAGE_REPLACED.equals(action) ||
             Intent.ACTION_REBOOT.equals(action) ||
-            "android.intent.action.QUICKBOOT_POWERON".equals(action)) { // Xiaomi quick boot
+            "android.intent.action.QUICKBOOT_POWERON".equals(action) ||
+            "android.intent.action.ACTION_BOOT_COMPLETED".equals(action) ||
+            "com.htc.intent.action.QUICKBOOT_POWERON".equals(action) ||
+            "android.intent.action.MEDIA_MOUNTED".equals(action)) {
             
-            Log.d(TAG, "Device boot completed or app updated, checking if SMS forwarding should be enabled");
+            Log.d(TAG, "Boot event detected: " + action);
             
-            // Add delay for MIUI devices to ensure system is fully ready
-            if (BatteryOptimizationHelper.isMIUIDevice(context)) {
-                Log.d(TAG, "MIUI device detected, adding delay before starting service");
-                scheduleDelayedStart(context, 30000); // 30 seconds delay
-            } else {
-                startSMSForwardingService(context);
-            }
+            // Always schedule multiple delayed starts for reliability
+            scheduleMultipleDelayedStarts(context);
+            
         } else if ("com.enixcoda.smsforward.DELAYED_START".equals(action)) {
             Log.d(TAG, "Delayed start triggered");
             startSMSForwardingService(context);
@@ -83,6 +83,38 @@ public class BootReceiver extends BroadcastReceiver {
             }
         } catch (Exception e) {
             Log.e(TAG, "Error starting SMS forwarding service: " + e.getMessage(), e);
+        }
+    }
+
+    private void scheduleMultipleDelayedStarts(Context context) {
+        try {
+            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            
+            // Schedule multiple delayed starts for maximum reliability
+            long[] delays = {10000, 30000, 60000, 120000}; // 10s, 30s, 1min, 2min
+            
+            for (int i = 0; i < delays.length; i++) {
+                Intent intent = new Intent(context, BootReceiver.class);
+                intent.setAction("com.enixcoda.smsforward.DELAYED_START");
+                
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                    context, i, intent, 
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                );
+                
+                long triggerTime = SystemClock.elapsedRealtime() + delays[i];
+                alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerTime, pendingIntent);
+                
+                Log.d(TAG, "Scheduled delayed start #" + (i+1) + " in " + delays[i] + "ms");
+            }
+            
+            // Also try immediate start as fallback
+            startSMSForwardingService(context);
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error scheduling multiple delayed starts: " + e.getMessage(), e);
+            // Fallback to immediate start
+            startSMSForwardingService(context);
         }
     }
 
