@@ -5,6 +5,20 @@ All notable changes to SMS Forwarder will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.3] - 2024-09-21
+
+### 🎨 UI Improvements
+- **New Professional Icon** - Modern, clean icon design representing SMS forwarding
+- **Enhanced Visual Identity** - Blue gradient background with white phones and forward arrow
+- **Better Brand Recognition** - Professional appearance in app launcher and settings
+- **Consistent Design** - Icon matches the app's dark theme and color scheme
+
+### 🔧 Technical Improvements
+- **Optimized Icon Assets** - All required Android icon sizes (48px to 192px)
+- **Vector-Based Design** - Clean, scalable icon design
+- **Performance Optimized** - Minimal icon file sizes for faster loading
+- **Cross-Platform Compatibility** - Works perfectly on all Android versions
+
 ## [1.0.2] - 2024-09-21
 
 ### 🚀 Major Features Added
