@@ -5,6 +5,28 @@ All notable changes to SMS Forwarder will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.7] - 2025-10-17
+
+### 📱 Telegram Improvements
+- **Group Username Support** - Now supports @username format for Telegram groups and channels (e.g., @spinykillergroup)
+- **Improved Error Handling** - Better logging and error messages for Telegram API failures
+- **GET Request Method** - Uses simple GET requests with proper URL encoding
+- **Better Response Handling** - Reads and logs both success and error responses from Telegram API
+- **Connection Timeouts** - Configurable timeouts (10 seconds) to prevent hanging requests
+
+### 🎨 UI Improvements
+- Updated Telegram Chat ID field with examples showing @username format
+- Added helpful summary explaining how to get bot token from @BotFather
+- Better field labels and documentation
+- Examples for both numeric chat IDs and @username formats
+
+### 🔧 Technical Changes
+- Rewrote `ForwardTaskForTelegram` class for better reliability
+- Uses `URLEncoder` for proper URL encoding (like Python's urllib.parse.quote_plus)
+- Comprehensive logging with proper TAG
+- Proper connection cleanup with try-finally blocks
+- Reads full response body for debugging
+
 ## [1.0.6] - 2025-10-17
 
 ### 🐛 Critical Bug Fix

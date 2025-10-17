@@ -5,8 +5,8 @@ android {
     defaultConfig {
         applicationId "com.enixcoda.smsforward"
         minSdkVersion 25
-        versionCode 6
-        versionName "1.0.6"
+        versionCode 7
+        versionName "1.0.7"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     
