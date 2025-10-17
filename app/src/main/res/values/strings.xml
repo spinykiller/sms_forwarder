@@ -15,8 +15,10 @@
     <string name="enable_telegram">Enable Telegram</string>
     <string name="key_target_telegram">key_target_telegram</string>
     <string name="key_telegram_apikey">key_telegram_apikey</string>
-    <string name="target_title_telegram">Target Telegram ID</string>
-    <string name="title_telegram_apikey">Telegram API KEY</string>
+    <string name="target_title_telegram">Target Telegram Chat ID</string>
+    <string name="target_summary_telegram">Chat ID (numeric) or @username for groups/channels\nexample: 123456789 or @mygroup</string>
+    <string name="title_telegram_apikey">Telegram Bot Token</string>
+    <string name="summary_telegram_apikey">Get from @BotFather on Telegram\nexample: 110201543:AAH4eZxxxxxxxxxxxxxxxxxxxxxP4U</string>
 
     <!-- Web -->
     <string name="key_enable_web">key_enable_web</string>

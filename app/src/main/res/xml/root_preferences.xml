@@ -38,6 +38,7 @@
             android:selectAllOnFocus="true"
             android:singleLine="true"
             android:title="@string/target_title_telegram"
+            android:summary="@string/target_summary_telegram"
             app:iconSpaceReserved="false" />
         <EditTextPreference
             android:defaultValue=""
@@ -45,6 +46,7 @@
             android:selectAllOnFocus="true"
             android:singleLine="true"
             android:title="@string/title_telegram_apikey"
+            android:summary="@string/summary_telegram_apikey"
             app:iconSpaceReserved="false" />
 
     </PreferenceCategory>
