@@ -5,6 +5,22 @@ All notable changes to SMS Forwarder will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.6] - 2025-10-17
+
+### 🐛 Critical Bug Fix
+- **Fixed blocklist blocking all messages** - Resolved issue where enabling blocklist with no numbers would block ALL messages
+- **Fixed empty string matching** - Empty blocked numbers no longer match any phone number
+- **Enhanced partial matching** - Now requires minimum 7-digit numbers for partial matching
+
+### 🔧 Technical Improvements
+- Added empty string validation in `isSenderBlocked()` method
+- Skip empty blocked numbers in the matching loop
+- Validate sender number is not empty before processing
+- Improved logging to distinguish exact vs partial matches
+
+### ⚠️ Important
+- **Users on v1.0.5 should upgrade immediately** - This fixes a critical bug that prevented all forwarding when blocklist was enabled
+
 ## [1.0.5] - 2025-10-17
 
 ### 🚫 New Feature: Sender Blocklist

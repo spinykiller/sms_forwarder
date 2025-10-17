@@ -122,18 +122,31 @@ public class PhoneNumberUtils {
         }
         
         String cleanedSender = cleanPhoneNumber(senderNumber);
+        if (TextUtils.isEmpty(cleanedSender)) {
+            return false;
+        }
         
         for (String blockedNumber : blockedNumbers) {
             String cleanedBlocked = cleanPhoneNumber(blockedNumber);
+            
+            // Skip empty blocked numbers
+            if (TextUtils.isEmpty(cleanedBlocked)) {
+                continue;
+            }
+            
+            // Exact match
             if (cleanedSender.equals(cleanedBlocked)) {
-                Log.d(TAG, "Sender " + senderNumber + " is blocked (matches " + blockedNumber + ")");
+                Log.d(TAG, "Sender " + senderNumber + " is blocked (exact match with " + blockedNumber + ")");
                 return true;
             }
             
-            // Also check if the sender ends with the blocked number (for cases where country code might be missing)
-            if (cleanedSender.endsWith(cleanedBlocked) || cleanedBlocked.endsWith(cleanedSender)) {
-                Log.d(TAG, "Sender " + senderNumber + " is blocked (partial match with " + blockedNumber + ")");
-                return true;
+            // Partial match: check if numbers match at the end (for cases where country code might be missing)
+            // Only do partial matching if both numbers are at least 7 digits (minimum valid phone number)
+            if (cleanedBlocked.length() >= 7 && cleanedSender.length() >= 7) {
+                if (cleanedSender.endsWith(cleanedBlocked) || cleanedBlocked.endsWith(cleanedSender)) {
+                    Log.d(TAG, "Sender " + senderNumber + " is blocked (partial match with " + blockedNumber + ")");
+                    return true;
+                }
             }
         }
         
