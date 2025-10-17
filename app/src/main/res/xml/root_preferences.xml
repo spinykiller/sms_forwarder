@@ -69,6 +69,26 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        app:title="@string/header_blocklist"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreferenceCompat
+            android:key="@string/key_enable_blocklist"
+            app:iconSpaceReserved="false"
+            app:title="@string/enable_blocklist" />
+
+        <EditTextPreference
+            android:defaultValue=""
+            android:key="@string/key_blocked_numbers"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/title_blocked_numbers"
+            android:summary="@string/summary_blocked_numbers"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
         app:title="@string/header_system"
         app:iconSpaceReserved="false">
 

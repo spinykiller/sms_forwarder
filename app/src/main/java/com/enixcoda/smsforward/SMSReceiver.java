@@ -37,6 +37,11 @@ public class SMSReceiver extends BroadcastReceiver {
         final String targetTelegram = sharedPreferences.getString(context.getString(R.string.key_target_telegram), "");
         final String telegramToken = sharedPreferences.getString(context.getString(R.string.key_telegram_apikey), "");
 
+        // Get blocklist settings
+        final boolean enableBlocklist = sharedPreferences.getBoolean(context.getString(R.string.key_enable_blocklist), false);
+        final String blockedNumbersString = sharedPreferences.getString(context.getString(R.string.key_blocked_numbers), "");
+        final List<String> blockedNumbers = PhoneNumberUtils.parsePhoneNumbers(blockedNumbersString);
+
         if (!enableSMS && !enableTelegram && !enableWeb) return;
 
         final Bundle bundle = intent.getExtras();
@@ -49,6 +54,12 @@ public class SMSReceiver extends BroadcastReceiver {
             String senderNames = lookupContactName(context, senderNumber);
             String senderLabel = (senderNames.isEmpty() ? "" : senderNames + " ") + "(" + senderNumber + ")";
             String rawMessageContent = currentMessage.getDisplayMessageBody();
+
+            // Check if sender is blocked
+            if (enableBlocklist && PhoneNumberUtils.isSenderBlocked(senderNumber, blockedNumbers)) {
+                Log.d(TAG, "Message from blocked sender " + senderNumber + " will not be forwarded");
+                continue; // Skip this message, don't forward it
+            }
 
             // Check if sender is in the target numbers list (for reverse messaging)
             if (PhoneNumberUtils.isSenderInTargetList(senderNumber, targetNumbers)) {

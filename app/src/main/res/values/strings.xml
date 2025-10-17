@@ -26,6 +26,14 @@
     <string name="target_title_web">Target Web URL</string>
     <string name="target_summary_web">Example: https://site.com/api\nThis app will send POST request on receive SMS, request body example:\n{ "from": "10000", "message": "Hello" }</string>
 
+    <!-- Blocklist -->
+    <string name="header_blocklist">Blocklist Settings</string>
+    <string name="key_enable_blocklist">key_enable_blocklist</string>
+    <string name="enable_blocklist">Enable Blocklist</string>
+    <string name="key_blocked_numbers">key_blocked_numbers</string>
+    <string name="title_blocked_numbers">Blocked Phone Numbers</string>
+    <string name="summary_blocked_numbers">Messages from these numbers will not be forwarded\nMultiple numbers separated by commas\nexample: +86 10000, +1 5551234567</string>
+
     <!-- System -->
     <string name="header_system">System Settings</string>
     <string name="key_permission_status">key_permission_status</string>
