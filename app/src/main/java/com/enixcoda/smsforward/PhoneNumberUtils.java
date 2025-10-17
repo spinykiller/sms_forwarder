@@ -109,4 +109,34 @@ public class PhoneNumberUtils {
     public static boolean hasValidNumbers(List<String> phoneNumbers) {
         return phoneNumbers != null && !phoneNumbers.isEmpty();
     }
+
+    /**
+     * Check if a sender number is in the blocklist
+     * @param senderNumber The sender's phone number
+     * @param blockedNumbers List of blocked phone numbers
+     * @return true if sender number is blocked
+     */
+    public static boolean isSenderBlocked(String senderNumber, List<String> blockedNumbers) {
+        if (TextUtils.isEmpty(senderNumber) || blockedNumbers == null || blockedNumbers.isEmpty()) {
+            return false;
+        }
+        
+        String cleanedSender = cleanPhoneNumber(senderNumber);
+        
+        for (String blockedNumber : blockedNumbers) {
+            String cleanedBlocked = cleanPhoneNumber(blockedNumber);
+            if (cleanedSender.equals(cleanedBlocked)) {
+                Log.d(TAG, "Sender " + senderNumber + " is blocked (matches " + blockedNumber + ")");
+                return true;
+            }
+            
+            // Also check if the sender ends with the blocked number (for cases where country code might be missing)
+            if (cleanedSender.endsWith(cleanedBlocked) || cleanedBlocked.endsWith(cleanedSender)) {
+                Log.d(TAG, "Sender " + senderNumber + " is blocked (partial match with " + blockedNumber + ")");
+                return true;
+            }
+        }
+        
+        return false;
+    }
 }

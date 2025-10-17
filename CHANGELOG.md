@@ -5,6 +5,35 @@ All notable changes to SMS Forwarder will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.5] - 2025-10-17
+
+### 🚫 New Feature: Sender Blocklist
+- **Block Specific Senders** - Prevent messages from certain phone numbers from being forwarded
+- **Easy Configuration** - Simple UI to add/remove blocked numbers via comma-separated list
+- **Toggle Control** - Enable/disable blocklist feature with a single switch
+- **Smart Matching** - Intelligent phone number matching that handles different formats
+- **Multiple Numbers** - Block as many numbers as you need
+- **Universal Blocking** - Works across all forwarding methods (SMS, Telegram, Web)
+
+### 🔧 Technical Implementation
+- Added blocklist settings UI in preferences screen
+- Implemented `isSenderBlocked()` method in PhoneNumberUtils
+- Integrated blocklist check in SMSReceiver before forwarding
+- Smart phone number normalization and matching
+- Comprehensive logging for debugging
+
+### 📋 Use Cases
+- Block spam senders
+- Filter out marketing/promotional SMS
+- Block specific contacts from being forwarded
+- Privacy control for sensitive senders
+
+### 🎯 Benefits
+- No performance impact
+- Works with all forwarding methods
+- Configurable and persistent
+- Safe upgrade from v1.0.4
+
 ## [1.0.4] - 2024-09-21
 
 ### 🔔 Notification Improvements
