@@ -49,17 +49,20 @@ public class ForwardTaskForTelegram extends AsyncTask<Void, Void, Void> {
         try {
             // Build URL with encoded parameters (similar to Python's urllib.parse.quote_plus)
             String encodedMessage = URLEncoder.encode(message, "UTF-8");
-            String encodedChatId = URLEncoder.encode(chatId, "UTF-8");
+            
+            // Don't encode chatId if it starts with @ (username format)
+            // For @username, we need to keep the @ symbol as-is
+            String chatIdParam = chatId.startsWith("@") ? chatId : URLEncoder.encode(chatId, "UTF-8");
             
             // Construct the Telegram API URL
             String urlString = String.format(
                 "https://api.telegram.org/bot%s/sendMessage?chat_id=%s&text=%s",
                 token,
-                encodedChatId,
+                chatIdParam,
                 encodedMessage
             );
             
-            Log.d(TAG, "Sending to Telegram chat: " + chatId);
+            Log.d(TAG, "Sending to Telegram chat: " + chatId.replaceAll("@", "[at]"));
             
             URL url = new URL(urlString);
             connection = (HttpURLConnection) url.openConnection();

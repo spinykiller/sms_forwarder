@@ -102,7 +102,7 @@ Bot Token: 110201543:AAH4eZxxxxxxxxxxxxxxxxxxxxxP4U
 Chat ID: 123456789
 ```
 
-**For Error Channel:**
+**For Channel Forwarding:**
 ```
 Bot Token: 110201543:AAH4eZxxxxxxxxxxxxxxxxxxxxxP4U
 Chat ID: @mychannel

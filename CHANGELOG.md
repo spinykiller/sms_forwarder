@@ -5,6 +5,23 @@ All notable changes to SMS Forwarder will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.8] - 2025-10-17
+
+### 🔒 Security Improvements
+- **Removed Hardcoded Credentials** - All real bot tokens removed from documentation and examples
+- **Placeholder Examples** - Now using generic placeholders (e.g., `110201543:AAH4eZxxxxxxxxxxxxxxxxxxxxxP4U`)
+- **Privacy Protection** - Removed real group/channel names from examples
+
+### 🐛 Bug Fixes
+- **Fixed Telegram @ Username Encoding** - The @ symbol in usernames is now preserved correctly (not URL encoded)
+- **Improved Chat ID Handling** - Conditional encoding based on format (numeric vs @username)
+- **Better Logging Privacy** - Logs now mask @ symbols for security
+
+### 🔧 Technical Changes
+- Conditional URL encoding for Telegram chat IDs
+- Only numeric IDs are URL encoded, @usernames preserved
+- Enhanced privacy in debug logs
+
 ## [1.0.7] - 2025-10-17
 
 ### 📱 Telegram Improvements
