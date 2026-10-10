@@ -26,7 +26,7 @@
     <string name="enable_web">Enable Web</string>
     <string name="key_target_web">key_target_web</string>
     <string name="target_title_web">Target Web URL</string>
-    <string name="target_summary_web">Example: https://site.com/api\nThis app will send POST request on receive SMS, request body example:\n{ "from": "10000", "message": "Hello" }</string>
+    <string name="target_summary_web">Example: https://site.com/api (https only)\nThis app will send POST request on receive SMS, request body example:\n{ \"from\": \"10000\", \"message\": \"Hello\" }</string>
 
     <!-- Blocklist -->
     <string name="header_blocklist">Blocklist Settings</string>
@@ -47,7 +47,46 @@
     <string name="key_autostart_settings">key_autostart_settings</string>
     <string name="title_autostart_settings">Auto-start Settings</string>
     <string name="summary_autostart_settings">Enable auto-start for MIUI/Poco devices</string>
-    <string name="key_autostart_status">key_autostart_status</string>
-    <string name="title_autostart_status">Auto-start Status</string>
-    <string name="summary_autostart_status">Check auto-start permission status</string>
+    <string name="key_send_test">key_send_test</string>
+    <string name="title_send_test">Send test message</string>
+    <string name="summary_send_test">Sends a test through each enabled method (SMS may cost per your plan)</string>
+
+    <!-- Status -->
+    <string name="status_permission_missing">SMS permission needed — tap to grant</string>
+    <string name="status_off">Forwarding is off — turn on a method below</string>
+    <string name="status_forwarding">Forwarding via %s</string>
+    <string name="status_not_set_up">%s (not set up)</string>
+    <string name="battery_optimized">Battery optimization is on — forwarding may be delayed or stop. Tap to fix</string>
+    <string name="battery_ok">Not battery optimized ✓</string>
+    <string name="permissions_ok">All permissions granted ✓</string>
+    <string name="permissions_sms_missing">SMS permission missing — tap to fix</string>
+    <string name="permissions_contacts_missing">Contacts not allowed (optional: sender names are hidden)</string>
+
+    <!-- Permissions -->
+    <string name="permission_title">Allow SMS access</string>
+    <string name="permission_message">SMS Forward reads incoming messages only to forward them to the numbers, Telegram chat or web address you set up. Nothing is sent anywhere else.\n\n• SMS: receive messages and forward them by SMS\n• Contacts (optional): show the sender\'s name</string>
+    <string name="permission_denied_title">SMS permission denied</string>
+    <string name="permission_denied_message">Forwarding can\'t work without SMS access. Allow it in the app\'s settings under Permissions.</string>
+    <string name="open_settings">Open settings</string>
+    <string name="continue_">Continue</string>
+    <string name="not_now">Not now</string>
+    <string name="later">Later</string>
+
+    <!-- Validation -->
+    <string name="invalid_numbers">Enter phone numbers separated by commas</string>
+    <string name="invalid_chat_id">Enter a numeric chat ID or @username</string>
+    <string name="invalid_token">That doesn\'t look like a bot token (123456:ABC…)</string>
+    <string name="invalid_url">Enter a full https:// URL</string>
+
+    <!-- Test message -->
+    <string name="test_none_enabled">Turn on a forwarding method first</string>
+    <string name="test_sender">SMS Forward (test)</string>
+    <string name="test_message">This is a test message from SMS Forward.</string>
+    <string name="test_sending">Sending test…</string>
+    <string name="test_result_title">Test results</string>
+    <string name="test_sms_sent">SMS: sent to %d number(s)</string>
+    <string name="test_sms_no_numbers">SMS: no numbers set</string>
+    <string name="test_ok">%s: delivered ✓</string>
+    <string name="test_retry">%s: network or server error — try again</string>
+    <string name="test_fail">%s: rejected — check the settings</string>
 </resources>
