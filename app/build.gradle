@@ -1,17 +1,50 @@
 apply plugin: 'com.android.application'
 
+// Upload-signing config is loaded from keystore.properties (gitignored). Absent on CI / fresh
+// clones → release builds are left unsigned rather than failing.
+def keystorePropertiesFile = rootProject.file('keystore.properties')
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) keystorePropertiesFile.withInputStream { keystoreProperties.load(it) }
+
+// AdMob IDs (not secret) come from gradle.properties. Debug always uses Google's public test IDs:
+// live units on dev devices count as invalid traffic.
+def admobTestAppId = 'ca-app-pub-3940256099942544~3347511713'
+def admobTestBannerUnit = 'ca-app-pub-3940256099942544/9214589741'
+def admobAppId = findProperty('admobAppId') ?: admobTestAppId
+def admobBannerUnit = findProperty('admobBannerUnit') ?: admobTestBannerUnit
+gradle.taskGraph.whenReady { graph ->
+    if (graph.allTasks.any { it.name ==~ /(assemble|bundle)Release/ } && (admobAppId == admobTestAppId || admobBannerUnit == admobTestBannerUnit))
+        throw new GradleException('Set admobAppId and admobBannerUnit in gradle.properties to the real AdMob IDs before a release build')
+}
+
 android {
-    compileSdk 34
+    compileSdk 36
     defaultConfig {
-        applicationId "com.enixcoda.smsforward"
+        applicationId "com.spinykiller.smsforward"
         minSdkVersion 25
-        versionCode 8
-        versionName "1.0.8"
+        targetSdkVersion 36
+        versionCode 9
+        versionName "1.1.0"
+        manifestPlaceholders = [admobAppId: admobAppId]
+        buildConfigField 'String', 'BANNER_UNIT', "\"$admobBannerUnit\""
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     
+    signingConfigs {
+        if (keystorePropertiesFile.exists()) {
+            release {
+                storeFile rootProject.file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
+        }
+    }
+
     buildTypes {
         debug {
+            manifestPlaceholders = [admobAppId: admobTestAppId]
+            buildConfigField 'String', 'BANNER_UNIT', "\"$admobTestBannerUnit\""
             minifyEnabled false
             shrinkResources false
             debuggable true
@@ -20,10 +53,9 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.debug
-            
+            if (keystorePropertiesFile.exists()) signingConfig signingConfigs.release
+
             // Additional optimizations
-            zipAlignEnabled true
             debuggable false
             jniDebuggable false
             renderscriptDebuggable false
@@ -31,9 +63,9 @@ android {
         }
     }
     
-    // Enable resource shrinking
+    // BuildConfig carries the AdMob banner unit
     buildFeatures {
-        buildConfig false
+        buildConfig true
     }
     
     // Optimize APK
@@ -52,6 +84,11 @@ android {
         exclude 'META-INF/com.google.**'
     }
     
+    // android.util.Log in code under JVM unit tests
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
     namespace 'com.enixcoda.smsforward'
 }
 
@@ -59,6 +96,16 @@ dependencies {
     // Core Android libraries (minimal set)
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.preference:preference:1.2.1'
+    // Retries Telegram/Web forwards that fail while offline
+    implementation 'androidx.work:work-runtime:2.9.1'
+
+    // Monetization: banner ads, GDPR consent, Pro purchases (same versions as MemoryMedic)
+    implementation 'com.google.android.gms:play-services-ads:23.5.0'
+    implementation 'com.google.android.ump:user-messaging-platform:3.1.0'
+    implementation 'com.android.billingclient:billing:8.0.0'
+    // The ads SDK brings Guava at runtime, which empties the listenablefuture artifact WorkManager's Worker
+    // compiles against; declare the same Guava so ListenableFuture is on the compile classpath (no size change)
+    implementation 'com.google.guava:guava:31.1-android'
     
     // Material Design (only if needed for UI)
     implementation 'com.google.android.material:material:1.10.0'
@@ -69,7 +116,7 @@ dependencies {
     // - com.fasterxml.jackson.core:jackson-annotations (not used)
     
     // Test dependencies (only for debug builds)
-    debugImplementation 'junit:junit:4.13.2'
+    testImplementation 'junit:junit:4.13.2'
     debugImplementation 'androidx.test.ext:junit:1.1.5'
     debugImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }

@@ -6,23 +6,24 @@ A lightweight Android application that automatically forwards SMS messages to mu
 
 ### 📱 Core Functionality
 - **Multi-Channel Forwarding**: Forward SMS via SMS, Telegram, or webhooks
-- **Multiple Recipients**: Support for multiple phone numbers (comma-separated)
+- **Multiple Recipients**: Support for multiple phone numbers (comma-separated, Pro)
 - **Reverse Messaging**: Send messages back to original sender
 - **Loop Prevention**: Prevents forwarding messages to the same number
-- **Contact Integration**: Shows sender names from contacts
+- **Contact Integration**: Shows sender names from contacts (optional permission)
+- **Long Messages**: Multipart SMS are forwarded as one message
+- **Offline Retry**: Telegram/webhook forwards that fail while offline are retried once the network is back
+- **Dual SIM**: Forwards and replies on the SIM that received the message
+
+### 💎 Free with ads, or Pro
+- Free: SMS (one number), Telegram and webhook forwarding, blocklist, reverse messaging — with one banner on the settings screen
+- Pro (yearly with free trial, monthly, or lifetime): no ads, multiple target numbers, keyword/sender filters, custom message format, forward log
 
 ### 🔋 Battery & Performance Optimized
-- **Minimal Battery Usage**: Optimized for 24/7 operation
-- **Low CPU Usage**: Reduced background processing by 80%
-- **Smart Scheduling**: Periodic checks every 30-60 minutes
-- **Efficient Notifications**: Minimal priority notifications
+- **No Background Service**: Android wakes the app only when an SMS arrives — no persistent notification, no polling
 
 ### 🛡️ Reliability Features
-- **Auto-Start on Boot**: Automatically starts after device reboot
 - **Battery Optimization Handling**: Works with aggressive battery managers
 - **Device-Specific Support**: Optimized for MIUI, EMUI, ColorOS, FuntouchOS
-- **Foreground Service**: Keeps app running in background
-- **Periodic Restart**: Self-healing mechanism
 
 ### 🎨 User Experience
 - **Dark Theme**: Modern dark UI with excellent visibility
@@ -33,7 +34,7 @@ A lightweight Android application that automatically forwards SMS messages to mu
 ## 📋 Requirements
 
 - **Android Version**: 7.0 (API 25) or higher
-- **Permissions**: SMS (Send/Receive), Internet, Contacts, Notifications
+- **Permissions**: SMS (Send/Receive), Internet, Contacts (optional)
 - **Storage**: ~2MB APK size
 
 ## 🛠️ Installation
@@ -56,7 +57,7 @@ cd sms_forwarder/SMS-Forward
 The app will automatically request necessary permissions:
 - **SMS Permissions**: Required for forwarding messages
 - **Internet Permission**: Required for Telegram/webhook forwarding
-- **Notification Permission**: Required for background operation
+- **Contacts Permission**: Optional, shows sender names
 
 ### 2. Configure Forwarding Methods
 
@@ -110,14 +111,13 @@ The app will automatically request necessary permissions:
 ### Architecture
 - **MainActivity**: Permission management and UI
 - **SMSReceiver**: BroadcastReceiver for incoming SMS
-- **BootReceiver**: Handles device boot and app updates
-- **SMSForwardService**: Foreground service for reliability
+- **Forwarder**: Sends via SMS, Telegram and webhooks
+- **ForwardWorker**: WorkManager job that retries failed Telegram/webhook forwards
 - **AutoStartHelper**: Device-specific auto-start management
 - **BatteryOptimizationHelper**: Battery optimization handling
 
 ### Performance Optimizations
-- **AlarmManager**: Periodic checks every 30-60 minutes
-- **Notification Priority**: IMPORTANCE_MIN for minimal battery impact
+- **Event-Driven**: Runs only when an SMS arrives; retries use WorkManager with a network constraint
 - **Reduced Checks**: Eliminated redundant permission checks
 - **Simplified Logic**: Streamlined auto-start detection
 
@@ -138,13 +138,11 @@ The app will automatically request necessary permissions:
 
 ### Android Versions
 - **Android 7.0+**: Full feature support
-- **Android 8.0+**: Enhanced notification support
 - **Android 10+**: Scoped storage compatibility
-- **Android 13+**: Runtime notification permissions
 
 ## 🐛 Troubleshooting
 
-### App Not Starting After Reboot
+### Not Forwarding After Reboot
 1. Check auto-start permissions in device settings
 2. Disable battery optimization for the app
 3. Enable background activity permissions
@@ -158,9 +156,7 @@ The app will automatically request necessary permissions:
 
 ### High Battery Usage
 1. Ensure you're using the latest optimized version
-2. Check notification settings (should be minimal priority)
-3. Verify battery optimization is disabled
-4. Check for conflicting apps
+2. Check for conflicting apps
 
 ## 📄 License
 

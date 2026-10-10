@@ -7,7 +7,7 @@
     <string name="enable_sms">Enable SMS</string>
     <string name="key_target_sms">key_sms_target</string>
     <string name="target_title_sms">Target phone numbers</string>
-    <string name="target_summary_sms">Multiple numbers separated by commas\nexample: +86 10000, +1 5551234567</string>
+    <string name="target_summary_sms">Multiple numbers separated by commas (Pro; free forwards to one)\nexample: +86 10000, +1 5551234567</string>
 
     <!-- Telegram -->
     <string name="key_enable_telegram">key_enable_telegram</string>
@@ -26,7 +26,7 @@
     <string name="enable_web">Enable Web</string>
     <string name="key_target_web">key_target_web</string>
     <string name="target_title_web">Target Web URL</string>
-    <string name="target_summary_web">Example: https://site.com/api\nThis app will send POST request on receive SMS, request body example:\n{ "from": "10000", "message": "Hello" }</string>
+    <string name="target_summary_web">Example: https://site.com/api (https only)\nThis app will send POST request on receive SMS, request body example:\n{ \"from\": \"10000\", \"message\": \"Hello\" }</string>
 
     <!-- Blocklist -->
     <string name="header_blocklist">Blocklist Settings</string>
@@ -35,6 +35,38 @@
     <string name="key_blocked_numbers">key_blocked_numbers</string>
     <string name="title_blocked_numbers">Blocked Phone Numbers</string>
     <string name="summary_blocked_numbers">Messages from these numbers will not be forwarded\nMultiple numbers separated by commas\nexample: +86 10000, +1 5551234567</string>
+
+    <!-- Pro features -->
+    <string name="header_pro_features">Pro features</string>
+    <string name="key_pro_unlock">key_pro_unlock</string>
+    <string name="title_pro_unlock">Unlock with Pro</string>
+    <string name="summary_pro_unlock">Filter which messages are forwarded, customize the forwarded text and see a forward log</string>
+    <string name="key_forward_log">key_forward_log</string>
+    <string name="title_forward_log">Forward log</string>
+    <string name="summary_forward_log">Recent forwards and their status (last 100, kept on this phone)</string>
+    <string name="log_empty">No forwards yet</string>
+    <string name="log_clear">Clear log</string>
+    <string name="log_clear_confirm">Delete the forward log from this phone?</string>
+    <string name="log_row_title">%1$s · %2$s · %3$s</string>
+    <string name="log_row_body">%1$s: %2$s</string>
+    <string name="log_delivered">✓ Delivered</string>
+    <string name="log_sent">✓ Sent</string>
+    <string name="log_queued">⏳ Queued</string>
+    <string name="log_failed">✗ Failed — tap to retry</string>
+    <string name="log_retry">Retry</string>
+    <string name="log_retry_confirm">Send this message to %s again?</string>
+    <string name="key_enable_filter">key_enable_filter</string>
+    <string name="enable_filter">Only forward matching messages</string>
+    <string name="key_filter_keywords">key_filter_keywords</string>
+    <string name="title_filter_keywords">Keywords</string>
+    <string name="summary_filter_keywords">Forward only messages containing any of these (comma-separated, any case)\nexample: OTP, code</string>
+    <string name="key_filter_senders">key_filter_senders</string>
+    <string name="title_filter_senders">Senders</string>
+    <string name="summary_filter_senders">…and only from these numbers or sender names (both must match when both are set)\nexample: HDFCBK, +1 5551234567</string>
+    <string name="key_template">key_template</string>
+    <string name="title_template">Message format</string>
+    <string name="summary_template">Text sent by SMS and Telegram. Placeholders: {from}, {sender}, {name}, {message}\nDefault: From {from}: {message}</string>
+    <string name="invalid_template">The format must include {message}</string>
 
     <!-- System -->
     <string name="header_system">System Settings</string>
@@ -47,7 +79,74 @@
     <string name="key_autostart_settings">key_autostart_settings</string>
     <string name="title_autostart_settings">Auto-start Settings</string>
     <string name="summary_autostart_settings">Enable auto-start for MIUI/Poco devices</string>
-    <string name="key_autostart_status">key_autostart_status</string>
-    <string name="title_autostart_status">Auto-start Status</string>
-    <string name="summary_autostart_status">Check auto-start permission status</string>
+    <string name="key_send_test">key_send_test</string>
+    <string name="title_send_test">Send test message</string>
+    <string name="summary_send_test">Sends a test through each enabled method (SMS may cost per your plan)</string>
+
+    <string name="key_privacy_choices">key_privacy_choices</string>
+    <string name="title_privacy_choices">Privacy choices</string>
+    <string name="summary_privacy_choices">Change your ad consent</string>
+
+    <!-- Pro -->
+    <string name="key_pro">key_pro</string>
+    <string name="title_pro">SMS Forward Pro</string>
+    <string name="summary_pro">Remove ads</string>
+    <string name="remove_ads">Remove ads</string>
+    <string name="pro_title">SMS Forward Pro</string>
+    <string name="pro_features">• No ads\n• Forward to multiple numbers\n• Forward only messages matching keywords or senders\n• Custom message format\n• Forward log with retry\n• Supports development</string>
+    <string name="pro_plan_annual">Yearly — %s</string>
+    <string name="pro_plan_annual_trial">Yearly — free trial, then %s</string>
+    <string name="pro_plan_monthly">Monthly — %s</string>
+    <string name="pro_plan_lifetime">Lifetime — %s, one payment</string>
+    <string name="pro_terms_subscription">Renews automatically at %s until you cancel. Cancel anytime in Google Play.</string>
+    <string name="pro_terms_trial">Free during the trial, then %s per year, renewing until you cancel. Cancel before the trial ends and you won\'t be charged.</string>
+    <string name="pro_terms_lifetime">One payment. No subscription.</string>
+    <string name="pro_buy">Continue</string>
+    <string name="pro_restore">Restore purchase</string>
+    <string name="pro_restoring">Checking your purchases…</string>
+    <string name="pro_manage">Manage subscription</string>
+    <string name="pro_active">Pro is active ✓</string>
+    <string name="pro_pending">Payment pending — Pro unlocks when it completes</string>
+    <string name="pro_store_unavailable">Google Play billing isn\'t available right now. Check that you\'re signed in to Play and online.</string>
+
+    <!-- Status -->
+    <string name="status_permission_missing">SMS permission needed — tap to grant</string>
+    <string name="status_off">Forwarding is off — turn on a method below</string>
+    <string name="status_forwarding">Forwarding via %s</string>
+    <string name="status_not_set_up">%s (not set up)</string>
+    <string name="battery_optimized">Battery optimization is on — forwarding may be delayed or stop. Tap to fix</string>
+    <string name="battery_ok">Not battery optimized ✓</string>
+    <string name="permissions_ok">All permissions granted ✓</string>
+    <string name="permissions_sms_missing">SMS permission missing — tap to fix</string>
+    <string name="permissions_contacts_missing">Contacts not allowed (optional: sender names are hidden)</string>
+
+    <!-- Permissions -->
+    <string name="permission_title">Allow SMS access</string>
+    <string name="permission_message">SMS Forward reads incoming messages only to forward them to the numbers, Telegram chat or web address you set up. Nothing is sent anywhere else.\n\n• SMS: receive messages and forward them by SMS\n• Contacts (optional): show the sender\'s name</string>
+    <string name="permission_denied_title">SMS permission denied</string>
+    <string name="permission_denied_message">Forwarding can\'t work without SMS access. Allow it in the app\'s settings under Permissions.</string>
+    <string name="open_settings">Open settings</string>
+    <string name="continue_">Continue</string>
+    <string name="not_now">Not now</string>
+    <string name="later">Later</string>
+
+    <!-- Validation -->
+    <string name="invalid_numbers">Enter phone numbers separated by commas</string>
+    <string name="free_one_number">The free version forwards to one number. Get Pro to forward to several.</string>
+    <string name="invalid_chat_id">Enter a numeric chat ID or @username</string>
+    <string name="invalid_token">That doesn\'t look like a bot token (123456:ABC…)</string>
+    <string name="invalid_url">Enter a full https:// URL</string>
+
+    <!-- Test message -->
+    <string name="test_none_enabled">Turn on a forwarding method first</string>
+    <string name="test_sender">SMS Forward (test)</string>
+    <string name="test_message">This is a test message from SMS Forward.</string>
+    <string name="test_sending">Sending test…</string>
+    <string name="test_result_title">Test results</string>
+    <string name="test_sms_sent">SMS: sent to %d number(s)</string>
+    <string name="test_sms_failed">SMS: %d number(s) failed — check the SMS permission</string>
+    <string name="test_sms_no_numbers">SMS: no numbers set</string>
+    <string name="test_ok">%s: delivered ✓</string>
+    <string name="test_retry">%s: network or server error — try again</string>
+    <string name="test_fail">%s: rejected — check the settings</string>
 </resources>

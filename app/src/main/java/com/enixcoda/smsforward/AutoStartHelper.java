@@ -25,22 +25,6 @@ public class AutoStartHelper {
     private static final String ONEPLUS_MANAGER = "com.oneplus.security";
 
     /**
-     * Check if auto-start permission is granted for this app
-     * @param context Application context
-     * @return true if auto-start is enabled
-     */
-    public static boolean isAutoStartEnabled(Context context) {
-        try {
-            // Simplified check - for most devices, if we can start services, auto-start is likely enabled
-            // This reduces CPU usage by avoiding complex manufacturer-specific checks
-            return true; // Assume enabled to reduce unnecessary checks
-        } catch (Exception e) {
-            Log.e(TAG, "Error checking auto-start permission: " + e.getMessage());
-            return true; // Default to true to avoid unnecessary user prompts
-        }
-    }
-
-    /**
      * Check if the device is running MIUI (Xiaomi/Poco)
      * @param context Application context
      * @return true if MIUI is detected
@@ -314,25 +298,6 @@ public class AutoStartHelper {
                    "3. Disable battery optimization\n" +
                    "4. Enable all required permissions\n\n" +
                    "This prevents the system from killing the app.";
-        }
-    }
-
-    /**
-     * Get device manufacturer name
-     * @param context Application context
-     * @return Manufacturer name
-     */
-    public static String getDeviceManufacturer(Context context) {
-        if (isMIUIDevice(context)) {
-            return "Xiaomi/Poco";
-        } else if (isEMUIDevice(context)) {
-            return "Huawei/Honor";
-        } else if (isColorOSDevice(context)) {
-            return "OPPO/OnePlus";
-        } else if (isFuntouchOSDevice(context)) {
-            return "Vivo";
-        } else {
-            return Build.MANUFACTURER;
         }
     }
 }
