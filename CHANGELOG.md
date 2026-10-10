@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Forwarded content is no longer prefixed with "Msg: "
 - Forwards and replies use the SIM that received the message
 
+### 💎 Free and Pro
+- Free: one banner ad on the settings screen (with GDPR consent and "Privacy choices"); SMS forwarding to one number
+- Pro (yearly with free trial, monthly, or lifetime): no ads, multiple target numbers, keyword/sender filters, custom message format, forward log with retry
+
 ### ✨ Improvements
 - Telegram/webhook forwards that fail while offline are retried automatically
 - No background service, persistent notification or alarms — the app runs only when an SMS arrives

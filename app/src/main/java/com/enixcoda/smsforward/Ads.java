@@ -31,6 +31,11 @@ final class Ads {
 
     /** Gathers consent (UMP), then initializes the SDK and runs onReady if ads are allowed. Safe to call on every start. */
     static void onStart(Activity activity, Runnable onReady) {
+        // Pro users see no ads, so don't ask them for ad consent
+        if (Billing.isPro(activity)) {
+            onReady.run();
+            return;
+        }
         ConsentInformation consent = UserMessagingPlatform.getConsentInformation(activity);
         consent.requestConsentInfoUpdate(activity, new ConsentRequestParameters.Builder().build(),
                 () -> UserMessagingPlatform.loadAndShowConsentFormIfRequired(activity, error -> enableIfAllowed(activity, onReady)),
