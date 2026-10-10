@@ -9,8 +9,9 @@ import java.util.Locale;
 // Uses plain null/empty checks instead of TextUtils so it runs in JVM unit tests.
 public class PhoneNumberUtils {
     private static final String TAG = "PhoneNumberUtils";
-    // Minimum digits for suffix matching (e.g. local "9876543210" vs "+919876543210")
-    private static final int MIN_SUFFIX_MATCH_DIGITS = 7;
+    // Minimum digits of the local number for suffix matching (e.g. "9876543210" vs "+919876543210");
+    // shorter local numbers would match unrelated senders that merely end the same way
+    private static final int MIN_SUFFIX_MATCH_DIGITS = 9;
 
     /**
      * Split a comma-separated string into trimmed, non-empty entries
@@ -74,8 +75,8 @@ public class PhoneNumberUtils {
     }
 
     /**
-     * Check if two phone numbers refer to the same number: exact match after cleaning, or a suffix match
-     * when both have enough digits (for cases where the country code might be missing on one side)
+     * Check if two phone numbers refer to the same number: exact match after cleaning, or an international
+     * number (+...) ending with a local number of enough digits (country code missing on one side)
      */
     public static boolean numbersMatch(String a, String b) {
         String cleanedA = cleanPhoneNumber(a);
@@ -86,8 +87,10 @@ public class PhoneNumberUtils {
         if (cleanedA.equals(cleanedB)) {
             return true;
         }
-        return cleanedA.length() >= MIN_SUFFIX_MATCH_DIGITS && cleanedB.length() >= MIN_SUFFIX_MATCH_DIGITS
-                && (cleanedA.endsWith(cleanedB) || cleanedB.endsWith(cleanedA));
+        String international = cleanedA.length() > cleanedB.length() ? cleanedA : cleanedB;
+        String local = international == cleanedA ? cleanedB : cleanedA;
+        return international.startsWith("+") && !local.startsWith("+")
+                && local.length() >= MIN_SUFFIX_MATCH_DIGITS && international.endsWith(local);
     }
 
     /**

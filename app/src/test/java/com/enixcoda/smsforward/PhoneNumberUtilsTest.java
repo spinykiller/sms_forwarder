@@ -27,8 +27,11 @@ public class PhoneNumberUtilsTest {
         assertTrue(PhoneNumberUtils.numbersMatch("+919876543210", "98765 43210"));
         assertTrue(PhoneNumberUtils.numbersMatch("0091 98765 43210", "+919876543210"));
         assertFalse(PhoneNumberUtils.numbersMatch("+919876543210", "+919876543211"));
-        // Short codes only match exactly
+        // Short codes and short local numbers only match exactly
         assertFalse(PhoneNumberUtils.numbersMatch("12345", "2345"));
+        assertFalse(PhoneNumberUtils.numbersMatch("+15551234567", "1234567"));
+        // Two local numbers of different lengths are different numbers
+        assertFalse(PhoneNumberUtils.numbersMatch("9876543210", "876543210"));
         assertFalse(PhoneNumberUtils.numbersMatch("HDFCBK", "HDFCBK"));
     }
 

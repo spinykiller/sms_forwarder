@@ -51,8 +51,12 @@ final class Ads {
                 == ConsentInformation.PrivacyOptionsRequirementStatus.REQUIRED;
     }
 
+    /** onReady runs either way: withdrawn consent must remove the banner, not just stop new ones. */
     static void showPrivacyOptions(Activity activity, Runnable onReady) {
-        UserMessagingPlatform.showPrivacyOptionsForm(activity, error -> enableIfAllowed(activity, onReady));
+        UserMessagingPlatform.showPrivacyOptionsForm(activity, error -> {
+            enableIfAllowed(activity, () -> { });
+            onReady.run();
+        });
     }
 
     /** Shows the slot with a banner in its container, or hides it for Pro users and without ad consent. */
