@@ -17,10 +17,12 @@ import android.util.Log;
 
 import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
+import androidx.work.Operation;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -117,7 +119,7 @@ public class SMSReceiver extends BroadcastReceiver {
 
             if (enableSMS) {
                 // Free forwards to the first number; the full list still guards against loops above.
-                for (String targetNumber : pro ? targetNumbers : targetNumbers.subList(0, Math.min(1, targetNumbers.size()))) {
+                for (String targetNumber : forwardTargets(pro, targetNumbers)) {
                     boolean sent = Forwarder.forwardViaSMS(subId, smsText, targetNumber);
                     ForwardLog.add(context, ForwardLog.SMS, targetNumber, senderLabel, rawMessageContent, smsText,
                             sent ? ForwardLog.SENT : ForwardLog.FAILED);
@@ -128,9 +130,21 @@ public class SMSReceiver extends BroadcastReceiver {
                 String destination = Forwarder.destination(context, channel);
                 if (destination.isEmpty()) continue;
                 long logId = ForwardLog.add(context, channel, destination, senderLabel, rawMessageContent, telegramText, ForwardLog.QUEUED);
-                ForwardWorker.enqueue(context, channel, destination, senderLabel, rawMessageContent, telegramText, logId);
+                Operation queued = ForwardWorker.enqueue(context, channel, destination, senderLabel, rawMessageContent, telegramText, logId);
+                // WorkManager persists asynchronously; finishing the broadcast first could let Android kill the process and drop it.
+                try {
+                    if (queued != null) queued.getResult().get();
+                } catch (ExecutionException | InterruptedException e) {
+                    Log.e(TAG, "Couldn't queue forward", e);
+                    ForwardLog.setStatus(context, logId, ForwardLog.FAILED);
+                }
             }
         }
+    }
+
+    /** Free forwards to the first number only; Pro to all. */
+    static List<String> forwardTargets(boolean pro, List<String> targetNumbers) {
+        return pro ? targetNumbers : targetNumbers.subList(0, Math.min(1, targetNumbers.size()));
     }
 
     private String lookupContactName(Context context, String phoneNumber) {

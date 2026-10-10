@@ -96,6 +96,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         updateStatus();
         bindAd(); // Pro status is cached in prefs
+        if (Billing.KEY_PRO.equals(key)) {
+            SettingsFragment settings = (SettingsFragment) getSupportFragmentManager().findFragmentById(R.id.settings);
+            if (settings != null && settings.isResumed()) settings.refresh();
+        }
     }
 
     static boolean hasSmsPermissions(Context context) {
@@ -262,6 +266,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         public void onResume() {
             super.onResume();
             // Permissions and battery settings change outside the app; refresh on return.
+            refresh();
+        }
+
+        void refresh() {
             Context context = requireContext();
             boolean contacts = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED;
             findPreference(getString(R.string.key_permission_status)).setSummary(!hasSmsPermissions(context)
@@ -314,7 +322,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             new Thread(() -> {
                 List<String> results = new ArrayList<>();
                 if (sms) {
-                    List<String> targets = PhoneNumberUtils.parsePhoneNumbers(prefs.getString(context.getString(R.string.key_target_sms), ""));
+                    List<String> targets = SMSReceiver.forwardTargets(Billing.isPro(context),
+                            PhoneNumberUtils.parsePhoneNumbers(prefs.getString(context.getString(R.string.key_target_sms), "")));
                     int sent = 0;
                     for (String target : targets) {
                         if (Forwarder.forwardViaSMS(SubscriptionManager.INVALID_SUBSCRIPTION_ID,

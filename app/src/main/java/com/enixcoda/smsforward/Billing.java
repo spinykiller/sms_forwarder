@@ -39,7 +39,7 @@ public final class Billing implements PurchasesUpdatedListener, BillingClientSta
     /** What the Pro screen sells. */
     enum Plan { ANNUAL, MONTHLY, LIFETIME }
 
-    private static final String KEY_PRO = "pro_active";
+    static final String KEY_PRO = "pro_active";
     private static final long INITIAL_RETRY_MS = 1_000;
     private static final long MAX_RETRY_MS = 60_000;
 
@@ -105,9 +105,15 @@ public final class Billing implements PurchasesUpdatedListener, BillingClientSta
             return;
         }
         retryMs = INITIAL_RETRY_MS;
-        query(PRO, BillingClient.ProductType.SUBS, details -> proDetails = details);
-        query(PRO_LIFETIME, BillingClient.ProductType.INAPP, details -> lifetimeDetails = details);
+        loadProducts();
         refresh();
+    }
+
+    /** Queries products not loaded yet (call when the Pro screen opens: an earlier query may have failed offline). */
+    void loadProducts() {
+        if (!client.isReady()) return;
+        if (proDetails == null) query(PRO, BillingClient.ProductType.SUBS, details -> proDetails = details);
+        if (lifetimeDetails == null) query(PRO_LIFETIME, BillingClient.ProductType.INAPP, details -> lifetimeDetails = details);
     }
 
     // Play Store updates / gets killed mid-session: reconnect, or purchases would go unacknowledged

@@ -57,6 +57,7 @@ public class ProActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         billing.addListener(render);
+        billing.loadProducts();
         billing.refresh();
         render();
     }

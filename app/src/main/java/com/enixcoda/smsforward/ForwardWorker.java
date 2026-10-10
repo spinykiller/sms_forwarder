@@ -10,6 +10,7 @@ import androidx.work.Constraints;
 import androidx.work.Data;
 import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
+import androidx.work.Operation;
 import androidx.work.OutOfQuotaPolicy;
 import androidx.work.WorkManager;
 import androidx.work.Worker;
@@ -44,8 +45,11 @@ public class ForwardWorker extends Worker {
         super(context, params);
     }
 
-    /** destination: chat ID or URL captured now; logId: the forward-log row to update, or -1 when not logged. */
-    static void enqueue(Context context, String channel, String destination, String senderLabel, String message, String text, long logId) {
+    /**
+     * destination: chat ID or URL captured now; logId: the forward-log row to update, or -1 when not logged.
+     * Returns the enqueue operation (await it before a broadcast finishes), or null if it couldn't be queued.
+     */
+    static Operation enqueue(Context context, String channel, String destination, String senderLabel, String message, String text, long logId) {
         // No-backup storage: queued SMS text must not leave the phone through Android backups.
         File dir = new File(context.getNoBackupFilesDir(), "forward_queue");
         File payload = new File(dir, UUID.randomUUID() + ".json");
@@ -59,7 +63,7 @@ public class ForwardWorker extends Worker {
         } catch (IOException | JSONException e) {
             Log.e(TAG, "Couldn't queue forward", e);
             ForwardLog.setStatus(context, logId, ForwardLog.FAILED);
-            return;
+            return null;
         }
         OneTimeWorkRequest.Builder request = new OneTimeWorkRequest.Builder(ForwardWorker.class)
                 .setConstraints(new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
@@ -68,7 +72,7 @@ public class ForwardWorker extends Worker {
         // Expedited runs right away, even in Doze. Before Android 12 it would need a foreground service, so it's skipped there.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
             request.setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST);
-        WorkManager.getInstance(context).enqueue(request.build());
+        return WorkManager.getInstance(context).enqueue(request.build());
     }
 
     @NonNull
