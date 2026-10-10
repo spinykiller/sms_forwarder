@@ -7,7 +7,7 @@
     <string name="enable_sms">Enable SMS</string>
     <string name="key_target_sms">key_sms_target</string>
     <string name="target_title_sms">Target phone numbers</string>
-    <string name="target_summary_sms">Multiple numbers separated by commas\nexample: +86 10000, +1 5551234567</string>
+    <string name="target_summary_sms">Multiple numbers separated by commas (Pro; free forwards to one)\nexample: +86 10000, +1 5551234567</string>
 
     <!-- Telegram -->
     <string name="key_enable_telegram">key_enable_telegram</string>
@@ -93,7 +93,7 @@
     <string name="summary_pro">Remove ads</string>
     <string name="remove_ads">Remove ads</string>
     <string name="pro_title">SMS Forward Pro</string>
-    <string name="pro_features">• No ads\n• Forward only messages matching keywords or senders\n• Custom message format\n• Forward log with retry\n• Supports development</string>
+    <string name="pro_features">• No ads\n• Forward to multiple numbers\n• Forward only messages matching keywords or senders\n• Custom message format\n• Forward log with retry\n• Supports development</string>
     <string name="pro_plan_annual">Yearly — %s</string>
     <string name="pro_plan_annual_trial">Yearly — free trial, then %s</string>
     <string name="pro_plan_monthly">Monthly — %s</string>
@@ -132,6 +132,7 @@
 
     <!-- Validation -->
     <string name="invalid_numbers">Enter phone numbers separated by commas</string>
+    <string name="free_one_number">The free version forwards to one number. Get Pro to forward to several.</string>
     <string name="invalid_chat_id">Enter a numeric chat ID or @username</string>
     <string name="invalid_token">That doesn\'t look like a bot token (123456:ABC…)</string>
     <string name="invalid_url">Enter a full https:// URL</string>

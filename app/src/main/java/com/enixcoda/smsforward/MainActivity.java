@@ -188,6 +188,16 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             // Every target number must contain digits (entries without any would be silently dropped)
             bindText(R.string.key_target_sms, R.string.target_summary_sms, InputType.TYPE_CLASS_PHONE, false,
                     v -> PhoneNumberUtils.splitList(v).size() == PhoneNumberUtils.parsePhoneNumbers(v).size(), R.string.invalid_numbers);
+            // Free forwards to one number; checked after the format check above
+            EditTextPreference targets = findPreference(getString(R.string.key_target_sms));
+            Preference.OnPreferenceChangeListener formatCheck = targets.getOnPreferenceChangeListener();
+            targets.setOnPreferenceChangeListener((p, newValue) -> {
+                if (!formatCheck.onPreferenceChange(p, newValue)) return false;
+                if (Billing.isPro(requireContext()) || PhoneNumberUtils.parsePhoneNumbers((String) newValue).size() <= 1) return true;
+                Toast.makeText(requireContext(), R.string.free_one_number, Toast.LENGTH_LONG).show();
+                startActivity(new Intent(requireContext(), ProActivity.class));
+                return false;
+            });
             bindText(R.string.key_target_telegram, R.string.target_summary_telegram, InputType.TYPE_CLASS_TEXT, false,
                     v -> v.matches("-?\\d+|@\\w+"), R.string.invalid_chat_id);
             bindText(R.string.key_telegram_apikey, R.string.summary_telegram_apikey,

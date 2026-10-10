@@ -6,7 +6,7 @@ A lightweight Android application that automatically forwards SMS messages to mu
 
 ### 📱 Core Functionality
 - **Multi-Channel Forwarding**: Forward SMS via SMS, Telegram, or webhooks
-- **Multiple Recipients**: Support for multiple phone numbers (comma-separated)
+- **Multiple Recipients**: Support for multiple phone numbers (comma-separated, Pro)
 - **Reverse Messaging**: Send messages back to original sender
 - **Loop Prevention**: Prevents forwarding messages to the same number
 - **Contact Integration**: Shows sender names from contacts (optional permission)
@@ -15,8 +15,8 @@ A lightweight Android application that automatically forwards SMS messages to mu
 - **Dual SIM**: Forwards and replies on the SIM that received the message
 
 ### 💎 Free with ads, or Pro
-- Free: every forwarding feature, with one banner on the settings screen
-- Pro (yearly with free trial, monthly, or lifetime): no ads
+- Free: SMS (one number), Telegram and webhook forwarding, blocklist, reverse messaging — with one banner on the settings screen
+- Pro (yearly with free trial, monthly, or lifetime): no ads, multiple target numbers, keyword/sender filters, custom message format, forward log
 
 ### 🔋 Battery & Performance Optimized
 - **No Background Service**: Android wakes the app only when an SMS arrives — no persistent notification, no polling

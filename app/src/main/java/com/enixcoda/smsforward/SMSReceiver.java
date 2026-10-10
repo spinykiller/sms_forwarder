@@ -116,7 +116,8 @@ public class SMSReceiver extends BroadcastReceiver {
                     senderLabel, senderNumber, senderNames, rawMessageContent);
 
             if (enableSMS) {
-                for (String targetNumber : targetNumbers) {
+                // Free forwards to the first number; the full list still guards against loops above.
+                for (String targetNumber : pro ? targetNumbers : targetNumbers.subList(0, Math.min(1, targetNumbers.size()))) {
                     boolean sent = Forwarder.forwardViaSMS(subId, smsText, targetNumber);
                     ForwardLog.add(context, ForwardLog.SMS, targetNumber, senderLabel, rawMessageContent, smsText,
                             sent ? ForwardLog.SENT : ForwardLog.FAILED);
