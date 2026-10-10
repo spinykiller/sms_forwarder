@@ -123,14 +123,12 @@ public class SMSReceiver extends BroadcastReceiver {
                             sent ? ForwardLog.SENT : ForwardLog.FAILED);
                 }
             }
-            // Try now; a transient failure (offline, server down) is queued and retried once online.
+            // Network sends run in a worker: the broadcast has a time limit, and the worker retries when offline.
             for (String channel : ForwardWorker.CHANNELS) {
-                if (!(ForwardWorker.TELEGRAM.equals(channel) ? enableTelegram : enableWeb)) continue;
-                int result = Forwarder.send(context, channel, senderLabel, rawMessageContent, telegramText);
-                long logId = ForwardLog.add(context, channel, null, senderLabel, rawMessageContent, telegramText,
-                        result == Forwarder.OK ? ForwardLog.DELIVERED : result == Forwarder.RETRY ? ForwardLog.QUEUED : ForwardLog.FAILED);
-                if (result == Forwarder.RETRY)
-                    ForwardWorker.enqueue(context, channel, senderLabel, rawMessageContent, telegramText, logId);
+                String destination = Forwarder.destination(context, channel);
+                if (destination.isEmpty()) continue;
+                long logId = ForwardLog.add(context, channel, destination, senderLabel, rawMessageContent, telegramText, ForwardLog.QUEUED);
+                ForwardWorker.enqueue(context, channel, destination, senderLabel, rawMessageContent, telegramText, logId);
             }
         }
     }

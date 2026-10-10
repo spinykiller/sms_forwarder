@@ -144,6 +144,7 @@
     <string name="test_sending">Sending test…</string>
     <string name="test_result_title">Test results</string>
     <string name="test_sms_sent">SMS: sent to %d number(s)</string>
+    <string name="test_sms_failed">SMS: %d number(s) failed — check the SMS permission</string>
     <string name="test_sms_no_numbers">SMS: no numbers set</string>
     <string name="test_ok">%s: delivered ✓</string>
     <string name="test_retry">%s: network or server error — try again</string>

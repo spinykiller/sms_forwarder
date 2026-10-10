@@ -63,7 +63,7 @@ public class LogActivity extends AppCompatActivity {
     }
 
     private String channelLabel(ForwardLog.Entry e) {
-        return ForwardLog.SMS.equals(e.channel) ? "SMS → " + e.target : ForwardWorker.TELEGRAM.equals(e.channel) ? "Telegram" : "Web";
+        return (ForwardLog.SMS.equals(e.channel) ? "SMS" : ForwardWorker.TELEGRAM.equals(e.channel) ? "Telegram" : "Web") + " → " + e.target;
     }
 
     private String statusLabel(String status) {
@@ -82,7 +82,7 @@ public class LogActivity extends AppCompatActivity {
                 .setMessage(getString(R.string.log_retry_confirm, channelLabel(e)))
                 .setPositiveButton(R.string.log_retry, (dialog, which) -> {
                     ForwardLog.setStatus(this, e.id, ForwardLog.QUEUED);
-                    ForwardWorker.enqueue(this, e.channel, e.sender, e.message, e.text, e.id);
+                    ForwardWorker.enqueue(this, e.channel, e.target, e.sender, e.message, e.text, e.id);
                     load();
                 })
                 .setNegativeButton(android.R.string.cancel, null)

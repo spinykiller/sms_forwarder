@@ -315,17 +315,22 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 List<String> results = new ArrayList<>();
                 if (sms) {
                     List<String> targets = PhoneNumberUtils.parsePhoneNumbers(prefs.getString(context.getString(R.string.key_target_sms), ""));
+                    int sent = 0;
                     for (String target : targets) {
-                        Forwarder.forwardViaSMS(SubscriptionManager.INVALID_SUBSCRIPTION_ID,
-                                MessageRules.format(MessageRules.DEFAULT_SMS_FORMAT, sender, sender, "", message), target);
+                        if (Forwarder.forwardViaSMS(SubscriptionManager.INVALID_SUBSCRIPTION_ID,
+                                MessageRules.format(MessageRules.DEFAULT_SMS_FORMAT, sender, sender, "", message), target)) sent++;
                     }
-                    results.add(targets.isEmpty()
-                            ? context.getString(R.string.test_sms_no_numbers)
-                            : context.getString(R.string.test_sms_sent, targets.size()));
+                    results.add(targets.isEmpty() ? context.getString(R.string.test_sms_no_numbers)
+                            : sent == targets.size() ? context.getString(R.string.test_sms_sent, sent)
+                            : context.getString(R.string.test_sms_failed, targets.size() - sent));
                 }
                 String telegramText = MessageRules.format(MessageRules.DEFAULT_TELEGRAM_FORMAT, sender, sender, "", message);
-                if (telegram) results.add(describe(context, "Telegram", Forwarder.send(context, ForwardWorker.TELEGRAM, sender, message, telegramText)));
-                if (web) results.add(describe(context, "Web", Forwarder.send(context, ForwardWorker.WEB, sender, message, telegramText)));
+                for (String channel : ForwardWorker.CHANNELS) {
+                    String destination = Forwarder.destination(context, channel);
+                    if (!(ForwardWorker.TELEGRAM.equals(channel) ? telegram : web)) continue;
+                    results.add(describe(context, ForwardWorker.TELEGRAM.equals(channel) ? "Telegram" : "Web",
+                            destination.isEmpty() ? Forwarder.FAIL : Forwarder.send(context, channel, destination, sender, message, telegramText)));
+                }
                 if (getActivity() == null) return;
                 getActivity().runOnUiThread(() -> {
                     if (!isAdded()) return;

@@ -6,12 +6,14 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 /** Pro: on-device history of the newest forwards. Nothing is logged for free users. */
 final class ForwardLog extends SQLiteOpenHelper {
     static final String SMS = "sms"; // channel for SMS rows; Telegram/Web use ForwardWorker's channel names
+    // target: the phone number, Telegram chat ID or webhook URL forwarded to
     static final String SENT = "sent";           // SMS handed to the carrier
     static final String DELIVERED = "delivered"; // Telegram/Web accepted it
     static final String QUEUED = "queued";       // waiting for a retry
@@ -41,8 +43,9 @@ final class ForwardLog extends SQLiteOpenHelper {
         return instance;
     }
 
+    // In no-backup storage: SMS text must not leave the phone through Android backups.
     private ForwardLog(Context context) {
-        super(context, "forward_log.db", null, 1);
+        super(context, new File(context.getNoBackupFilesDir(), "forward_log.db").getPath(), null, 1);
     }
 
     @Override

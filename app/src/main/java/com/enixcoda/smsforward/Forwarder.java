@@ -48,27 +48,32 @@ public class Forwarder {
         }
     }
 
-    /**
-     * Forwards via Telegram (sends the formatted text) or Web (posts sender and raw message as JSON) per the
-     * current settings. Blocking: call off the main thread.
-     */
-    static int send(Context context, String channel, String senderLabel, String message, String text) {
+    /** The configured Telegram chat ID or webhook URL, or "" when the method is off or not set up. */
+    static String destination(Context context, String channel) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean telegram = ForwardWorker.TELEGRAM.equals(channel);
+        if (!prefs.getBoolean(context.getString(telegram ? R.string.key_enable_telegram : R.string.key_enable_web), false)) return "";
+        return prefs.getString(context.getString(telegram ? R.string.key_target_telegram : R.string.key_target_web), "").trim();
+    }
+
+    /**
+     * Forwards to a destination captured when the SMS arrived (so a later settings change can't redirect it):
+     * Telegram sends the formatted text, Web posts sender and raw message as JSON. Fails if the method has
+     * since been turned off. Blocking: call off the main thread.
+     */
+    static int send(Context context, String channel, String destination, String senderLabel, String message, String text) {
+        if (destination(context, channel).isEmpty()) return FAIL;
         if (ForwardWorker.TELEGRAM.equals(channel)) {
-            String chatId = prefs.getString(context.getString(R.string.key_target_telegram), "").trim();
-            String token = prefs.getString(context.getString(R.string.key_telegram_apikey), "").trim();
-            if (!prefs.getBoolean(context.getString(R.string.key_enable_telegram), false) || chatId.isEmpty() || token.isEmpty())
-                return FAIL;
+            String token = PreferenceManager.getDefaultSharedPreferences(context)
+                    .getString(context.getString(R.string.key_telegram_apikey), "").trim();
+            if (token.isEmpty()) return FAIL;
             return post("https://api.telegram.org/bot" + token + "/sendMessage",
                     "application/x-www-form-urlencoded",
-                    "chat_id=" + encode(chatId) + "&text=" + encode(text));
+                    "chat_id=" + encode(destination) + "&text=" + encode(text));
         }
-        String endpoint = prefs.getString(context.getString(R.string.key_target_web), "").trim();
-        if (!prefs.getBoolean(context.getString(R.string.key_enable_web), false) || endpoint.isEmpty())
-            return FAIL;
         try {
             JSONObject body = new JSONObject().put("from", senderLabel).put("message", message);
-            return post(endpoint, "application/json; charset=utf-8", body.toString());
+            return post(destination, "application/json; charset=utf-8", body.toString());
         } catch (JSONException e) {
             return FAIL;
         }
