@@ -6,6 +6,17 @@ def keystorePropertiesFile = rootProject.file('keystore.properties')
 def keystoreProperties = new Properties()
 if (keystorePropertiesFile.exists()) keystorePropertiesFile.withInputStream { keystoreProperties.load(it) }
 
+// AdMob IDs (not secret) come from gradle.properties. Debug always uses Google's public test IDs:
+// live units on dev devices count as invalid traffic.
+def admobTestAppId = 'ca-app-pub-3940256099942544~3347511713'
+def admobTestBannerUnit = 'ca-app-pub-3940256099942544/9214589741'
+def admobAppId = findProperty('admobAppId') ?: admobTestAppId
+def admobBannerUnit = findProperty('admobBannerUnit') ?: admobTestBannerUnit
+gradle.taskGraph.whenReady { graph ->
+    if (graph.allTasks.any { it.name ==~ /(assemble|bundle)Release/ } && (admobAppId == admobTestAppId || admobBannerUnit == admobTestBannerUnit))
+        throw new GradleException('Set admobAppId and admobBannerUnit in gradle.properties to the real AdMob IDs before a release build')
+}
+
 android {
     compileSdk 36
     defaultConfig {
@@ -14,6 +25,8 @@ android {
         targetSdkVersion 36
         versionCode 9
         versionName "1.1.0"
+        manifestPlaceholders = [admobAppId: admobAppId]
+        buildConfigField 'String', 'BANNER_UNIT', "\"$admobBannerUnit\""
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     
@@ -30,6 +43,8 @@ android {
 
     buildTypes {
         debug {
+            manifestPlaceholders = [admobAppId: admobTestAppId]
+            buildConfigField 'String', 'BANNER_UNIT', "\"$admobTestBannerUnit\""
             minifyEnabled false
             shrinkResources false
             debuggable true
@@ -48,9 +63,9 @@ android {
         }
     }
     
-    // Enable resource shrinking
+    // BuildConfig carries the AdMob banner unit
     buildFeatures {
-        buildConfig false
+        buildConfig true
     }
     
     // Optimize APK
@@ -83,6 +98,14 @@ dependencies {
     implementation 'androidx.preference:preference:1.2.1'
     // Retries Telegram/Web forwards that fail while offline
     implementation 'androidx.work:work-runtime:2.9.1'
+
+    // Monetization: banner ads, GDPR consent, Pro purchases (same versions as MemoryMedic)
+    implementation 'com.google.android.gms:play-services-ads:23.5.0'
+    implementation 'com.google.android.ump:user-messaging-platform:3.1.0'
+    implementation 'com.android.billingclient:billing:8.0.0'
+    // The ads SDK brings Guava at runtime, which empties the listenablefuture artifact WorkManager's Worker
+    // compiles against; declare the same Guava so ListenableFuture is on the compile classpath (no size change)
+    implementation 'com.google.guava:guava:31.1-android'
     
     // Material Design (only if needed for UI)
     implementation 'com.google.android.material:material:1.10.0'

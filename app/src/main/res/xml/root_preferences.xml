@@ -2,6 +2,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:iconSpaceReserved="false">
 
+    <Preference
+        android:key="@string/key_pro"
+        android:title="@string/title_pro"
+        android:summary="@string/summary_pro"
+        app:iconSpaceReserved="false" />
+
     <PreferenceCategory
         app:iconSpaceReserved="false"
         app:title="@string/header_sms">
@@ -116,6 +122,13 @@
             android:key="@string/key_autostart_settings"
             android:title="@string/title_autostart_settings"
             android:summary="@string/summary_autostart_settings"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            android:key="@string/key_privacy_choices"
+            android:title="@string/title_privacy_choices"
+            android:summary="@string/summary_privacy_choices"
+            app:isPreferenceVisible="false"
             app:iconSpaceReserved="false" />
 
     </PreferenceCategory>

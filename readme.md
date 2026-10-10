@@ -14,6 +14,10 @@ A lightweight Android application that automatically forwards SMS messages to mu
 - **Offline Retry**: Telegram/webhook forwards that fail while offline are retried once the network is back
 - **Dual SIM**: Forwards and replies on the SIM that received the message
 
+### 💎 Free with ads, or Pro
+- Free: every forwarding feature, with one banner on the settings screen
+- Pro (yearly with free trial, monthly, or lifetime): no ads
+
 ### 🔋 Battery & Performance Optimized
 - **No Background Service**: Android wakes the app only when an SMS arrives — no persistent notification, no polling
 

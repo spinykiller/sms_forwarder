@@ -12,16 +12,13 @@ import android.provider.Settings;
 import android.telephony.SubscriptionManager;
 import android.text.InputType;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.EditTextPreference;
@@ -39,16 +36,21 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private static final String KEY_BATTERY_PROMPTED = "battery_prompted";
 
     private TextView statusText;
+    private View adSlot;
+    private ViewGroup adContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        applySystemBarInsets();
+        SystemBars.apply(this, findViewById(R.id.header));
         statusText = findViewById(R.id.status_text);
         statusText.setOnClickListener(v -> {
             if (!hasSmsPermissions(this)) requestPermissions();
         });
+        adSlot = findViewById(R.id.ad_slot);
+        adContainer = findViewById(R.id.ad_container);
+        findViewById(R.id.remove_ads).setOnClickListener(v -> startActivity(new Intent(this, ProActivity.class)));
 
         if (savedInstanceState == null) {
             getSupportFragmentManager()
@@ -60,18 +62,21 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         }
     }
 
-    /** Draws behind the system bars on every Android version (enforced from Android 15) and pads content clear of them. */
-    private void applySystemBarInsets() {
-        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-        View header = findViewById(R.id.header);
-        View settings = findViewById(R.id.settings);
-        int headerPadding = header.getPaddingTop();
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, windowInsets) -> {
-            Insets bars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
-            header.setPadding(headerPadding + bars.left, headerPadding + bars.top, headerPadding + bars.right, headerPadding);
-            settings.setPadding(bars.left, 0, bars.right, bars.bottom);
-            return WindowInsetsCompat.CONSUMED;
-        });
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Billing.get(this).refresh();
+        Ads.onStart(this, this::bindAd);
+    }
+
+    @Override
+    protected void onDestroy() {
+        Ads.destroyBanner(adContainer);
+        super.onDestroy();
+    }
+
+    private void bindAd() {
+        Ads.bindBanner(this, adSlot, adContainer);
     }
 
     @Override
@@ -90,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         updateStatus();
+        bindAd(); // Pro status is cached in prefs
     }
 
     static boolean hasSmsPermissions(Context context) {
@@ -193,6 +199,15 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             bindText(R.string.key_blocked_numbers, R.string.summary_blocked_numbers, InputType.TYPE_CLASS_TEXT, false,
                     v -> true, 0);
 
+            findPreference(getString(R.string.key_pro)).setOnPreferenceClickListener(preference -> {
+                startActivity(new Intent(requireContext(), ProActivity.class));
+                return true;
+            });
+            findPreference(getString(R.string.key_privacy_choices)).setOnPreferenceClickListener(preference -> {
+                MainActivity activity = (MainActivity) requireActivity();
+                Ads.showPrivacyOptions(activity, activity::bindAd);
+                return true;
+            });
             findPreference(getString(R.string.key_send_test)).setOnPreferenceClickListener(preference -> {
                 sendTest();
                 return true;
@@ -228,6 +243,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     : contacts ? R.string.permissions_ok : R.string.permissions_contacts_missing);
             findPreference(getString(R.string.key_battery_optimization)).setSummary(
                     BatteryOptimizationHelper.isBatteryOptimized(context) ? R.string.battery_optimized : R.string.battery_ok);
+            findPreference(getString(R.string.key_pro)).setSummary(Billing.isPro(context) ? R.string.pro_active : R.string.summary_pro);
+            findPreference(getString(R.string.key_privacy_choices)).setVisible(Ads.privacyOptionsRequired(context));
         }
 
         /** Shows the current value as the summary (help text when empty), sets the keyboard and rejects invalid input. */

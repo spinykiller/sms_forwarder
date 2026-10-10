@@ -51,6 +51,32 @@
     <string name="title_send_test">Send test message</string>
     <string name="summary_send_test">Sends a test through each enabled method (SMS may cost per your plan)</string>
 
+    <string name="key_privacy_choices">key_privacy_choices</string>
+    <string name="title_privacy_choices">Privacy choices</string>
+    <string name="summary_privacy_choices">Change your ad consent</string>
+
+    <!-- Pro -->
+    <string name="key_pro">key_pro</string>
+    <string name="title_pro">SMS Forward Pro</string>
+    <string name="summary_pro">Remove ads</string>
+    <string name="remove_ads">Remove ads</string>
+    <string name="pro_title">SMS Forward Pro</string>
+    <string name="pro_features">• No ads\n• Supports development</string>
+    <string name="pro_plan_annual">Yearly — %s</string>
+    <string name="pro_plan_annual_trial">Yearly — free trial, then %s</string>
+    <string name="pro_plan_monthly">Monthly — %s</string>
+    <string name="pro_plan_lifetime">Lifetime — %s, one payment</string>
+    <string name="pro_terms_subscription">Renews automatically at %s until you cancel. Cancel anytime in Google Play.</string>
+    <string name="pro_terms_trial">Free during the trial, then %s per year, renewing until you cancel. Cancel before the trial ends and you won\'t be charged.</string>
+    <string name="pro_terms_lifetime">One payment. No subscription.</string>
+    <string name="pro_buy">Continue</string>
+    <string name="pro_restore">Restore purchase</string>
+    <string name="pro_restoring">Checking your purchases…</string>
+    <string name="pro_manage">Manage subscription</string>
+    <string name="pro_active">Pro is active ✓</string>
+    <string name="pro_pending">Payment pending — Pro unlocks when it completes</string>
+    <string name="pro_store_unavailable">Google Play billing isn\'t available right now. Check that you\'re signed in to Play and online.</string>
+
     <!-- Status -->
     <string name="status_permission_missing">SMS permission needed — tap to grant</string>
     <string name="status_off">Forwarding is off — turn on a method below</string>
