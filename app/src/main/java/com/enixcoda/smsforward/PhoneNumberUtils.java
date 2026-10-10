@@ -131,15 +131,24 @@ public class PhoneNumberUtils {
      * @return true if sender is blocked
      */
     public static boolean isSenderBlocked(String senderNumber, List<String> blockedEntries) {
-        if (isEmpty(senderNumber) || blockedEntries == null) {
+        boolean blocked = senderMatchesAny(senderNumber, blockedEntries);
+        if (blocked) Log.d(TAG, "Sender is blocked");
+        return blocked;
+    }
+
+    /**
+     * Check if a sender matches any entry: a phone number (see {@link #numbersMatch}) or a sender
+     * name such as "HDFCBK", which matches any sender ID containing it (e.g. "AX-HDFCBK")
+     */
+    public static boolean senderMatchesAny(String senderNumber, List<String> entries) {
+        if (isEmpty(senderNumber) || entries == null) {
             return false;
         }
 
         String sender = senderNumber.toLowerCase(Locale.ROOT);
-        for (String blocked : blockedEntries) {
-            boolean isName = blocked.matches(".*[A-Za-z].*");
-            if (isName ? sender.contains(blocked.toLowerCase(Locale.ROOT)) : numbersMatch(senderNumber, blocked)) {
-                Log.d(TAG, "Sender is blocked");
+        for (String entry : entries) {
+            boolean isName = entry.matches(".*[A-Za-z].*");
+            if (isName ? sender.contains(entry.toLowerCase(Locale.ROOT)) : numbersMatch(senderNumber, entry)) {
                 return true;
             }
         }

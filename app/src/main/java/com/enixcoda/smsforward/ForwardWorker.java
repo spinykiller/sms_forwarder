@@ -23,6 +23,7 @@ public class ForwardWorker extends Worker {
     private static final String KEY_CHANNEL = "channel";
     private static final String KEY_FROM = "from";
     private static final String KEY_MESSAGE = "message";
+    private static final String KEY_TEXT = "text";
     // With exponential backoff from 30s (capped at 5h by WorkManager) this spans roughly a day.
     private static final int MAX_ATTEMPTS = 10;
 
@@ -30,7 +31,7 @@ public class ForwardWorker extends Worker {
         super(context, params);
     }
 
-    static void enqueue(Context context, String channel, String senderLabel, String message) {
+    static void enqueue(Context context, String channel, String senderLabel, String message, String text) {
         WorkManager.getInstance(context).enqueue(new OneTimeWorkRequest.Builder(ForwardWorker.class)
                 .setConstraints(new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
                 .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 30, TimeUnit.SECONDS)
@@ -38,6 +39,7 @@ public class ForwardWorker extends Worker {
                         .putString(KEY_CHANNEL, channel)
                         .putString(KEY_FROM, senderLabel)
                         .putString(KEY_MESSAGE, message)
+                        .putString(KEY_TEXT, text)
                         .build())
                 .build());
     }
@@ -46,7 +48,7 @@ public class ForwardWorker extends Worker {
     @Override
     public Result doWork() {
         Data in = getInputData();
-        int result = Forwarder.send(getApplicationContext(), in.getString(KEY_CHANNEL), in.getString(KEY_FROM), in.getString(KEY_MESSAGE));
+        int result = Forwarder.send(getApplicationContext(), in.getString(KEY_CHANNEL), in.getString(KEY_FROM), in.getString(KEY_MESSAGE), in.getString(KEY_TEXT));
         if (result == Forwarder.RETRY && getRunAttemptCount() < MAX_ATTEMPTS) return Result.retry();
         return result == Forwarder.OK ? Result.success() : Result.failure();
     }

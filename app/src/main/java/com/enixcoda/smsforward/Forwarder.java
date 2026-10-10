@@ -37,23 +37,25 @@ public class Forwarder {
         smsManager.sendMultipartTextMessage(number, null, smsManager.divideMessage(content), null, null);
     }
 
-    public static void forwardViaSMS(int subId, String senderLabel, String forwardContent, String forwardNumber) {
+    public static void forwardViaSMS(int subId, String text, String forwardNumber) {
         try {
-            sendSMS(subId, forwardNumber, String.format("From %s:\n%s", senderLabel, forwardContent));
+            sendSMS(subId, forwardNumber, text);
         } catch (RuntimeException e) {
             Log.e(TAG, "Error forwarding SMS: " + e, e);
         }
     }
 
-    /** Forwards via Telegram or Web per the current settings. Blocking: call off the main thread. */
-    static int send(Context context, String channel, String senderLabel, String message) {
+    /**
+     * Forwards via Telegram (sends the formatted text) or Web (posts sender and raw message as JSON) per the
+     * current settings. Blocking: call off the main thread.
+     */
+    static int send(Context context, String channel, String senderLabel, String message, String text) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         if (ForwardWorker.TELEGRAM.equals(channel)) {
             String chatId = prefs.getString(context.getString(R.string.key_target_telegram), "").trim();
             String token = prefs.getString(context.getString(R.string.key_telegram_apikey), "").trim();
             if (!prefs.getBoolean(context.getString(R.string.key_enable_telegram), false) || chatId.isEmpty() || token.isEmpty())
                 return FAIL;
-            String text = String.format("Message from %s:\n%s", senderLabel, message);
             return post("https://api.telegram.org/bot" + token + "/sendMessage",
                     "application/x-www-form-urlencoded",
                     "chat_id=" + encode(chatId) + "&text=" + encode(text));

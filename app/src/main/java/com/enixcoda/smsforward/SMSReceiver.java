@@ -60,6 +60,13 @@ public class SMSReceiver extends BroadcastReceiver {
         final String blockedNumbersString = sharedPreferences.getString(context.getString(R.string.key_blocked_numbers), "");
         final List<String> blockedEntries = PhoneNumberUtils.splitList(blockedNumbersString);
 
+        // Pro: forward only matching messages, custom format. Ignored if Pro lapses (forward everything, default format).
+        final boolean pro = Billing.isPro(context);
+        final boolean enableFilter = pro && sharedPreferences.getBoolean(context.getString(R.string.key_enable_filter), false);
+        final List<String> filterKeywords = PhoneNumberUtils.splitList(sharedPreferences.getString(context.getString(R.string.key_filter_keywords), ""));
+        final List<String> filterSenders = PhoneNumberUtils.splitList(sharedPreferences.getString(context.getString(R.string.key_filter_senders), ""));
+        final String template = pro ? sharedPreferences.getString(context.getString(R.string.key_template), "").trim() : "";
+
         if (!enableSMS && !enableTelegram && !enableWeb) return;
 
         // Reply/forward on the SIM that received the message (matters on dual-SIM phones).
@@ -96,18 +103,27 @@ public class SMSReceiver extends BroadcastReceiver {
                 continue;
             }
 
+            if (enableFilter && !MessageRules.matchesFilter(senderNumber, rawMessageContent, filterKeywords, filterSenders)) {
+                Log.d(TAG, "Message doesn't match the filter, not forwarded");
+                continue;
+            }
+
             String senderNames = lookupContactName(context, senderNumber);
             String senderLabel = (senderNames.isEmpty() ? "" : senderNames + " ") + "(" + senderNumber + ")";
+            String smsText = MessageRules.format(template.isEmpty() ? MessageRules.DEFAULT_SMS_FORMAT : template,
+                    senderLabel, senderNumber, senderNames, rawMessageContent);
+            String telegramText = MessageRules.format(template.isEmpty() ? MessageRules.DEFAULT_TELEGRAM_FORMAT : template,
+                    senderLabel, senderNumber, senderNames, rawMessageContent);
 
             if (enableSMS) {
                 for (String targetNumber : targetNumbers) {
-                    Forwarder.forwardViaSMS(subId, senderLabel, rawMessageContent, targetNumber);
+                    Forwarder.forwardViaSMS(subId, smsText, targetNumber);
                 }
             }
             // Try now; a transient failure (offline, server down) is queued and retried once online.
             for (String channel : ForwardWorker.CHANNELS) {
-                if (Forwarder.send(context, channel, senderLabel, rawMessageContent) == Forwarder.RETRY)
-                    ForwardWorker.enqueue(context, channel, senderLabel, rawMessageContent);
+                if (Forwarder.send(context, channel, senderLabel, rawMessageContent, telegramText) == Forwarder.RETRY)
+                    ForwardWorker.enqueue(context, channel, senderLabel, rawMessageContent, telegramText);
             }
         }
     }

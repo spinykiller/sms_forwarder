@@ -36,6 +36,24 @@
     <string name="title_blocked_numbers">Blocked Phone Numbers</string>
     <string name="summary_blocked_numbers">Messages from these numbers will not be forwarded\nMultiple numbers separated by commas\nexample: +86 10000, +1 5551234567</string>
 
+    <!-- Pro features -->
+    <string name="header_pro_features">Pro features</string>
+    <string name="key_pro_unlock">key_pro_unlock</string>
+    <string name="title_pro_unlock">Unlock with Pro</string>
+    <string name="summary_pro_unlock">Filter which messages are forwarded and customize the forwarded text</string>
+    <string name="key_enable_filter">key_enable_filter</string>
+    <string name="enable_filter">Only forward matching messages</string>
+    <string name="key_filter_keywords">key_filter_keywords</string>
+    <string name="title_filter_keywords">Keywords</string>
+    <string name="summary_filter_keywords">Forward only messages containing any of these (comma-separated, any case)\nexample: OTP, code</string>
+    <string name="key_filter_senders">key_filter_senders</string>
+    <string name="title_filter_senders">Senders</string>
+    <string name="summary_filter_senders">…and only from these numbers or sender names (both must match when both are set)\nexample: HDFCBK, +1 5551234567</string>
+    <string name="key_template">key_template</string>
+    <string name="title_template">Message format</string>
+    <string name="summary_template">Text sent by SMS and Telegram. Placeholders: {from}, {sender}, {name}, {message}\nDefault: From {from}: {message}</string>
+    <string name="invalid_template">The format must include {message}</string>
+
     <!-- System -->
     <string name="header_system">System Settings</string>
     <string name="key_permission_status">key_permission_status</string>
@@ -61,7 +79,7 @@
     <string name="summary_pro">Remove ads</string>
     <string name="remove_ads">Remove ads</string>
     <string name="pro_title">SMS Forward Pro</string>
-    <string name="pro_features">• No ads\n• Supports development</string>
+    <string name="pro_features">• No ads\n• Forward only messages matching keywords or senders\n• Custom message format\n• Supports development</string>
     <string name="pro_plan_annual">Yearly — %s</string>
     <string name="pro_plan_annual_trial">Yearly — free trial, then %s</string>
     <string name="pro_plan_monthly">Monthly — %s</string>

@@ -96,6 +96,45 @@
 
     </PreferenceCategory>
 
+    <!-- Pro: disabled with an unlock entry for free users -->
+    <PreferenceCategory
+        app:title="@string/header_pro_features"
+        app:iconSpaceReserved="false">
+
+        <Preference
+            android:key="@string/key_pro_unlock"
+            android:title="@string/title_pro_unlock"
+            android:summary="@string/summary_pro_unlock"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:key="@string/key_enable_filter"
+            app:iconSpaceReserved="false"
+            app:title="@string/enable_filter" />
+
+        <EditTextPreference
+            android:defaultValue=""
+            android:key="@string/key_filter_keywords"
+            android:title="@string/title_filter_keywords"
+            android:summary="@string/summary_filter_keywords"
+            app:iconSpaceReserved="false" />
+
+        <EditTextPreference
+            android:defaultValue=""
+            android:key="@string/key_filter_senders"
+            android:title="@string/title_filter_senders"
+            android:summary="@string/summary_filter_senders"
+            app:iconSpaceReserved="false" />
+
+        <EditTextPreference
+            android:defaultValue=""
+            android:key="@string/key_template"
+            android:title="@string/title_template"
+            android:summary="@string/summary_template"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
     <PreferenceCategory
         app:title="@string/header_system"
         app:iconSpaceReserved="false">

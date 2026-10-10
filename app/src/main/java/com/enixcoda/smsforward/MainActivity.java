@@ -198,6 +198,18 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     v -> "https".equalsIgnoreCase(Uri.parse(v).getScheme()) && Uri.parse(v).getHost() != null, R.string.invalid_url);
             bindText(R.string.key_blocked_numbers, R.string.summary_blocked_numbers, InputType.TYPE_CLASS_TEXT, false,
                     v -> true, 0);
+            bindText(R.string.key_filter_keywords, R.string.summary_filter_keywords, InputType.TYPE_CLASS_TEXT, false,
+                    v -> true, 0);
+            bindText(R.string.key_filter_senders, R.string.summary_filter_senders, InputType.TYPE_CLASS_TEXT, false,
+                    v -> true, 0);
+            bindText(R.string.key_template, R.string.summary_template,
+                    InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE, false,
+                    v -> v.contains("{message}"), R.string.invalid_template);
+
+            findPreference(getString(R.string.key_pro_unlock)).setOnPreferenceClickListener(preference -> {
+                startActivity(new Intent(requireContext(), ProActivity.class));
+                return true;
+            });
 
             findPreference(getString(R.string.key_pro)).setOnPreferenceClickListener(preference -> {
                 startActivity(new Intent(requireContext(), ProActivity.class));
@@ -243,7 +255,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     : contacts ? R.string.permissions_ok : R.string.permissions_contacts_missing);
             findPreference(getString(R.string.key_battery_optimization)).setSummary(
                     BatteryOptimizationHelper.isBatteryOptimized(context) ? R.string.battery_optimized : R.string.battery_ok);
-            findPreference(getString(R.string.key_pro)).setSummary(Billing.isPro(context) ? R.string.pro_active : R.string.summary_pro);
+            boolean pro = Billing.isPro(context);
+            findPreference(getString(R.string.key_pro)).setSummary(pro ? R.string.pro_active : R.string.summary_pro);
+            findPreference(getString(R.string.key_pro_unlock)).setVisible(!pro);
+            for (int key : new int[]{R.string.key_enable_filter, R.string.key_filter_keywords, R.string.key_filter_senders, R.string.key_template}) {
+                findPreference(getString(key)).setEnabled(pro);
+            }
             findPreference(getString(R.string.key_privacy_choices)).setVisible(Ads.privacyOptionsRequired(context));
         }
 
@@ -252,7 +269,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             EditTextPreference preference = findPreference(getString(keyRes));
             preference.setOnBindEditTextListener(editText -> {
                 editText.setInputType(inputType);
-                editText.setSingleLine(true);
+                editText.setSingleLine((inputType & InputType.TYPE_TEXT_FLAG_MULTI_LINE) == 0);
             });
             preference.setSummaryProvider(p -> {
                 String value = ((EditTextPreference) p).getText();
@@ -285,14 +302,16 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 if (sms) {
                     List<String> targets = PhoneNumberUtils.parsePhoneNumbers(prefs.getString(context.getString(R.string.key_target_sms), ""));
                     for (String target : targets) {
-                        Forwarder.forwardViaSMS(SubscriptionManager.INVALID_SUBSCRIPTION_ID, sender, message, target);
+                        Forwarder.forwardViaSMS(SubscriptionManager.INVALID_SUBSCRIPTION_ID,
+                                MessageRules.format(MessageRules.DEFAULT_SMS_FORMAT, sender, sender, "", message), target);
                     }
                     results.add(targets.isEmpty()
                             ? context.getString(R.string.test_sms_no_numbers)
                             : context.getString(R.string.test_sms_sent, targets.size()));
                 }
-                if (telegram) results.add(describe(context, "Telegram", Forwarder.send(context, ForwardWorker.TELEGRAM, sender, message)));
-                if (web) results.add(describe(context, "Web", Forwarder.send(context, ForwardWorker.WEB, sender, message)));
+                String telegramText = MessageRules.format(MessageRules.DEFAULT_TELEGRAM_FORMAT, sender, sender, "", message);
+                if (telegram) results.add(describe(context, "Telegram", Forwarder.send(context, ForwardWorker.TELEGRAM, sender, message, telegramText)));
+                if (web) results.add(describe(context, "Web", Forwarder.send(context, ForwardWorker.WEB, sender, message, telegramText)));
                 if (getActivity() == null) return;
                 getActivity().runOnUiThread(() -> {
                     if (!isAdded()) return;
