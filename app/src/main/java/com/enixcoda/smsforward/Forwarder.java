@@ -70,6 +70,8 @@ public class Forwarder {
     }
 
     private static int post(String url, String contentType, String body) {
+        // Android blocks cleartext http; it would fail on every retry.
+        if (!url.regionMatches(true, 0, "https://", 0, 8)) return FAIL;
         HttpURLConnection connection = null;
         try {
             connection = (HttpURLConnection) new URL(url).openConnection();

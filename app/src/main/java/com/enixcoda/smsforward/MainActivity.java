@@ -11,12 +11,17 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.telephony.SubscriptionManager;
 import android.text.InputType;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.EditTextPreference;
@@ -39,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        applySystemBarInsets();
         statusText = findViewById(R.id.status_text);
         statusText.setOnClickListener(v -> {
             if (!hasSmsPermissions(this)) requestPermissions();
@@ -52,6 +58,20 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             if (hasSmsPermissions(this)) maybePromptBatteryOptimization();
             else showPermissionExplanationDialog();
         }
+    }
+
+    /** Draws behind the system bars on every Android version (enforced from Android 15) and pads content clear of them. */
+    private void applySystemBarInsets() {
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        View header = findViewById(R.id.header);
+        View settings = findViewById(R.id.settings);
+        int headerPadding = header.getPaddingTop();
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, windowInsets) -> {
+            Insets bars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
+            header.setPadding(headerPadding + bars.left, headerPadding + bars.top, headerPadding + bars.right, headerPadding);
+            settings.setPadding(bars.left, 0, bars.right, bars.bottom);
+            return WindowInsetsCompat.CONSUMED;
+        });
     }
 
     @Override
@@ -149,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         new AlertDialog.Builder(this)
             .setTitle("Battery Optimization Detected")
             .setMessage(BatteryOptimizationHelper.getBatteryOptimizationInstructions(this))
-            .setPositiveButton(R.string.open_settings, (dialog, which) -> BatteryOptimizationHelper.requestDisableBatteryOptimization(this))
+            .setPositiveButton(R.string.open_settings, (dialog, which) -> BatteryOptimizationHelper.openBatteryOptimizationSettings(this))
             .setNegativeButton(R.string.later, null)
             .show();
     }

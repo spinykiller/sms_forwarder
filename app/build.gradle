@@ -1,15 +1,33 @@
 apply plugin: 'com.android.application'
 
+// Upload-signing config is loaded from keystore.properties (gitignored). Absent on CI / fresh
+// clones → release builds are left unsigned rather than failing.
+def keystorePropertiesFile = rootProject.file('keystore.properties')
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) keystorePropertiesFile.withInputStream { keystoreProperties.load(it) }
+
 android {
-    compileSdk 34
+    compileSdk 36
     defaultConfig {
-        applicationId "com.enixcoda.smsforward"
+        applicationId "com.spinykiller.smsforward"
         minSdkVersion 25
-        versionCode 8
-        versionName "1.0.8"
+        targetSdkVersion 36
+        versionCode 9
+        versionName "1.1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     
+    signingConfigs {
+        if (keystorePropertiesFile.exists()) {
+            release {
+                storeFile rootProject.file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
+        }
+    }
+
     buildTypes {
         debug {
             minifyEnabled false
@@ -20,10 +38,9 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.debug
-            
+            if (keystorePropertiesFile.exists()) signingConfig signingConfigs.release
+
             // Additional optimizations
-            zipAlignEnabled true
             debuggable false
             jniDebuggable false
             renderscriptDebuggable false

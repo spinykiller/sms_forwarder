@@ -5,6 +5,25 @@ All notable changes to SMS Forwarder will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-10-10
+
+### 🐛 Bug Fixes
+- Long (multipart) SMS are forwarded as one message instead of fragments
+- No crash when Contacts permission is denied (contacts is optional)
+- Blocklist matches alphanumeric sender IDs (e.g. `HDFCBK` blocks `AX-HDFCBK`)
+- Loop prevention matches local and international number formats
+- Forwarded content is no longer prefixed with "Msg: "
+- Forwards and replies use the SIM that received the message
+
+### ✨ Improvements
+- Telegram/webhook forwards that fail while offline are retried automatically
+- No background service, persistent notification or alarms — the app runs only when an SMS arrives
+- Live status header, validated settings, "Send test message"
+- Targets Android 16 (API 36); webhooks must use https
+
+### ⚠️ Breaking
+- Package name is now `com.spinykiller.smsforward` (installs alongside older builds; settings are not carried over)
+
 ## [1.0.8] - 2025-10-17
 
 ### 🔒 Security Improvements
