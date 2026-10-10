@@ -1,67 +1,107 @@
 package com.enixcoda.smsforward;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.telephony.SmsManager;
+import android.telephony.SubscriptionManager;
 import android.util.Log;
 
-import java.util.ArrayList;
+import androidx.preference.PreferenceManager;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 public class Forwarder {
-    // Standard SMS length is ~160 characters for GSM-7, ~70 for Unicode
-    // We use a conservative limit to account for encoding variations
-    static final int MAX_SMS_LENGTH = 140;
+    private static final String TAG = "Forwarder";
 
-    public static void sendSMS(String number, String content) {
-        SmsManager smsManager = SmsManager.getDefault();
-        
-        // Check if message needs to be split
-        ArrayList<String> parts = smsManager.divideMessage(content);
-        if (parts.size() > 1) {
-            // Send as multi-part SMS (Android handles it properly)
-            smsManager.sendMultipartTextMessage(number, null, parts, null, null);
-        } else {
-            // Send as single SMS
-            smsManager.sendTextMessage(number, null, content, null, null);
-        }
-    }
-    
-    /**
-     * Ensures that the message content doesn't start with a number to prevent SMS delivery failures.
-     * Some carriers reject or fail to deliver SMS messages that start with digits.
-     */
-    private static String sanitizeMessageContent(String content) {
-        if (content == null || content.isEmpty()) {
-            return content;
-        }
-        
-        // Check if the message starts with a digit
-        if (Character.isDigit(content.charAt(0))) {
-            // Prepend text to prevent delivery issues
-            return "Msg: " + content;
-        }
-        
-        return content;
+    // Result of a network forward.
+    static final int OK = 0;
+    static final int RETRY = 1; // transient (offline, timeout, 408/429/5xx): queue and try again
+    static final int FAIL = 2;  // disabled, misconfigured or rejected (4xx): retrying won't help
+
+    /** Sends on the given SIM (the one that received the message), or the default SIM if unknown. */
+    public static void sendSMS(int subId, String number, String content) {
+        SmsManager smsManager = subId == SubscriptionManager.INVALID_SUBSCRIPTION_ID
+                ? SmsManager.getDefault()
+                : SmsManager.getSmsManagerForSubscriptionId(subId);
+        // Android splits long text into a linked multipart SMS; a single part is sent as a normal SMS.
+        smsManager.sendMultipartTextMessage(number, null, smsManager.divideMessage(content), null, null);
     }
 
-    public static void forwardViaSMS(String senderNumber, String forwardContent, String forwardNumber) {
-        String forwardPrefix = String.format("From %s:\n", senderNumber);
-        
-        // Sanitize the content to prevent issues with numbers at the start
-        String sanitizedContent = sanitizeMessageContent(forwardContent);
-        String fullMessage = forwardPrefix + sanitizedContent;
-
+    public static void forwardViaSMS(int subId, String senderLabel, String forwardContent, String forwardNumber) {
         try {
-            // Use Android's built-in multi-part SMS handling which properly splits messages
-            // and maintains the connection between parts
-            sendSMS(forwardNumber, fullMessage);
+            sendSMS(subId, forwardNumber, String.format("From %s:\n%s", senderLabel, forwardContent));
         } catch (RuntimeException e) {
-            Log.e(Forwarder.class.toString(), "Error forwarding SMS: " + e.toString(), e);
+            Log.e(TAG, "Error forwarding SMS: " + e, e);
         }
     }
 
-    public static void forwardViaTelegram(String senderNumber, String message, String targetTelegramID, String telegramToken) {
-        new ForwardTaskForTelegram(senderNumber, message, targetTelegramID, telegramToken).execute();
+    /** Forwards via Telegram or Web per the current settings. Blocking: call off the main thread. */
+    static int send(Context context, String channel, String senderLabel, String message) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        if (ForwardWorker.TELEGRAM.equals(channel)) {
+            String chatId = prefs.getString(context.getString(R.string.key_target_telegram), "").trim();
+            String token = prefs.getString(context.getString(R.string.key_telegram_apikey), "").trim();
+            if (!prefs.getBoolean(context.getString(R.string.key_enable_telegram), false) || chatId.isEmpty() || token.isEmpty())
+                return FAIL;
+            String text = String.format("Message from %s:\n%s", senderLabel, message);
+            return post("https://api.telegram.org/bot" + token + "/sendMessage",
+                    "application/x-www-form-urlencoded",
+                    "chat_id=" + encode(chatId) + "&text=" + encode(text));
+        }
+        String endpoint = prefs.getString(context.getString(R.string.key_target_web), "").trim();
+        if (!prefs.getBoolean(context.getString(R.string.key_enable_web), false) || endpoint.isEmpty())
+            return FAIL;
+        try {
+            JSONObject body = new JSONObject().put("from", senderLabel).put("message", message);
+            return post(endpoint, "application/json; charset=utf-8", body.toString());
+        } catch (JSONException e) {
+            return FAIL;
+        }
     }
-    public static void forwardViaWeb(String senderNumber, String message, String endpoint) {
-        new ForwardTaskForWeb(senderNumber, message, endpoint).execute();
+
+    private static int post(String url, String contentType, String body) {
+        HttpURLConnection connection = null;
+        try {
+            connection = (HttpURLConnection) new URL(url).openConnection();
+            connection.setConnectTimeout(10000);
+            connection.setReadTimeout(10000);
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", contentType);
+            try (OutputStream out = connection.getOutputStream()) {
+                out.write(body.getBytes(StandardCharsets.UTF_8));
+            }
+            int code = connection.getResponseCode();
+            Log.d(TAG, "Forward response: " + code);
+            if (code >= 200 && code < 300) return OK;
+            return code == 408 || code == 429 || code >= 500 ? RETRY : FAIL;
+        } catch (MalformedURLException | IllegalArgumentException | ClassCastException e) {
+            // Not a valid http(s) URL
+            Log.e(TAG, "Invalid forward URL", e);
+            return FAIL;
+        } catch (IOException e) {
+            Log.w(TAG, "Forward failed, will retry: " + e);
+            return RETRY;
+        } finally {
+            if (connection != null) connection.disconnect();
+        }
+    }
+
+    private static String encode(String s) {
+        try {
+            return URLEncoder.encode(s, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new AssertionError(e); // UTF-8 is always supported
+        }
     }
 }

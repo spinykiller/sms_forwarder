@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
@@ -21,7 +20,6 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final int PERMISSION_REQUEST_CODE = 100;
     private static final int SMS_PERMISSION_REQUEST_CODE = 101;
-    private static final int NOTIFICATION_PERMISSION_REQUEST_CODE = 102;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,15 +77,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkOtherPermissions() {
-        // Request notification permission for Android 13+
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) 
-                != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, 
-                    new String[]{Manifest.permission.POST_NOTIFICATIONS}, NOTIFICATION_PERMISSION_REQUEST_CODE);
-            }
-        }
-
         // Request other permissions
         String[] otherPermissions = {
             Manifest.permission.INTERNET,
@@ -116,9 +105,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Check auto-start permission
         checkAutoStartPermission();
-
-        // Start the SMS forwarding service
-        startSMSForwardService();
     }
 
     private void checkPermissionsAndStatus() {
@@ -188,7 +174,6 @@ public class MainActivity extends AppCompatActivity {
                 break;
                 
             case PERMISSION_REQUEST_CODE:
-            case NOTIFICATION_PERMISSION_REQUEST_CODE:
                 // Other permissions - not critical for basic functionality
                 Log.d(TAG, "Other permissions result: " + (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED ? "granted" : "denied"));
                 initializeApp();
@@ -246,12 +231,6 @@ public class MainActivity extends AppCompatActivity {
             })
             .setCancelable(false)
             .show();
-    }
-
-    private void startSMSForwardService() {
-        Intent serviceIntent = new Intent(this, SMSForwardService.class);
-        startService(serviceIntent);
-        Log.d(TAG, "Started SMS Forward Service");
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
