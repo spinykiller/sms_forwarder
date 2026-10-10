@@ -33,6 +33,10 @@
             android:name=".ProActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".LogActivity"
+            android:exported="false" />
+
         <receiver
             android:name=".SMSReceiver"
             android:permission="android.permission.BROADCAST_SMS"

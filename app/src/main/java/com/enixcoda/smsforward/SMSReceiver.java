@@ -117,13 +117,19 @@ public class SMSReceiver extends BroadcastReceiver {
 
             if (enableSMS) {
                 for (String targetNumber : targetNumbers) {
-                    Forwarder.forwardViaSMS(subId, smsText, targetNumber);
+                    boolean sent = Forwarder.forwardViaSMS(subId, smsText, targetNumber);
+                    ForwardLog.add(context, ForwardLog.SMS, targetNumber, senderLabel, rawMessageContent, smsText,
+                            sent ? ForwardLog.SENT : ForwardLog.FAILED);
                 }
             }
             // Try now; a transient failure (offline, server down) is queued and retried once online.
             for (String channel : ForwardWorker.CHANNELS) {
-                if (Forwarder.send(context, channel, senderLabel, rawMessageContent, telegramText) == Forwarder.RETRY)
-                    ForwardWorker.enqueue(context, channel, senderLabel, rawMessageContent, telegramText);
+                if (!(ForwardWorker.TELEGRAM.equals(channel) ? enableTelegram : enableWeb)) continue;
+                int result = Forwarder.send(context, channel, senderLabel, rawMessageContent, telegramText);
+                long logId = ForwardLog.add(context, channel, null, senderLabel, rawMessageContent, telegramText,
+                        result == Forwarder.OK ? ForwardLog.DELIVERED : result == Forwarder.RETRY ? ForwardLog.QUEUED : ForwardLog.FAILED);
+                if (result == Forwarder.RETRY)
+                    ForwardWorker.enqueue(context, channel, senderLabel, rawMessageContent, telegramText, logId);
             }
         }
     }

@@ -24,6 +24,7 @@ public class ForwardWorker extends Worker {
     private static final String KEY_FROM = "from";
     private static final String KEY_MESSAGE = "message";
     private static final String KEY_TEXT = "text";
+    private static final String KEY_LOG_ID = "log_id";
     // With exponential backoff from 30s (capped at 5h by WorkManager) this spans roughly a day.
     private static final int MAX_ATTEMPTS = 10;
 
@@ -31,7 +32,8 @@ public class ForwardWorker extends Worker {
         super(context, params);
     }
 
-    static void enqueue(Context context, String channel, String senderLabel, String message, String text) {
+    /** logId: the forward-log row to update, or -1 when not logged. */
+    static void enqueue(Context context, String channel, String senderLabel, String message, String text, long logId) {
         WorkManager.getInstance(context).enqueue(new OneTimeWorkRequest.Builder(ForwardWorker.class)
                 .setConstraints(new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
                 .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 30, TimeUnit.SECONDS)
@@ -40,6 +42,7 @@ public class ForwardWorker extends Worker {
                         .putString(KEY_FROM, senderLabel)
                         .putString(KEY_MESSAGE, message)
                         .putString(KEY_TEXT, text)
+                        .putLong(KEY_LOG_ID, logId)
                         .build())
                 .build());
     }
@@ -50,6 +53,7 @@ public class ForwardWorker extends Worker {
         Data in = getInputData();
         int result = Forwarder.send(getApplicationContext(), in.getString(KEY_CHANNEL), in.getString(KEY_FROM), in.getString(KEY_MESSAGE), in.getString(KEY_TEXT));
         if (result == Forwarder.RETRY && getRunAttemptCount() < MAX_ATTEMPTS) return Result.retry();
+        ForwardLog.setStatus(getApplicationContext(), in.getLong(KEY_LOG_ID, -1), result == Forwarder.OK ? ForwardLog.DELIVERED : ForwardLog.FAILED);
         return result == Forwarder.OK ? Result.success() : Result.failure();
     }
 }

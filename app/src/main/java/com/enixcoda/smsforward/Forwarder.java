@@ -37,11 +37,14 @@ public class Forwarder {
         smsManager.sendMultipartTextMessage(number, null, smsManager.divideMessage(content), null, null);
     }
 
-    public static void forwardViaSMS(int subId, String text, String forwardNumber) {
+    /** False if the SMS couldn't be handed to the carrier. */
+    public static boolean forwardViaSMS(int subId, String text, String forwardNumber) {
         try {
             sendSMS(subId, forwardNumber, text);
+            return true;
         } catch (RuntimeException e) {
             Log.e(TAG, "Error forwarding SMS: " + e, e);
+            return false;
         }
     }
 

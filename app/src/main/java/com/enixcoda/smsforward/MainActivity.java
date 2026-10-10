@@ -206,6 +206,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE, false,
                     v -> v.contains("{message}"), R.string.invalid_template);
 
+            findPreference(getString(R.string.key_forward_log)).setOnPreferenceClickListener(preference -> {
+                startActivity(new Intent(requireContext(), LogActivity.class));
+                return true;
+            });
             findPreference(getString(R.string.key_pro_unlock)).setOnPreferenceClickListener(preference -> {
                 startActivity(new Intent(requireContext(), ProActivity.class));
                 return true;
@@ -258,7 +262,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             boolean pro = Billing.isPro(context);
             findPreference(getString(R.string.key_pro)).setSummary(pro ? R.string.pro_active : R.string.summary_pro);
             findPreference(getString(R.string.key_pro_unlock)).setVisible(!pro);
-            for (int key : new int[]{R.string.key_enable_filter, R.string.key_filter_keywords, R.string.key_filter_senders, R.string.key_template}) {
+            for (int key : new int[]{R.string.key_forward_log, R.string.key_enable_filter, R.string.key_filter_keywords, R.string.key_filter_senders, R.string.key_template}) {
                 findPreference(getString(key)).setEnabled(pro);
             }
             findPreference(getString(R.string.key_privacy_choices)).setVisible(Ads.privacyOptionsRequired(context));

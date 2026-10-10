@@ -12,7 +12,7 @@ SMS Forward ("the app") forwards text messages you receive to destinations **you
 | Contacts (optional) | Show the sender's name in forwarded messages | Name is included in the forwarded message only; contacts are never uploaded |
 | Settings (target numbers, Telegram chat ID and bot token, webhook URL, blocklist) | Needed to forward | Stored on your device only. Android may include them in your device backup if backup is on |
 
-The app does not store a history of your messages. A forward that fails because you are offline is kept on the device until it is delivered or retries end (about a day), then deleted.
+The free version does not store a history of your messages. With Pro, the optional **forward log** keeps your last 100 forwards (sender, text, status) on this phone only; clear it anytime from the log screen. A forward that fails because you are offline is kept on the device until it is delivered or retries end (about a day), then deleted.
 
 ## What the app does not do
 - No collection of SMS or contact data by the developer.

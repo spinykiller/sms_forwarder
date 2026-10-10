@@ -107,6 +107,12 @@
             android:summary="@string/summary_pro_unlock"
             app:iconSpaceReserved="false" />
 
+        <Preference
+            android:key="@string/key_forward_log"
+            android:title="@string/title_forward_log"
+            android:summary="@string/summary_forward_log"
+            app:iconSpaceReserved="false" />
+
         <SwitchPreferenceCompat
             android:key="@string/key_enable_filter"
             app:iconSpaceReserved="false"
