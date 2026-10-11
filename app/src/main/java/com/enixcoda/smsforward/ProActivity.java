@@ -9,7 +9,6 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.billingclient.api.ProductDetails;
 
@@ -19,7 +18,7 @@ import java.util.List;
  * The Pro paywall (also where "Remove ads" leads). No ad on this screen. Annual (with the free trial
  * when eligible) is pre-selected; monthly and lifetime are the alternatives. Prices come from Play.
  */
-public class ProActivity extends AppCompatActivity {
+public class ProActivity extends LockedActivity {
     private Billing billing;
     private RadioGroup plans;
     private RadioButton annual, monthly, lifetime;

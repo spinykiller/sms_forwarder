@@ -40,6 +40,9 @@ public class ForwardWorker extends Worker {
     // The message lives in a file, not in WorkManager's Data (10 KB limit; a long SMS can exceed it).
     private static final String KEY_PAYLOAD = "payload";
     private static final String KEY_LOG_ID = "log_id";
+    private static final String KEY_SMS = "sms";
+    // While forwarding is paused, queued forwards wait and check again this often (fresh retry budget each time)
+    private static final long PAUSED_RECHECK_MS = TimeUnit.MINUTES.toMillis(15);
     // With exponential backoff from 30s (capped at 5h by WorkManager) this spans roughly a day.
     private static final int MAX_ATTEMPTS = 10;
 
@@ -69,11 +72,15 @@ public class ForwardWorker extends Worker {
             ForwardLog.setStatus(context, logId, ForwardLog.FAILED);
             return null;
         }
-        boolean sms = ForwardLog.SMS.equals(channel);
+        return schedule(context, payload.getPath(), logId, ForwardLog.SMS.equals(channel), delayMs);
+    }
+
+    private static Operation schedule(Context context, String payloadPath, long logId, boolean sms, long delayMs) {
         OneTimeWorkRequest.Builder request = new OneTimeWorkRequest.Builder(ForwardWorker.class)
                 .setConstraints(new Constraints.Builder().setRequiredNetworkType(sms ? NetworkType.NOT_REQUIRED : NetworkType.CONNECTED).build())
                 .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 30, TimeUnit.SECONDS)
-                .setInputData(new Data.Builder().putString(KEY_PAYLOAD, payload.getPath()).putLong(KEY_LOG_ID, logId).build());
+                .setInputData(new Data.Builder().putString(KEY_PAYLOAD, payloadPath).putLong(KEY_LOG_ID, logId)
+                        .putBoolean(KEY_SMS, sms).build());
         if (delayMs > 0) request.setInitialDelay(delayMs, TimeUnit.MILLISECONDS);
         // Expedited runs right away, even in Doze. Before Android 12 it would need a foreground service, so it's skipped there.
         else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
@@ -86,7 +93,13 @@ public class ForwardWorker extends Worker {
     public Result doWork() {
         Context context = getApplicationContext();
         long logId = getInputData().getLong(KEY_LOG_ID, -1);
-        File payload = new File(getInputData().getString(KEY_PAYLOAD));
+        String payloadPath = getInputData().getString(KEY_PAYLOAD);
+        if (Dispatcher.isPaused(context)) {
+            // "Nothing is forwarded while paused": hold it, and send once forwarding resumes
+            schedule(context, payloadPath, logId, getInputData().getBoolean(KEY_SMS, false), PAUSED_RECHECK_MS);
+            return Result.success();
+        }
+        File payload = new File(payloadPath);
         int result;
         boolean sms = false;
         try (DataInputStream in = new DataInputStream(new FileInputStream(payload))) {

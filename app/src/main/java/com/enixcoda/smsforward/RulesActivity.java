@@ -12,7 +12,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -20,7 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 /** Pro: list and edit routing rules. Pro-only screen, so no ad. */
-public class RulesActivity extends AppCompatActivity {
+public class RulesActivity extends LockedActivity {
     private static final int[] CHECKBOXES = {R.id.rule_sms, R.id.rule_telegram, R.id.rule_web, R.id.rule_email};
 
     private List<Rules.Rule> rules;

@@ -10,7 +10,6 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.provider.Settings;
 import android.provider.Telephony;
 import android.telephony.SubscriptionInfo;
@@ -28,9 +27,6 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.biometric.BiometricManager;
-import androidx.biometric.BiometricPrompt;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.os.LocaleListCompat;
 import androidx.preference.EditTextPreference;
@@ -46,18 +42,14 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeMap;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Predicate;
 
-public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class MainActivity extends LockedActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final int PERMISSION_REQUEST_CODE = 100;
     // Battery optimization is explained once; afterwards it's under System Settings.
     private static final String KEY_BATTERY_PROMPTED = "battery_prompted";
-
-    // App lock: unlocked for the rest of the process once authenticated, until the app has been in the background a minute
-    private static final long RELOCK_AFTER_MS = 60_000;
-    private static long unlockedUntil = 0; // SystemClock.elapsedRealtime(); 0 = locked
-    private boolean unlocking;
 
     private TextView statusText;
     private View adSlot;
@@ -97,48 +89,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        if (!isChangingConfigurations() && unlockedUntil == Long.MAX_VALUE)
-            unlockedUntil = SystemClock.elapsedRealtime() + RELOCK_AFTER_MS;
-    }
-
-    static boolean canLock(Context context) {
-        return BiometricManager.from(context).canAuthenticate(LOCK_AUTHENTICATORS) == BiometricManager.BIOMETRIC_SUCCESS;
-    }
-
-    private static final int LOCK_AUTHENTICATORS = BiometricManager.Authenticators.BIOMETRIC_WEAK | BiometricManager.Authenticators.DEVICE_CREDENTIAL;
-
-    /** Hides the settings (they hold tokens and the log holds SMS text) until the user authenticates. */
-    private void lockIfNeeded() {
-        boolean enabled = Billing.isPro(this)
-                && PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.key_app_lock), false);
-        // No screen lock any more (removed after enabling): don't lock the user out of their own settings
-        if (!enabled || !canLock(this) || SystemClock.elapsedRealtime() <= unlockedUntil) return;
-        View content = findViewById(android.R.id.content);
-        content.setVisibility(View.INVISIBLE);
-        if (unlocking) return;
-        unlocking = true;
-        new BiometricPrompt(this, ContextCompat.getMainExecutor(this), new BiometricPrompt.AuthenticationCallback() {
-            @Override
-            public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
-                unlocking = false;
-                unlockedUntil = Long.MAX_VALUE;
-                content.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
-                unlocking = false;
-                finish(); // cancelled or locked out: leave rather than show the settings
-            }
-        }).authenticate(new BiometricPrompt.PromptInfo.Builder()
-                .setTitle(getString(R.string.unlock_title))
-                .setAllowedAuthenticators(LOCK_AUTHENTICATORS)
-                .build());
-    }
-
-    @Override
     protected void onDestroy() {
         Ads.destroyBanner(adContainer);
         super.onDestroy();
@@ -153,7 +103,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         super.onResume();
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
         updateStatus();
-        lockIfNeeded();
     }
 
     @Override
@@ -469,15 +418,20 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             // The SMS app is excluded: its notifications duplicate the SMS forwarding
             String smsApp = Telephony.Sms.getDefaultSmsPackage(context);
             List<ResolveInfo> launchable = pm.queryIntentActivities(new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER), 0);
-            TreeMap<String, String> appsByLabel = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+            // Package → label, sorted by label; two apps may share a label, so the package stays the key
+            Map<String, String> labels = new HashMap<>();
             for (ResolveInfo info : launchable) {
                 String pkg = info.activityInfo.packageName;
                 if (pkg.equals(context.getPackageName()) || pkg.equals(smsApp)) continue;
-                appsByLabel.put(info.loadLabel(pm).toString(), pkg);
+                labels.put(pkg, info.loadLabel(pm).toString());
             }
+            List<String> packages = new ArrayList<>(labels.keySet());
+            packages.sort((a, b) -> String.CASE_INSENSITIVE_ORDER.compare(labels.get(a), labels.get(b)));
+            CharSequence[] entries = new CharSequence[packages.size()];
+            for (int i = 0; i < entries.length; i++) entries[i] = labels.get(packages.get(i));
             MultiSelectListPreference apps = findPreference(getString(R.string.key_notification_apps));
-            apps.setEntries(appsByLabel.keySet().toArray(new CharSequence[0]));
-            apps.setEntryValues(appsByLabel.values().toArray(new CharSequence[0]));
+            apps.setEntries(entries);
+            apps.setEntryValues(packages.toArray(new CharSequence[0]));
             apps.setSummaryProvider(p -> {
                 int n = ((MultiSelectListPreference) p).getValues().size();
                 return getResources().getQuantityString(R.plurals.summary_notification_apps, n, n);

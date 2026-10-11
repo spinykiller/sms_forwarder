@@ -11,12 +11,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.List;
 
 /** Pro: recent forwards with their status; a failed Telegram/Web forward can be retried. Pro-only, so no ad. */
-public class LogActivity extends AppCompatActivity {
+public class LogActivity extends LockedActivity {
     private ListView list;
     private View empty;
 

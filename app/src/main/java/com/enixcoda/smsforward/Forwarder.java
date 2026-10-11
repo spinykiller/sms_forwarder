@@ -21,7 +21,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class Forwarder {
@@ -45,11 +44,13 @@ public class Forwarder {
         ArrayList<PendingIntent> sent = null;
         ArrayList<PendingIntent> delivered = null;
         if (logId >= 0) {
-            // Reports for the last part stand for the whole message
-            sent = new ArrayList<>(Collections.nCopies(parts.size(), (PendingIntent) null));
-            delivered = new ArrayList<>(Collections.nCopies(parts.size(), (PendingIntent) null));
-            sent.set(parts.size() - 1, SmsStatusReceiver.sent(context, logId));
-            delivered.set(parts.size() - 1, SmsStatusReceiver.delivered(context, logId));
+            // A report per part: the message counts as delivered only when every part is
+            sent = new ArrayList<>();
+            delivered = new ArrayList<>();
+            for (int part = 0; part < parts.size(); part++) {
+                sent.add(SmsStatusReceiver.sent(context, logId, part));
+                delivered.add(SmsStatusReceiver.delivered(context, logId, part, parts.size()));
+            }
         }
         smsManager.sendMultipartTextMessage(number, null, parts, sent, delivered);
     }
