@@ -98,7 +98,7 @@
     <string name="header_pro_features">Pro features</string>
     <string name="key_pro_unlock">key_pro_unlock</string>
     <string name="title_pro_unlock">Unlock with Pro</string>
-    <string name="summary_pro_unlock">Filter which messages are forwarded, customize the forwarded text and see a forward log</string>
+    <string name="summary_pro_unlock">Forward app notifications, routing rules, filters, OTP-only, custom text and a forward log</string>
     <string name="key_forward_log">key_forward_log</string>
     <string name="title_forward_log">Forward log</string>
     <string name="summary_forward_log">Recent forwards and their status (last 100, kept on this phone)</string>
@@ -113,6 +113,49 @@
     <string name="log_failed">✗ Failed — tap to retry</string>
     <string name="log_retry">Retry</string>
     <string name="log_retry_confirm">Send this message to %s again?</string>
+    <string name="key_rules">key_rules</string>
+    <string name="title_rules">Routing rules</string>
+    <string name="summary_rules">Send different messages to different places</string>
+    <string name="rules_count">%d rule(s)</string>
+    <string name="rules_explainer">A message goes to the methods of every rule it matches</string>
+    <string name="rules_empty">No rules: every message goes to every enabled method.\nAdd a rule, e.g. bank codes → Telegram only.</string>
+    <string name="rules_add">Add rule</string>
+    <string name="rule_edit">Edit rule</string>
+    <string name="rule_save">Save</string>
+    <string name="rule_delete">Delete</string>
+    <string name="rule_name">Name (e.g. Bank codes)</string>
+    <string name="rule_senders">From senders (numbers or names; empty = anyone)</string>
+    <string name="rule_keywords">Containing (words or /regex/; empty = anything)</string>
+    <string name="rule_send_to">Send to</string>
+    <string name="rule_no_methods">Choose at least one method</string>
+    <string name="rule_default_name">Rule %d</string>
+    <string name="rule_row_title">%1$s → %2$s</string>
+    <string name="rule_row_body">From: %1$s · Containing: %2$s</string>
+    <string name="rule_any">any</string>
+    <string name="invalid_regex">Invalid regular expression: %s</string>
+    <string name="invalid_regex_generic">One of the /regex/ keywords is invalid</string>
+    <string name="key_rules_unmatched">key_rules_unmatched</string>
+    <string name="title_rules_unmatched">Messages matching no rule</string>
+    <string-array name="rules_unmatched_entries">
+        <item>Send to every enabled method</item>
+        <item>Don\'t forward</item>
+    </string-array>
+    <string-array name="rules_unmatched_values" translatable="false">
+        <item>all</item>
+        <item>none</item>
+    </string-array>
+    <string name="key_otp_only">key_otp_only</string>
+    <string name="title_otp_only">Only verification codes</string>
+    <string name="summary_otp_only">Forward only messages with a one-time code (OTP, verification code, PIN)</string>
+    <string name="key_enable_notifications">key_enable_notifications</string>
+    <string name="title_enable_notifications">Forward app notifications</string>
+    <string name="summary_notifications_on">Forwarding notifications from the apps below</string>
+    <string name="summary_notifications_access">Notification access is off — tap to allow</string>
+    <string name="key_notification_apps">key_notification_apps</string>
+    <string name="title_notification_apps">Apps</string>
+    <string name="summary_notification_apps">%d app(s) selected</string>
+    <string name="notification_access_title">Allow notification access</string>
+    <string name="notification_access_message">To forward notifications, SMS Forward reads notifications from the apps you pick here — nothing else — and sends their title and text only to your own destinations. Android will open the Notification access screen: turn on SMS Forward.\n\nDon\'t pick an app you also forward to (like Telegram), or the forwards will arrive twice.</string>
     <string name="key_enable_filter">key_enable_filter</string>
     <string name="enable_filter">Only forward matching messages</string>
     <string name="key_filter_keywords">key_filter_keywords</string>
@@ -163,7 +206,7 @@
     <string name="summary_pro">Remove ads</string>
     <string name="remove_ads">Remove ads</string>
     <string name="pro_title">SMS Forward Pro</string>
-    <string name="pro_features">• No ads\n• Forward to multiple numbers\n• Forward only messages matching keywords or senders\n• Custom message format\n• Forward log with retry\n• Supports development</string>
+    <string name="pro_features">• No ads\n• Forward app notifications (WhatsApp, bank apps, …)\n• Routing rules: different messages to different places\n• Only verification codes (OTP) mode\n• Forward to multiple numbers and email addresses\n• Forward only messages matching keywords or senders\n• Custom message format\n• Forward log with retry\n• Supports development</string>
     <string name="pro_plan_annual">Yearly — %s</string>
     <string name="pro_plan_annual_trial">Yearly — free trial, then %s</string>
     <string name="pro_plan_monthly">Monthly — %s</string>

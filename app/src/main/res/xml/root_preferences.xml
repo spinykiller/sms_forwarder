@@ -169,6 +169,37 @@
             android:summary="@string/summary_forward_log"
             app:iconSpaceReserved="false" />
 
+        <Preference
+            android:key="@string/key_rules"
+            android:title="@string/title_rules"
+            android:summary="@string/summary_rules"
+            app:iconSpaceReserved="false" />
+
+        <ListPreference
+            android:key="@string/key_rules_unmatched"
+            android:title="@string/title_rules_unmatched"
+            android:defaultValue="all"
+            android:entries="@array/rules_unmatched_entries"
+            android:entryValues="@array/rules_unmatched_values"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:key="@string/key_otp_only"
+            android:title="@string/title_otp_only"
+            android:summary="@string/summary_otp_only"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:key="@string/key_enable_notifications"
+            android:title="@string/title_enable_notifications"
+            app:iconSpaceReserved="false" />
+
+        <MultiSelectListPreference
+            android:key="@string/key_notification_apps"
+            android:title="@string/title_notification_apps"
+            app:iconSpaceReserved="false" />
+
         <SwitchPreferenceCompat
             android:key="@string/key_enable_filter"
             app:iconSpaceReserved="false"

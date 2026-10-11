@@ -8,6 +8,14 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
+    <!-- Lists launchable apps for picking which apps' notifications to forward -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -36,6 +44,20 @@
         <activity
             android:name=".LogActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".RulesActivity"
+            android:exported="false" />
+
+        <service
+            android:name=".NotificationForwarder"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
 
         <service
             android:name=".PauseTileService"

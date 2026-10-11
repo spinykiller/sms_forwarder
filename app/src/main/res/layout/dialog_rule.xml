@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="24dp"
+        android:paddingTop="8dp">
+
+        <EditText
+            android:id="@+id/rule_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/rule_name"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:minHeight="48dp" />
+
+        <EditText
+            android:id="@+id/rule_senders"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/rule_senders"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:minHeight="48dp" />
+
+        <EditText
+            android:id="@+id/rule_keywords"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/rule_keywords"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:minHeight="48dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/rule_send_to" />
+
+        <CheckBox
+            android:id="@+id/rule_sms"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="SMS" />
+
+        <CheckBox
+            android:id="@+id/rule_telegram"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Telegram" />
+
+        <CheckBox
+            android:id="@+id/rule_web"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Web" />
+
+        <CheckBox
+            android:id="@+id/rule_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Email" />
+    </LinearLayout>
+</ScrollView>

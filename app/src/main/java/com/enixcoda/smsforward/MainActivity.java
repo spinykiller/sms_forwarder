@@ -6,9 +6,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.provider.Telephony;
 import android.telephony.SubscriptionManager;
 import android.text.InputType;
 import android.util.Patterns;
@@ -26,6 +28,8 @@ import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.EditTextPreference;
+import androidx.preference.MultiSelectListPreference;
+import androidx.preference.SwitchPreferenceCompat;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
@@ -35,6 +39,7 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.function.Predicate;
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -258,13 +263,27 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             bindText(R.string.key_blocked_numbers, R.string.summary_blocked_numbers, InputType.TYPE_CLASS_TEXT, false,
                     v -> true, 0);
             bindText(R.string.key_filter_keywords, R.string.summary_filter_keywords, InputType.TYPE_CLASS_TEXT, false,
-                    v -> true, 0);
+                    v -> MessageRules.invalidRegex(MessageRules.splitKeywords(v)) == null, R.string.invalid_regex_generic);
             bindText(R.string.key_filter_senders, R.string.summary_filter_senders, InputType.TYPE_CLASS_TEXT, false,
                     v -> true, 0);
             bindText(R.string.key_template, R.string.summary_template,
                     InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE, false,
                     v -> v.contains("{message}"), R.string.invalid_template);
 
+            findPreference(getString(R.string.key_rules)).setOnPreferenceClickListener(preference -> {
+                startActivity(new Intent(requireContext(), RulesActivity.class));
+                return true;
+            });
+            bindNotificationApps();
+            findPreference(getString(R.string.key_enable_notifications)).setOnPreferenceChangeListener((preference, on) -> {
+                if ((Boolean) on && !NotificationForwarder.hasAccess(requireContext())) askNotificationAccess();
+                return true;
+            });
+            findPreference(getString(R.string.key_enable_notifications)).setOnPreferenceClickListener(preference -> {
+                // Tapping while on but without access (e.g. revoked later) asks again
+                if (((SwitchPreferenceCompat) preference).isChecked() && !NotificationForwarder.hasAccess(requireContext())) askNotificationAccess();
+                return false;
+            });
             findPreference(getString(R.string.key_forward_log)).setOnPreferenceClickListener(preference -> {
                 startActivity(new Intent(requireContext(), LogActivity.class));
                 return true;
@@ -338,10 +357,45 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             boolean pro = Billing.isPro(context);
             findPreference(getString(R.string.key_pro)).setSummary(pro ? R.string.pro_active : R.string.summary_pro);
             findPreference(getString(R.string.key_pro_unlock)).setVisible(!pro);
-            for (int key : new int[]{R.string.key_forward_log, R.string.key_enable_filter, R.string.key_filter_keywords, R.string.key_filter_senders, R.string.key_template}) {
+            for (int key : new int[]{R.string.key_forward_log, R.string.key_rules, R.string.key_rules_unmatched, R.string.key_otp_only,
+                    R.string.key_enable_notifications, R.string.key_notification_apps,
+                    R.string.key_enable_filter, R.string.key_filter_keywords, R.string.key_filter_senders, R.string.key_template}) {
                 findPreference(getString(key)).setEnabled(pro);
             }
+            findPreference(getString(R.string.key_rules)).setSummary(Rules.load(context).isEmpty()
+                    ? getString(R.string.summary_rules) : getString(R.string.rules_count, Rules.load(context).size()));
+            findPreference(getString(R.string.key_enable_notifications)).setSummary(NotificationForwarder.hasAccess(context)
+                    ? R.string.summary_notifications_on : R.string.summary_notifications_access);
             findPreference(getString(R.string.key_privacy_choices)).setVisible(Ads.privacyOptionsRequired(context));
+        }
+
+        // ponytail: lists launchable apps on the main thread (~100 ms); move off-thread if it shows up as jank
+        private void bindNotificationApps() {
+            Context context = requireContext();
+            PackageManager pm = context.getPackageManager();
+            // The SMS app is excluded: its notifications duplicate the SMS forwarding
+            String smsApp = Telephony.Sms.getDefaultSmsPackage(context);
+            List<ResolveInfo> launchable = pm.queryIntentActivities(new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER), 0);
+            TreeMap<String, String> appsByLabel = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+            for (ResolveInfo info : launchable) {
+                String pkg = info.activityInfo.packageName;
+                if (pkg.equals(context.getPackageName()) || pkg.equals(smsApp)) continue;
+                appsByLabel.put(info.loadLabel(pm).toString(), pkg);
+            }
+            MultiSelectListPreference apps = findPreference(getString(R.string.key_notification_apps));
+            apps.setEntries(appsByLabel.keySet().toArray(new CharSequence[0]));
+            apps.setEntryValues(appsByLabel.values().toArray(new CharSequence[0]));
+            apps.setSummaryProvider(p -> getString(R.string.summary_notification_apps, ((MultiSelectListPreference) p).getValues().size()));
+        }
+
+        // Prominent disclosure before the system screen (Play policy for notification access)
+        private void askNotificationAccess() {
+            new AlertDialog.Builder(requireContext())
+                    .setTitle(R.string.notification_access_title)
+                    .setMessage(R.string.notification_access_message)
+                    .setPositiveButton(R.string.open_settings, (d, w) -> startActivity(new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)))
+                    .setNegativeButton(R.string.not_now, null)
+                    .show();
         }
 
         /** Adds a free-tier limit after the setting's format check: over the limit shows why and opens the Pro screen. */
