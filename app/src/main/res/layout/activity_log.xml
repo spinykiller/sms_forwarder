@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_dark"
+    android:background="@color/window_background"
     android:orientation="vertical">
 
     <LinearLayout
@@ -36,7 +36,7 @@
         android:layout_weight="1"
         android:gravity="center"
         android:text="@string/log_empty"
-        android:textColor="@color/text_secondary" />
+        android:textColor="?android:attr/textColorSecondary" />
 
     <Button
         android:id="@+id/clear"

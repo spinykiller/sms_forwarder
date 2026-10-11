@@ -8,4 +8,6 @@
     <color name="background_light">#FAFAFA</color>
     <color name="text_primary">#FFFFFF</color>
     <color name="text_secondary">#B3FFFFFF</color>
+    <!-- Screen background; values-night overrides it for dark mode. text_primary/secondary are for the blue header. -->
+    <color name="window_background">@color/background_light</color>
 </resources>

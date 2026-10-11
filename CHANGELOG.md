@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Telegram/webhook forwards that fail while offline are retried automatically
 - No background service, persistent notification or alarms — the app runs only when an SMS arrives
 - Live status header, validated settings, "Send test message"
+- Light, dark or follow-system theme (Settings → Theme)
 - Targets Android 16 (API 36); webhooks must use https
 
 ### ⚠️ Breaking

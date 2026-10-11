@@ -21,6 +21,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
@@ -41,6 +42,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Before super: the chosen theme applies to every screen for the rest of the process.
+        applyTheme(PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.key_theme), "system"));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         SystemBars.apply(this, findViewById(R.id.header));
@@ -100,6 +103,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             SettingsFragment settings = (SettingsFragment) getSupportFragmentManager().findFragmentById(R.id.settings);
             if (settings != null && settings.isResumed()) settings.refresh();
         }
+    }
+
+    static void applyTheme(String value) {
+        AppCompatDelegate.setDefaultNightMode("light".equals(value) ? AppCompatDelegate.MODE_NIGHT_NO
+                : "dark".equals(value) ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
     }
 
     static boolean hasSmsPermissions(Context context) {
@@ -236,6 +244,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             findPreference(getString(R.string.key_privacy_choices)).setOnPreferenceClickListener(preference -> {
                 MainActivity activity = (MainActivity) requireActivity();
                 Ads.showPrivacyOptions(activity, activity::bindAd);
+                return true;
+            });
+            // Recreates open screens in the new theme
+            findPreference(getString(R.string.key_theme)).setOnPreferenceChangeListener((preference, value) -> {
+                applyTheme((String) value);
                 return true;
             });
             findPreference(getString(R.string.key_send_test)).setOnPreferenceClickListener(preference -> {

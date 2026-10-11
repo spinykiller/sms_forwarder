@@ -151,6 +151,15 @@
             android:summary="@string/summary_send_test"
             app:iconSpaceReserved="false" />
 
+        <ListPreference
+            android:key="@string/key_theme"
+            android:title="@string/title_theme"
+            android:defaultValue="system"
+            android:entries="@array/theme_entries"
+            android:entryValues="@array/theme_values"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false" />
+
         <Preference
             android:key="@string/key_permission_status"
             android:title="@string/title_permission_status"

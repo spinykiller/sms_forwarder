@@ -70,6 +70,18 @@
 
     <!-- System -->
     <string name="header_system">System Settings</string>
+    <string name="key_theme">key_theme</string>
+    <string name="title_theme">Theme</string>
+    <string-array name="theme_entries">
+        <item>Follow system</item>
+        <item>Light</item>
+        <item>Dark</item>
+    </string-array>
+    <string-array name="theme_values" translatable="false">
+        <item>system</item>
+        <item>light</item>
+        <item>dark</item>
+    </string-array>
     <string name="key_permission_status">key_permission_status</string>
     <string name="title_permission_status">Permission Status</string>
     <string name="summary_permission_status">Check and manage app permissions</string>
