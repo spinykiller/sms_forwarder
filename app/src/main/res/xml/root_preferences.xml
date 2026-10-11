@@ -288,6 +288,15 @@
             app:iconSpaceReserved="false" />
 
         <ListPreference
+            android:key="@string/key_language"
+            android:title="@string/title_language"
+            android:defaultValue=""
+            android:entries="@array/language_entries"
+            android:entryValues="@array/language_values"
+            android:persistent="false"
+            app:iconSpaceReserved="false" />
+
+        <ListPreference
             android:key="@string/key_theme"
             android:title="@string/title_theme"
             android:defaultValue="system"

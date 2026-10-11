@@ -2,33 +2,33 @@
     <string name="app_name">SMS Forward</string>
 
     <!-- SMS -->
-    <string name="key_enable_sms">key_enable_sms</string>
+    <string name="key_enable_sms" translatable="false">key_enable_sms</string>
     <string name="header_sms">Forward via SMS</string>
     <string name="enable_sms">Enable SMS</string>
-    <string name="key_target_sms">key_sms_target</string>
+    <string name="key_target_sms" translatable="false">key_sms_target</string>
     <string name="target_title_sms">Target phone numbers</string>
     <string name="target_summary_sms">Multiple numbers separated by commas (Pro; free forwards to one)\nexample: +86 10000, +1 5551234567</string>
 
     <!-- Telegram -->
-    <string name="key_enable_telegram">key_enable_telegram</string>
+    <string name="key_enable_telegram" translatable="false">key_enable_telegram</string>
     <string name="header_telegram">Forward via Telegram</string>
     <string name="enable_telegram">Enable Telegram</string>
-    <string name="key_target_telegram">key_target_telegram</string>
-    <string name="key_telegram_apikey">key_telegram_apikey</string>
+    <string name="key_target_telegram" translatable="false">key_target_telegram</string>
+    <string name="key_telegram_apikey" translatable="false">key_telegram_apikey</string>
     <string name="target_title_telegram">Target Telegram Chat ID</string>
     <string name="target_summary_telegram">Chat ID (numeric) or @username for groups/channels\nexample: 123456789 or @mygroup</string>
     <string name="title_telegram_apikey">Telegram Bot Token</string>
     <string name="summary_telegram_apikey">Get from @BotFather on Telegram\nexample: 110201543:AAH4eZxxxxxxxxxxxxxxxxxxxxxP4U</string>
 
     <!-- Web -->
-    <string name="key_enable_web">key_enable_web</string>
+    <string name="key_enable_web" translatable="false">key_enable_web</string>
     <string name="header_web">Forward via Web</string>
     <string name="enable_web">Enable Web</string>
-    <string name="key_target_web">key_target_web</string>
+    <string name="key_target_web" translatable="false">key_target_web</string>
     <string name="target_title_web">Target Web URL</string>
     <string name="target_summary_web">Example: https://site.com/api (https only)\nThis app will send POST request on receive SMS, request body example:\n{ \"from\": \"10000\", \"message\": \"Hello\" }</string>
 
-    <string name="key_web_format">key_web_format</string>
+    <string name="key_web_format" translatable="false">key_web_format</string>
     <string name="title_web_format">Format</string>
     <string-array name="web_format_entries">
         <item>JSON {from, message}</item>
@@ -45,19 +45,19 @@
 
     <!-- Email -->
     <string name="header_email">Forward via Email</string>
-    <string name="key_enable_email">key_enable_email</string>
+    <string name="key_enable_email" translatable="false">key_enable_email</string>
     <string name="enable_email">Enable Email</string>
-    <string name="key_email_to">key_email_to</string>
+    <string name="key_email_to" translatable="false">key_email_to</string>
     <string name="title_email_to">Send to</string>
     <string name="summary_email_to">Email address (several with Pro, comma-separated)</string>
-    <string name="key_smtp_host">key_smtp_host</string>
+    <string name="key_smtp_host" translatable="false">key_smtp_host</string>
     <string name="title_smtp_host">SMTP server</string>
-    <string name="key_smtp_port">key_smtp_port</string>
+    <string name="key_smtp_port" translatable="false">key_smtp_port</string>
     <string name="title_smtp_port">SMTP port (465 SSL or 587 STARTTLS)</string>
-    <string name="key_smtp_user">key_smtp_user</string>
+    <string name="key_smtp_user" translatable="false">key_smtp_user</string>
     <string name="title_smtp_user">Your email (sender)</string>
     <string name="summary_smtp_user">The account that sends the forwards</string>
-    <string name="key_smtp_password">key_smtp_password</string>
+    <string name="key_smtp_password" translatable="false">key_smtp_password</string>
     <string name="title_smtp_password">Password</string>
     <string name="summary_smtp_password">Gmail: create an App Password (Google Account → Security → 2-Step Verification → App passwords). Stored only on this phone.</string>
     <string name="email_subject">SMS from %s</string>
@@ -66,7 +66,7 @@
     <string name="free_one_email">The free version emails one address. Get Pro to email several.</string>
 
     <!-- Pause -->
-    <string name="key_paused">key_paused</string>
+    <string name="key_paused" translatable="false">key_paused</string>
     <string name="title_paused">Pause forwarding</string>
     <string name="summary_paused">Nothing is forwarded while paused. Also in Quick Settings and as a home-screen widget</string>
     <string name="status_paused">Forwarding is paused</string>
@@ -76,10 +76,10 @@
     <string name="widget_description">Pause or resume forwarding</string>
 
     <!-- Backup -->
-    <string name="key_export">key_export</string>
+    <string name="key_export" translatable="false">key_export</string>
     <string name="title_export">Export settings</string>
     <string name="summary_export">Save settings to a file (includes your Telegram bot token — keep it private)</string>
-    <string name="key_import">key_import</string>
+    <string name="key_import" translatable="false">key_import</string>
     <string name="title_import">Import settings</string>
     <string name="summary_import">Restore settings from an exported file</string>
     <string name="export_done">Settings exported</string>
@@ -88,18 +88,18 @@
 
     <!-- Blocklist -->
     <string name="header_blocklist">Blocklist Settings</string>
-    <string name="key_enable_blocklist">key_enable_blocklist</string>
+    <string name="key_enable_blocklist" translatable="false">key_enable_blocklist</string>
     <string name="enable_blocklist">Enable Blocklist</string>
-    <string name="key_blocked_numbers">key_blocked_numbers</string>
+    <string name="key_blocked_numbers" translatable="false">key_blocked_numbers</string>
     <string name="title_blocked_numbers">Blocked Phone Numbers</string>
     <string name="summary_blocked_numbers">Messages from these numbers will not be forwarded\nMultiple numbers separated by commas\nexample: +86 10000, +1 5551234567</string>
 
     <!-- Pro features -->
     <string name="header_pro_features">Pro features</string>
-    <string name="key_pro_unlock">key_pro_unlock</string>
+    <string name="key_pro_unlock" translatable="false">key_pro_unlock</string>
     <string name="title_pro_unlock">Unlock with Pro</string>
     <string name="summary_pro_unlock">Forward app notifications, routing rules, filters, OTP-only, custom text and a forward log</string>
-    <string name="key_forward_log">key_forward_log</string>
+    <string name="key_forward_log" translatable="false">key_forward_log</string>
     <string name="title_forward_log">Forward log</string>
     <string name="summary_forward_log">Recent forwards and their status (last 100, kept on this phone)</string>
     <string name="log_empty">No forwards yet</string>
@@ -113,10 +113,13 @@
     <string name="log_failed">✗ Failed — tap to retry</string>
     <string name="log_retry">Retry</string>
     <string name="log_retry_confirm">Send this message to %s again?</string>
-    <string name="key_rules">key_rules</string>
+    <string name="key_rules" translatable="false">key_rules</string>
     <string name="title_rules">Routing rules</string>
     <string name="summary_rules">Send different messages to different places</string>
-    <string name="rules_count">%d rule(s)</string>
+    <plurals name="rules_count">
+        <item quantity="one">%d rule</item>
+        <item quantity="other">%d rules</item>
+    </plurals>
     <string name="rules_explainer">A message goes to the methods of every rule it matches</string>
     <string name="rules_empty">No rules: every message goes to every enabled method.\nAdd a rule, e.g. bank codes → Telegram only.</string>
     <string name="rules_add">Add rule</string>
@@ -134,7 +137,7 @@
     <string name="rule_any">any</string>
     <string name="invalid_regex">Invalid regular expression: %s</string>
     <string name="invalid_regex_generic">One of the /regex/ keywords is invalid</string>
-    <string name="key_rules_unmatched">key_rules_unmatched</string>
+    <string name="key_rules_unmatched" translatable="false">key_rules_unmatched</string>
     <string name="title_rules_unmatched">Messages matching no rule</string>
     <string-array name="rules_unmatched_entries">
         <item>Send to every enabled method</item>
@@ -144,66 +147,101 @@
         <item>all</item>
         <item>none</item>
     </string-array>
-    <string name="key_otp_only">key_otp_only</string>
+    <string name="key_otp_only" translatable="false">key_otp_only</string>
     <string name="title_otp_only">Only verification codes</string>
     <string name="summary_otp_only">Forward only messages with a one-time code (OTP, verification code, PIN)</string>
-    <string name="key_enable_notifications">key_enable_notifications</string>
+    <string name="key_enable_notifications" translatable="false">key_enable_notifications</string>
     <string name="title_enable_notifications">Forward app notifications</string>
     <string name="summary_notifications_on">Forwarding notifications from the apps below</string>
     <string name="summary_notifications_access">Notification access is off — tap to allow</string>
-    <string name="key_notification_apps">key_notification_apps</string>
+    <string name="key_notification_apps" translatable="false">key_notification_apps</string>
     <string name="title_notification_apps">Apps</string>
-    <string name="summary_notification_apps">%d app(s) selected</string>
+    <plurals name="summary_notification_apps">
+        <item quantity="one">%d app selected</item>
+        <item quantity="other">%d apps selected</item>
+    </plurals>
     <string name="notification_access_title">Allow notification access</string>
     <string name="notification_access_message">To forward notifications, SMS Forward reads notifications from the apps you pick here — nothing else — and sends their title and text only to your own destinations. Android will open the Notification access screen: turn on SMS Forward.\n\nDon\'t pick an app you also forward to (like Telegram), or the forwards will arrive twice.</string>
-    <string name="key_enable_filter">key_enable_filter</string>
+    <string name="key_enable_filter" translatable="false">key_enable_filter</string>
     <string name="enable_filter">Only forward matching messages</string>
-    <string name="key_filter_keywords">key_filter_keywords</string>
+    <string name="key_filter_keywords" translatable="false">key_filter_keywords</string>
     <string name="title_filter_keywords">Keywords</string>
     <string name="summary_filter_keywords">Forward only messages containing any of these (comma-separated, any case)\nexample: OTP, code</string>
-    <string name="key_filter_senders">key_filter_senders</string>
+    <string name="key_filter_senders" translatable="false">key_filter_senders</string>
     <string name="title_filter_senders">Senders</string>
     <string name="summary_filter_senders">…and only from these numbers or sender names (both must match when both are set)\nexample: HDFCBK, +1 5551234567</string>
-    <string name="key_template">key_template</string>
+    <string name="key_template" translatable="false">key_template</string>
     <string name="title_template">Message format</string>
     <string name="summary_template">Text sent by SMS and Telegram. Placeholders: {from}, {sender}, {name}, {message}\nDefault: From {from}: {message}</string>
     <string name="invalid_template">The format must include {message}</string>
 
     <!-- Pro: schedule and safety -->
     <string name="header_pro_safety">Pro: schedule and safety</string>
-    <string name="key_quiet_hours">key_quiet_hours</string>
+    <string name="key_quiet_hours" translatable="false">key_quiet_hours</string>
     <string name="title_quiet_hours">Quiet hours</string>
     <string name="summary_quiet_hours">Hold forwards during these hours and send them when they end</string>
-    <string name="key_quiet_start">key_quiet_start</string>
+    <string name="key_quiet_start" translatable="false">key_quiet_start</string>
     <string name="title_quiet_start">Quiet from (HH:mm)</string>
-    <string name="key_quiet_end">key_quiet_end</string>
+    <string name="key_quiet_end" translatable="false">key_quiet_end</string>
     <string name="title_quiet_end">Quiet until (HH:mm)</string>
     <string name="invalid_time">Enter a time like 22:00</string>
-    <string name="key_pause_roaming">key_pause_roaming</string>
+    <string name="key_pause_roaming" translatable="false">key_pause_roaming</string>
     <string name="title_pause_roaming">Pause SMS forwarding while roaming</string>
     <string name="summary_pause_roaming">Avoid roaming SMS charges; Telegram, Web and Email keep working</string>
-    <string name="key_send_sim">key_send_sim</string>
+    <string name="key_send_sim" translatable="false">key_send_sim</string>
     <string name="title_send_sim">Send SMS from</string>
     <string name="sim_same">The SIM that received it</string>
     <string name="sim_entry">SIM %1$d · %2$s</string>
     <string name="sim_needs_permission">Allow phone access to list your SIMs</string>
-    <string name="key_heartbeat">key_heartbeat</string>
+    <string name="key_heartbeat" translatable="false">key_heartbeat</string>
     <string name="title_heartbeat">Daily \"still running\" message</string>
     <string name="summary_heartbeat">Once a day to Telegram/Web/Email, so you notice if forwarding stops</string>
-    <string name="key_low_battery">key_low_battery</string>
+    <string name="key_low_battery" translatable="false">key_low_battery</string>
     <string name="title_low_battery">Low-battery alert</string>
     <string name="summary_low_battery">Alert on Telegram/Web/Email when this phone drops to 15%</string>
     <string name="health_heartbeat">✅ SMS Forward is running on %1$s · battery %2$d%%</string>
     <string name="health_low_battery">🔋 Battery low on %1$s: %2$d%% — forwarding stops if it dies</string>
-    <string name="key_app_lock">key_app_lock</string>
+    <string name="key_app_lock" translatable="false">key_app_lock</string>
     <string name="title_app_lock">App lock</string>
     <string name="summary_app_lock">Require fingerprint, face or screen lock to open the app</string>
     <string name="app_lock_needs_screen_lock">Set a screen lock on this phone first</string>
     <string name="unlock_title">Unlock SMS Forward</string>
 
+    <!-- Language -->
+    <string name="key_language" translatable="false">key_language</string>
+    <string name="title_language">Language</string>
+    <string-array name="language_entries" translatable="false">
+        <item>System default</item>
+        <item>English</item>
+        <item>हिन्दी</item>
+        <item>Bahasa Indonesia</item>
+        <item>Português</item>
+        <item>Español</item>
+        <item>Русский</item>
+    </string-array>
+    <string-array name="language_values" translatable="false">
+        <item></item>
+        <item>en</item>
+        <item>hi</item>
+        <item>in</item>
+        <item>pt</item>
+        <item>es</item>
+        <item>ru</item>
+    </string-array>
+
+    <!-- Device setup help -->
+    <string name="battery_dialog_title">Battery optimization detected</string>
+    <string name="battery_help_miui">For Poco/Xiaomi devices:\n\n1. Go to Settings > Apps > Manage apps > SMS Forward\n2. Enable \'Autostart\' permission\n3. Go to Settings > Battery &amp; performance > Battery saver\n4. Add SMS Forward to \'No restrictions\'\n5. Go to Settings > Apps > Permissions > SMS Forward\n6. Enable all SMS permissions\n\nThis ensures the app stays running in background.</string>
+    <string name="battery_help_generic">To ensure SMS forwarding works reliably:\n\n1. Go to Settings > Apps > SMS Forward\n2. Disable battery optimization\n3. Enable background activity\n4. Grant all required permissions\n\nThis prevents the system from killing the app.</string>
+    <string name="autostart_help_miui">For Poco/Xiaomi devices:\n\n1. Go to Settings > Apps > Manage apps > SMS Forward\n2. Tap on \'Autostart\' and enable it\n3. Go to Settings > Battery &amp; performance > Battery saver\n4. Add SMS Forward to \'No restrictions\'\n5. Go to Settings > Apps > Permissions > SMS Forward\n6. Enable all SMS permissions\n\nThis ensures the app starts automatically after reboot.</string>
+    <string name="autostart_help_emui">For Huawei/Honor devices:\n\n1. Go to Settings > Apps > SMS Forward\n2. Tap on \'Autostart\' and enable it\n3. Go to Settings > Battery > App launch\n4. Set SMS Forward to \'Manual\'\n5. Enable all required permissions\n\nThis ensures the app starts automatically after reboot.</string>
+    <string name="autostart_help_coloros">For OPPO/OnePlus devices:\n\n1. Go to Settings > Apps > SMS Forward\n2. Tap on \'Autostart\' and enable it\n3. Go to Settings > Battery > Background app management\n4. Set SMS Forward to \'Allow\'\n5. Enable all required permissions\n\nThis ensures the app starts automatically after reboot.</string>
+    <string name="autostart_help_vivo">For Vivo devices:\n\n1. Go to Settings > Apps > SMS Forward\n2. Tap on \'Autostart\' and enable it\n3. Go to Settings > Battery > Background app management\n4. Set SMS Forward to \'Allow\'\n5. Enable all required permissions\n\nThis ensures the app starts automatically after reboot.</string>
+    <string name="autostart_help_generic">To ensure SMS forwarding works after reboot:\n\n1. Go to Settings > Apps > SMS Forward\n2. Enable \'Allow background activity\'\n3. Disable battery optimization\n4. Enable all required permissions\n\nThis prevents the system from killing the app.</string>
+
     <!-- System -->
     <string name="header_system">System Settings</string>
-    <string name="key_theme">key_theme</string>
+    <string name="key_theme" translatable="false">key_theme</string>
     <string name="title_theme">Theme</string>
     <string-array name="theme_entries">
         <item>Follow system</item>
@@ -215,25 +253,25 @@
         <item>light</item>
         <item>dark</item>
     </string-array>
-    <string name="key_permission_status">key_permission_status</string>
+    <string name="key_permission_status" translatable="false">key_permission_status</string>
     <string name="title_permission_status">Permission Status</string>
     <string name="summary_permission_status">Check and manage app permissions</string>
-    <string name="key_battery_optimization">key_battery_optimization</string>
+    <string name="key_battery_optimization" translatable="false">key_battery_optimization</string>
     <string name="title_battery_optimization">Battery Optimization</string>
     <string name="summary_battery_optimization">Disable battery optimization to ensure SMS forwarding works reliably</string>
-    <string name="key_autostart_settings">key_autostart_settings</string>
+    <string name="key_autostart_settings" translatable="false">key_autostart_settings</string>
     <string name="title_autostart_settings">Auto-start Settings</string>
     <string name="summary_autostart_settings">Enable auto-start for MIUI/Poco devices</string>
-    <string name="key_send_test">key_send_test</string>
+    <string name="key_send_test" translatable="false">key_send_test</string>
     <string name="title_send_test">Send test message</string>
     <string name="summary_send_test">Sends a test through each enabled method (SMS may cost per your plan)</string>
 
-    <string name="key_privacy_choices">key_privacy_choices</string>
+    <string name="key_privacy_choices" translatable="false">key_privacy_choices</string>
     <string name="title_privacy_choices">Privacy choices</string>
     <string name="summary_privacy_choices">Change your ad consent</string>
 
     <!-- Pro -->
-    <string name="key_pro">key_pro</string>
+    <string name="key_pro" translatable="false">key_pro</string>
     <string name="title_pro">SMS Forward Pro</string>
     <string name="summary_pro">Remove ads</string>
     <string name="remove_ads">Remove ads</string>
@@ -288,8 +326,14 @@
     <string name="test_message">This is a test message from SMS Forward.</string>
     <string name="test_sending">Sending test…</string>
     <string name="test_result_title">Test results</string>
-    <string name="test_sms_sent">SMS: sent to %d number(s)</string>
-    <string name="test_sms_failed">SMS: %d number(s) failed — check the SMS permission</string>
+    <plurals name="test_sms_sent">
+        <item quantity="one">SMS: sent to %d number</item>
+        <item quantity="other">SMS: sent to %d numbers</item>
+    </plurals>
+    <plurals name="test_sms_failed">
+        <item quantity="one">SMS: %d number failed — check the SMS permission</item>
+        <item quantity="other">SMS: %d numbers failed — check the SMS permission</item>
+    </plurals>
     <string name="test_sms_no_numbers">SMS: no numbers set</string>
     <string name="test_ok">%s: delivered ✓</string>
     <string name="test_retry">%s: network or server error — try again</string>

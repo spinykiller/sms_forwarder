@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SMS Forward</string>
+    <string name="header_sms">Teruskan via SMS</string>
+    <string name="enable_sms">Aktifkan SMS</string>
+    <string name="target_title_sms">Nomor tujuan</string>
+    <string name="target_summary_sms">Beberapa nomor dipisahkan koma (Pro; versi gratis meneruskan ke satu nomor)\ncontoh: +62 81234567890, +1 5551234567</string>
+    <string name="header_telegram">Teruskan via Telegram</string>
+    <string name="enable_telegram">Aktifkan Telegram</string>
+    <string name="target_title_telegram">ID chat Telegram</string>
+    <string name="target_summary_telegram">ID chat (angka) atau @username untuk grup/channel\ncontoh: 123456789 atau @grupku</string>
+    <string name="title_telegram_apikey">Token bot Telegram</string>
+    <string name="summary_telegram_apikey">Dapatkan dari @BotFather di Telegram\ncontoh: 110201543:AAH4eZxxxxxxxxxxxxxxxxxxxxxP4U</string>
+    <string name="header_web">Teruskan via Web</string>
+    <string name="enable_web">Aktifkan Web</string>
+    <string name="target_title_web">URL tujuan</string>
+    <string name="target_summary_web">Contoh: https://situs.com/api (hanya https)\nAplikasi mengirim request POST saat menerima SMS, contoh body:\n{ \"from\": \"10000\", \"message\": \"Halo\" }</string>
+    <string name="title_web_format">Format</string>
+    <string-array name="web_format_entries">
+        <item>JSON {from, message}</item>
+        <item>Webhook Slack</item>
+        <item>Webhook Discord</item>
+        <item>Webhook Microsoft Teams</item>
+    </string-array>
+    <string name="header_email">Teruskan via Email</string>
+    <string name="enable_email">Aktifkan Email</string>
+    <string name="title_email_to">Kirim ke</string>
+    <string name="summary_email_to">Alamat email (beberapa dengan Pro, dipisahkan koma)</string>
+    <string name="title_smtp_host">Server SMTP</string>
+    <string name="title_smtp_port">Port SMTP (465 SSL atau 587 STARTTLS)</string>
+    <string name="title_smtp_user">Email Anda (pengirim)</string>
+    <string name="summary_smtp_user">Akun yang mengirim pesan terusan</string>
+    <string name="title_smtp_password">Kata sandi</string>
+    <string name="summary_smtp_password">Gmail: buat Sandi Aplikasi (Akun Google → Keamanan → Verifikasi 2 Langkah → Sandi aplikasi). Hanya disimpan di ponsel ini.</string>
+    <string name="email_subject">SMS dari %s</string>
+    <string name="invalid_email">Masukkan alamat email dipisahkan koma</string>
+    <string name="invalid_port">Masukkan nomor port, mis. 465 atau 587</string>
+    <string name="free_one_email">Versi gratis mengirim ke satu alamat. Pakai Pro untuk beberapa alamat.</string>
+    <string name="title_paused">Jeda penerusan</string>
+    <string name="summary_paused">Tidak ada yang diteruskan saat dijeda. Juga ada di Setelan Cepat dan sebagai widget</string>
+    <string name="status_paused">Penerusan sedang dijeda</string>
+    <string name="tile_label">SMS Forward</string>
+    <string name="widget_on">Penerusan aktif</string>
+    <string name="widget_paused">Dijeda</string>
+    <string name="widget_description">Jeda atau lanjutkan penerusan</string>
+    <string name="title_export">Ekspor setelan</string>
+    <string name="summary_export">Simpan setelan ke file (termasuk token bot Telegram Anda — jaga kerahasiaannya)</string>
+    <string name="title_import">Impor setelan</string>
+    <string name="summary_import">Pulihkan setelan dari file ekspor</string>
+    <string name="export_done">Setelan diekspor</string>
+    <string name="import_done">Setelan diimpor</string>
+    <string name="backup_failed">Gagal: %s</string>
+    <string name="header_blocklist">Daftar blokir</string>
+    <string name="enable_blocklist">Aktifkan daftar blokir</string>
+    <string name="title_blocked_numbers">Nomor yang diblokir</string>
+    <string name="summary_blocked_numbers">Pesan dari nomor ini tidak akan diteruskan\nBeberapa nomor dipisahkan koma\ncontoh: +62 81234567890, +1 5551234567</string>
+    <string name="header_pro_features">Fitur Pro</string>
+    <string name="title_pro_unlock">Buka dengan Pro</string>
+    <string name="summary_pro_unlock">Teruskan notifikasi aplikasi, aturan rute, filter, hanya OTP, teks khusus, dan log penerusan</string>
+    <string name="title_forward_log">Log penerusan</string>
+    <string name="summary_forward_log">Penerusan terbaru dan statusnya (100 terakhir, disimpan di ponsel ini)</string>
+    <string name="log_empty">Belum ada penerusan</string>
+    <string name="log_clear">Hapus log</string>
+    <string name="log_clear_confirm">Hapus log penerusan dari ponsel ini?</string>
+    <string name="log_row_title">%1$s · %2$s · %3$s</string>
+    <string name="log_row_body">%1$s: %2$s</string>
+    <string name="log_delivered">✓ Terkirim</string>
+    <string name="log_sent">✓ Dikirim</string>
+    <string name="log_queued">⏳ Antre</string>
+    <string name="log_failed">✗ Gagal — ketuk untuk coba lagi</string>
+    <string name="log_retry">Coba lagi</string>
+    <string name="log_retry_confirm">Kirim pesan ini ke %s lagi?</string>
+    <string name="title_rules">Aturan rute</string>
+    <string name="summary_rules">Kirim pesan berbeda ke tujuan berbeda</string>
+    <plurals name="rules_count">
+        <item quantity="other">%d aturan</item>
+    </plurals>
+    <string name="rules_explainer">Pesan dikirim ke metode dari setiap aturan yang cocok</string>
+    <string name="rules_empty">Belum ada aturan: setiap pesan dikirim ke semua metode yang aktif.\nTambahkan aturan, mis. kode bank → hanya Telegram.</string>
+    <string name="rules_add">Tambah aturan</string>
+    <string name="rule_edit">Edit aturan</string>
+    <string name="rule_save">Simpan</string>
+    <string name="rule_delete">Hapus</string>
+    <string name="rule_name">Nama (mis. Kode bank)</string>
+    <string name="rule_senders">Dari pengirim (nomor atau nama; kosong = siapa saja)</string>
+    <string name="rule_keywords">Berisi (kata atau /regex/; kosong = apa saja)</string>
+    <string name="rule_send_to">Kirim ke</string>
+    <string name="rule_no_methods">Pilih setidaknya satu metode</string>
+    <string name="rule_default_name">Aturan %d</string>
+    <string name="rule_row_title">%1$s → %2$s</string>
+    <string name="rule_row_body">Dari: %1$s · Berisi: %2$s</string>
+    <string name="rule_any">apa saja</string>
+    <string name="invalid_regex">Ekspresi reguler tidak valid: %s</string>
+    <string name="invalid_regex_generic">Salah satu kata kunci /regex/ tidak valid</string>
+    <string name="title_rules_unmatched">Pesan yang tidak cocok dengan aturan</string>
+    <string-array name="rules_unmatched_entries">
+        <item>Kirim ke semua metode yang aktif</item>
+        <item>Jangan teruskan</item>
+    </string-array>
+    <string name="title_otp_only">Hanya kode verifikasi</string>
+    <string name="summary_otp_only">Teruskan hanya pesan dengan kode sekali pakai (OTP, kode verifikasi, PIN)</string>
+    <string name="title_enable_notifications">Teruskan notifikasi aplikasi</string>
+    <string name="summary_notifications_on">Meneruskan notifikasi dari aplikasi di bawah</string>
+    <string name="summary_notifications_access">Akses notifikasi nonaktif — ketuk untuk mengizinkan</string>
+    <string name="title_notification_apps">Aplikasi</string>
+    <plurals name="summary_notification_apps">
+        <item quantity="other">%d aplikasi dipilih</item>
+    </plurals>
+    <string name="notification_access_title">Izinkan akses notifikasi</string>
+    <string name="notification_access_message">Untuk meneruskan notifikasi, SMS Forward membaca notifikasi dari aplikasi yang Anda pilih di sini — tidak ada yang lain — dan mengirim judul serta teksnya hanya ke tujuan Anda sendiri. Android akan membuka layar Akses notifikasi: aktifkan SMS Forward.\n\nJangan pilih aplikasi yang juga menjadi tujuan (seperti Telegram), atau pesan terusan akan datang dua kali.</string>
+    <string name="enable_filter">Hanya teruskan pesan yang cocok</string>
+    <string name="title_filter_keywords">Kata kunci</string>
+    <string name="summary_filter_keywords">Teruskan hanya pesan yang berisi salah satu kata ini (dipisahkan koma, huruf besar/kecil sama)\ncontoh: OTP, kode</string>
+    <string name="title_filter_senders">Pengirim</string>
+    <string name="summary_filter_senders">…dan hanya dari nomor atau nama pengirim ini (keduanya harus cocok jika keduanya diisi)\ncontoh: BCA, +62 81234567890</string>
+    <string name="title_template">Format pesan</string>
+    <string name="summary_template">Teks yang dikirim via SMS dan Telegram. Penanda: {from}, {sender}, {name}, {message}\nBawaan: From {from}: {message}</string>
+    <string name="invalid_template">Format harus berisi {message}</string>
+    <string name="header_pro_safety">Pro: jadwal dan keamanan</string>
+    <string name="title_quiet_hours">Jam tenang</string>
+    <string name="summary_quiet_hours">Tahan penerusan selama jam ini dan kirim setelah selesai</string>
+    <string name="title_quiet_start">Tenang mulai (HH:mm)</string>
+    <string name="title_quiet_end">Tenang sampai (HH:mm)</string>
+    <string name="invalid_time">Masukkan waktu seperti 22:00</string>
+    <string name="title_pause_roaming">Jeda SMS saat roaming</string>
+    <string name="summary_pause_roaming">Hindari biaya SMS roaming; Telegram, Web, dan Email tetap berjalan</string>
+    <string name="title_send_sim">Kirim SMS dari</string>
+    <string name="sim_same">SIM yang menerima pesan</string>
+    <string name="sim_entry">SIM %1$d · %2$s</string>
+    <string name="sim_needs_permission">Izinkan akses telepon untuk melihat daftar SIM</string>
+    <string name="title_heartbeat">Pesan harian \"masih berjalan\"</string>
+    <string name="summary_heartbeat">Sekali sehari ke Telegram/Web/Email, agar Anda tahu jika penerusan berhenti</string>
+    <string name="title_low_battery">Peringatan baterai lemah</string>
+    <string name="summary_low_battery">Beri tahu via Telegram/Web/Email saat baterai ponsel ini turun ke 15%</string>
+    <string name="health_heartbeat">✅ SMS Forward berjalan di %1$s · baterai %2$d%%</string>
+    <string name="health_low_battery">🔋 Baterai lemah di %1$s: %2$d%% — penerusan berhenti jika baterai habis</string>
+    <string name="title_app_lock">Kunci aplikasi</string>
+    <string name="summary_app_lock">Minta sidik jari, wajah, atau kunci layar untuk membuka aplikasi</string>
+    <string name="app_lock_needs_screen_lock">Atur kunci layar di ponsel ini terlebih dahulu</string>
+    <string name="unlock_title">Buka SMS Forward</string>
+    <string name="title_language">Bahasa</string>
+    <string name="battery_dialog_title">Optimasi baterai terdeteksi</string>
+    <string name="battery_help_miui">Untuk perangkat Poco/Xiaomi:\n\n1. Buka Setelan &gt; Aplikasi &gt; Kelola aplikasi &gt; SMS Forward\n2. Aktifkan izin \"Mulai otomatis\"\n3. Buka Setelan &gt; Baterai &amp; performa &gt; Penghemat baterai\n4. Setel SMS Forward ke \"Tanpa batasan\"\n5. Buka Setelan &gt; Aplikasi &gt; Izin &gt; SMS Forward\n6. Aktifkan semua izin SMS\n\nIni memastikan aplikasi tetap berjalan di latar belakang.</string>
+    <string name="battery_help_generic">Agar penerusan SMS berjalan andal:\n\n1. Buka Setelan &gt; Aplikasi &gt; SMS Forward\n2. Nonaktifkan optimasi baterai\n3. Izinkan aktivitas latar belakang\n4. Berikan semua izin yang diperlukan\n\nIni mencegah sistem menghentikan aplikasi.</string>
+    <string name="autostart_help_miui">Untuk perangkat Poco/Xiaomi:\n\n1. Buka Setelan &gt; Aplikasi &gt; Kelola aplikasi &gt; SMS Forward\n2. Ketuk \"Mulai otomatis\" lalu aktifkan\n3. Buka Setelan &gt; Baterai &amp; performa &gt; Penghemat baterai\n4. Setel SMS Forward ke \"Tanpa batasan\"\n5. Buka Setelan &gt; Aplikasi &gt; Izin &gt; SMS Forward\n6. Aktifkan semua izin SMS\n\nIni memastikan aplikasi otomatis berjalan setelah ponsel dinyalakan ulang.</string>
+    <string name="autostart_help_emui">Untuk perangkat Huawei/Honor:\n\n1. Buka Setelan &gt; Aplikasi &gt; SMS Forward\n2. Ketuk \"Mulai otomatis\" lalu aktifkan\n3. Buka Setelan &gt; Baterai &gt; Peluncuran aplikasi\n4. Setel SMS Forward ke \"Manual\"\n5. Aktifkan semua izin yang diperlukan\n\nIni memastikan aplikasi otomatis berjalan setelah ponsel dinyalakan ulang.</string>
+    <string name="autostart_help_coloros">Untuk perangkat OPPO/OnePlus:\n\n1. Buka Setelan &gt; Aplikasi &gt; SMS Forward\n2. Ketuk \"Mulai otomatis\" lalu aktifkan\n3. Buka Setelan &gt; Baterai &gt; Pengelolaan aplikasi latar belakang\n4. Setel SMS Forward ke \"Izinkan\"\n5. Aktifkan semua izin yang diperlukan\n\nIni memastikan aplikasi otomatis berjalan setelah ponsel dinyalakan ulang.</string>
+    <string name="autostart_help_vivo">Untuk perangkat Vivo:\n\n1. Buka Setelan &gt; Aplikasi &gt; SMS Forward\n2. Ketuk \"Mulai otomatis\" lalu aktifkan\n3. Buka Setelan &gt; Baterai &gt; Pengelolaan aplikasi latar belakang\n4. Setel SMS Forward ke \"Izinkan\"\n5. Aktifkan semua izin yang diperlukan\n\nIni memastikan aplikasi otomatis berjalan setelah ponsel dinyalakan ulang.</string>
+    <string name="autostart_help_generic">Agar penerusan tetap berjalan setelah ponsel dinyalakan ulang:\n\n1. Buka Setelan &gt; Aplikasi &gt; SMS Forward\n2. Aktifkan \"Izinkan aktivitas latar belakang\"\n3. Nonaktifkan optimasi baterai\n4. Aktifkan semua izin yang diperlukan\n\nIni mencegah sistem menghentikan aplikasi.</string>
+    <string name="header_system">Setelan sistem</string>
+    <string name="title_theme">Tema</string>
+    <string-array name="theme_entries">
+        <item>Ikuti sistem</item>
+        <item>Terang</item>
+        <item>Gelap</item>
+    </string-array>
+    <string name="title_permission_status">Status izin</string>
+    <string name="summary_permission_status">Periksa dan kelola izin aplikasi</string>
+    <string name="title_battery_optimization">Optimasi baterai</string>
+    <string name="summary_battery_optimization">Nonaktifkan optimasi baterai agar penerusan SMS berjalan andal</string>
+    <string name="title_autostart_settings">Mulai otomatis</string>
+    <string name="summary_autostart_settings">Aktifkan mulai otomatis di perangkat MIUI/Poco</string>
+    <string name="title_send_test">Kirim pesan uji</string>
+    <string name="summary_send_test">Mengirim pesan uji lewat setiap metode aktif (SMS mungkin dikenai biaya sesuai paket Anda)</string>
+    <string name="title_privacy_choices">Pilihan privasi</string>
+    <string name="summary_privacy_choices">Ubah persetujuan iklan Anda</string>
+    <string name="title_pro">SMS Forward Pro</string>
+    <string name="summary_pro">Hapus iklan</string>
+    <string name="remove_ads">Hapus iklan</string>
+    <string name="pro_title">SMS Forward Pro</string>
+    <string name="pro_features">• Tanpa iklan\n• Teruskan notifikasi aplikasi (WhatsApp, aplikasi bank, …)\n• Aturan rute: pesan berbeda ke tujuan berbeda\n• Mode hanya kode verifikasi (OTP)\n• Teruskan ke beberapa nomor dan email\n• Teruskan hanya pesan yang cocok dengan kata kunci atau pengirim\n• Format pesan khusus\n• Log penerusan dengan coba lagi\n• Mendukung pengembangan</string>
+    <string name="pro_plan_annual">Tahunan — %s</string>
+    <string name="pro_plan_annual_trial">Tahunan — uji coba gratis, lalu %s</string>
+    <string name="pro_plan_monthly">Bulanan — %s</string>
+    <string name="pro_plan_lifetime">Seumur hidup — %s, sekali bayar</string>
+    <string name="pro_terms_subscription">Diperpanjang otomatis seharga %s sampai Anda membatalkan. Batalkan kapan saja di Google Play.</string>
+    <string name="pro_terms_trial">Gratis selama uji coba, lalu %s per tahun, diperpanjang sampai Anda membatalkan. Batalkan sebelum uji coba berakhir agar tidak ditagih.</string>
+    <string name="pro_terms_lifetime">Sekali bayar. Tanpa langganan.</string>
+    <string name="pro_buy">Lanjutkan</string>
+    <string name="pro_restore">Pulihkan pembelian</string>
+    <string name="pro_restoring">Memeriksa pembelian Anda…</string>
+    <string name="pro_manage">Kelola langganan</string>
+    <string name="pro_active">Pro aktif ✓</string>
+    <string name="pro_pending">Pembayaran tertunda — Pro aktif setelah pembayaran selesai</string>
+    <string name="pro_store_unavailable">Penagihan Google Play sedang tidak tersedia. Pastikan Anda sudah masuk ke Play dan online.</string>
+    <string name="status_permission_missing">Perlu izin SMS — ketuk untuk memberikan</string>
+    <string name="status_off">Penerusan nonaktif — aktifkan metode di bawah</string>
+    <string name="status_forwarding">Meneruskan via %s</string>
+    <string name="status_not_set_up">%s (belum diatur)</string>
+    <string name="battery_optimized">Optimasi baterai aktif — penerusan bisa tertunda atau berhenti. Ketuk untuk memperbaiki</string>
+    <string name="battery_ok">Tidak dioptimasi baterai ✓</string>
+    <string name="permissions_ok">Semua izin diberikan ✓</string>
+    <string name="permissions_sms_missing">Izin SMS belum ada — ketuk untuk memperbaiki</string>
+    <string name="permissions_contacts_missing">Kontak tidak diizinkan (opsional: nama pengirim disembunyikan)</string>
+    <string name="permission_title">Izinkan akses SMS</string>
+    <string name="permission_message">SMS Forward membaca pesan masuk hanya untuk meneruskannya ke nomor, chat Telegram, atau alamat web yang Anda atur. Tidak ada yang dikirim ke tempat lain.\n\n• SMS: menerima pesan dan meneruskannya via SMS\n• Kontak (opsional): menampilkan nama pengirim</string>
+    <string name="permission_denied_title">Izin SMS ditolak</string>
+    <string name="permission_denied_message">Penerusan tidak bisa berjalan tanpa akses SMS. Izinkan di setelan aplikasi, bagian Izin.</string>
+    <string name="open_settings">Buka setelan</string>
+    <string name="continue_">Lanjutkan</string>
+    <string name="not_now">Nanti saja</string>
+    <string name="later">Nanti</string>
+    <string name="invalid_numbers">Masukkan nomor telepon dipisahkan koma</string>
+    <string name="free_one_number">Versi gratis meneruskan ke satu nomor. Pakai Pro untuk beberapa nomor.</string>
+    <string name="invalid_chat_id">Masukkan ID chat berupa angka atau @username</string>
+    <string name="invalid_token">Itu tidak terlihat seperti token bot (123456:ABC…)</string>
+    <string name="invalid_url">Masukkan URL https:// lengkap</string>
+    <string name="test_none_enabled">Aktifkan metode penerusan terlebih dahulu</string>
+    <string name="test_sender">SMS Forward (uji)</string>
+    <string name="test_message">Ini pesan uji dari SMS Forward.</string>
+    <string name="test_sending">Mengirim pesan uji…</string>
+    <string name="test_result_title">Hasil uji</string>
+    <plurals name="test_sms_sent">
+        <item quantity="other">SMS: dikirim ke %d nomor</item>
+    </plurals>
+    <plurals name="test_sms_failed">
+        <item quantity="other">SMS: %d nomor gagal — periksa izin SMS</item>
+    </plurals>
+    <string name="test_sms_no_numbers">SMS: belum ada nomor</string>
+    <string name="test_ok">%s: terkirim ✓</string>
+    <string name="test_retry">%s: kesalahan jaringan atau server — coba lagi</string>
+    <string name="test_fail">%s: ditolak — periksa setelan</string>
+</resources>

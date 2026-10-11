@@ -63,6 +63,11 @@ android {
         }
     }
     
+    // Lists the app's languages for Android 13+ per-app language settings
+    androidResources {
+        generateLocaleConfig true
+    }
+
     // BuildConfig carries the AdMob banner unit
     buildFeatures {
         buildConfig true

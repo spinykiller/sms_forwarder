@@ -32,7 +32,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.os.LocaleListCompat;
 import androidx.preference.EditTextPreference;
+import androidx.preference.ListPreference;
 import androidx.preference.MultiSelectListPreference;
 import androidx.preference.SwitchPreferenceCompat;
 import androidx.preference.Preference;
@@ -259,7 +261,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         if (!BatteryOptimizationHelper.isBatteryOptimized(this) || prefs.getBoolean(KEY_BATTERY_PROMPTED, false)) return;
         prefs.edit().putBoolean(KEY_BATTERY_PROMPTED, true).apply();
         new AlertDialog.Builder(this)
-            .setTitle("Battery Optimization Detected")
+            .setTitle(R.string.battery_dialog_title)
             .setMessage(BatteryOptimizationHelper.getBatteryOptimizationInstructions(this))
             .setPositiveButton(R.string.open_settings, (dialog, which) -> BatteryOptimizationHelper.openBatteryOptimizationSettings(this))
             .setNegativeButton(R.string.later, null)
@@ -381,6 +383,14 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 Ads.showPrivacyOptions(activity, activity::bindAd);
                 return true;
             });
+            // Per-app language (AppCompat persists it); the setting shows the current one rather than storing it
+            ListPreference language = findPreference(getString(R.string.key_language));
+            language.setValue(AppCompatDelegate.getApplicationLocales().toLanguageTags());
+            language.setSummary(language.getEntry());
+            language.setOnPreferenceChangeListener((preference, value) -> {
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags((String) value));
+                return true;
+            });
             // Recreates open screens in the new theme
             findPreference(getString(R.string.key_theme)).setOnPreferenceChangeListener((preference, value) -> {
                 applyTheme((String) value);
@@ -446,7 +456,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             findPreference(getString(R.string.key_send_sim)).setSummary("same".equals(PreferenceManager.getDefaultSharedPreferences(context)
                     .getString(getString(R.string.key_send_sim), "same")) ? getString(R.string.sim_same) : getString(R.string.title_send_sim));
             findPreference(getString(R.string.key_rules)).setSummary(Rules.load(context).isEmpty()
-                    ? getString(R.string.summary_rules) : getString(R.string.rules_count, Rules.load(context).size()));
+                    ? getString(R.string.summary_rules) : getResources().getQuantityString(R.plurals.rules_count, Rules.load(context).size(), Rules.load(context).size()));
             findPreference(getString(R.string.key_enable_notifications)).setSummary(NotificationForwarder.hasAccess(context)
                     ? R.string.summary_notifications_on : R.string.summary_notifications_access);
             findPreference(getString(R.string.key_privacy_choices)).setVisible(Ads.privacyOptionsRequired(context));
@@ -468,7 +478,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             MultiSelectListPreference apps = findPreference(getString(R.string.key_notification_apps));
             apps.setEntries(appsByLabel.keySet().toArray(new CharSequence[0]));
             apps.setEntryValues(appsByLabel.values().toArray(new CharSequence[0]));
-            apps.setSummaryProvider(p -> getString(R.string.summary_notification_apps, ((MultiSelectListPreference) p).getValues().size()));
+            apps.setSummaryProvider(p -> {
+                int n = ((MultiSelectListPreference) p).getValues().size();
+                return getResources().getQuantityString(R.plurals.summary_notification_apps, n, n);
+            });
         }
 
         @SuppressLint("MissingPermission") // checked by the caller
@@ -573,8 +586,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                                 MessageRules.format(MessageRules.DEFAULT_SMS_FORMAT, sender, sender, "", message), target, -1)) sent++;
                     }
                     results.add(targets.isEmpty() ? context.getString(R.string.test_sms_no_numbers)
-                            : sent == targets.size() ? context.getString(R.string.test_sms_sent, sent)
-                            : context.getString(R.string.test_sms_failed, targets.size() - sent));
+                            : sent == targets.size() ? context.getResources().getQuantityString(R.plurals.test_sms_sent, sent, sent)
+                            : context.getResources().getQuantityString(R.plurals.test_sms_failed, targets.size() - sent, targets.size() - sent));
                 }
                 String telegramText = MessageRules.format(MessageRules.DEFAULT_TELEGRAM_FORMAT, sender, sender, "", message);
                 for (String channel : ForwardWorker.CHANNELS) {
