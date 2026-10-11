@@ -72,10 +72,26 @@ public class Forwarder {
                     "chat_id=" + encode(destination) + "&text=" + encode(text));
         }
         try {
-            JSONObject body = new JSONObject().put("from", senderLabel).put("message", message);
-            return post(destination, "application/json; charset=utf-8", body.toString());
+            return post(destination, "application/json; charset=utf-8", webBody(context, senderLabel, message, text).toString());
         } catch (JSONException e) {
             return FAIL;
+        }
+    }
+
+    // Discord rejects longer content
+    private static final int DISCORD_MAX_CHARS = 2000;
+
+    /** JSON per the chosen webhook format: plain {from, message}, or Slack/Teams {text} / Discord {content} with the formatted text. */
+    private static JSONObject webBody(Context context, String senderLabel, String message, String text) throws JSONException {
+        String format = PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.key_web_format), "json");
+        switch (format) {
+            case "slack":
+            case "teams":
+                return new JSONObject().put("text", text);
+            case "discord":
+                return new JSONObject().put("content", text.length() > DISCORD_MAX_CHARS ? text.substring(0, DISCORD_MAX_CHARS - 1) + "…" : text);
+            default:
+                return new JSONObject().put("from", senderLabel).put("message", message);
         }
     }
 

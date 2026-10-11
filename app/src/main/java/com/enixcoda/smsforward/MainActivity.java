@@ -16,6 +16,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -27,6 +29,9 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 
+import org.json.JSONException;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -99,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         updateStatus();
         bindAd(); // Pro status is cached in prefs
+        if (getString(R.string.key_paused).equals(key)) Pause.refresh(this);
         if (Billing.KEY_PRO.equals(key)) {
             SettingsFragment settings = (SettingsFragment) getSupportFragmentManager().findFragmentById(R.id.settings);
             if (settings != null && settings.isResumed()) settings.refresh();
@@ -118,6 +124,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private void updateStatus() {
         if (!hasSmsPermissions(this)) {
             statusText.setText(R.string.status_permission_missing);
+            return;
+        }
+        if (Dispatcher.isPaused(this)) {
+            statusText.setText(R.string.status_paused);
             return;
         }
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -193,6 +203,24 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
+        private final ActivityResultLauncher<String> exportLauncher = registerForActivityResult(
+                new ActivityResultContracts.CreateDocument("application/json"), uri -> backup(uri, true));
+        private final ActivityResultLauncher<String[]> importLauncher = registerForActivityResult(
+                new ActivityResultContracts.OpenDocument(), uri -> backup(uri, false));
+
+        private void backup(Uri uri, boolean export) {
+            if (uri == null) return; // picker cancelled
+            Context context = requireContext();
+            try {
+                if (export) SettingsBackup.export(context, uri);
+                else SettingsBackup.restore(context, uri);
+                Toast.makeText(context, export ? R.string.export_done : R.string.import_done, Toast.LENGTH_SHORT).show();
+                if (!export) requireActivity().recreate(); // show the imported values
+            } catch (IOException | JSONException | SecurityException e) {
+                Toast.makeText(context, getString(R.string.backup_failed, e.getMessage()), Toast.LENGTH_LONG).show();
+            }
+        }
+
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
@@ -249,6 +277,14 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             // Recreates open screens in the new theme
             findPreference(getString(R.string.key_theme)).setOnPreferenceChangeListener((preference, value) -> {
                 applyTheme((String) value);
+                return true;
+            });
+            findPreference(getString(R.string.key_export)).setOnPreferenceClickListener(preference -> {
+                exportLauncher.launch("sms-forward-settings.json");
+                return true;
+            });
+            findPreference(getString(R.string.key_import)).setOnPreferenceClickListener(preference -> {
+                importLauncher.launch(new String[]{"application/json", "text/plain", "application/octet-stream"});
                 return true;
             });
             findPreference(getString(R.string.key_send_test)).setOnPreferenceClickListener(preference -> {
@@ -335,7 +371,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             new Thread(() -> {
                 List<String> results = new ArrayList<>();
                 if (sms) {
-                    List<String> targets = SMSReceiver.forwardTargets(Billing.isPro(context),
+                    List<String> targets = Dispatcher.forwardTargets(Billing.isPro(context),
                             PhoneNumberUtils.parsePhoneNumbers(prefs.getString(context.getString(R.string.key_target_sms), "")));
                     int sent = 0;
                     for (String target : targets) {

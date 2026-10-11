@@ -17,12 +17,10 @@ import android.util.Log;
 
 import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
-import androidx.work.Operation;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,28 +46,10 @@ public class SMSReceiver extends BroadcastReceiver {
     }
 
     private void handle(Context context, Intent intent) {
+        if (Dispatcher.isPaused(context)) return;
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-
-        final boolean enableSMS = sharedPreferences.getBoolean(context.getString(R.string.key_enable_sms), false);
-        final String targetNumbersString = sharedPreferences.getString(context.getString(R.string.key_target_sms), "");
-        final List<String> targetNumbers = PhoneNumberUtils.parsePhoneNumbers(targetNumbersString);
-
-        final boolean enableWeb = sharedPreferences.getBoolean(context.getString(R.string.key_enable_web), false);
-        final boolean enableTelegram = sharedPreferences.getBoolean(context.getString(R.string.key_enable_telegram), false);
-
-        // Get blocklist settings; entries stay raw so alphanumeric sender IDs (e.g. "HDFCBK") can be blocked
-        final boolean enableBlocklist = sharedPreferences.getBoolean(context.getString(R.string.key_enable_blocklist), false);
-        final String blockedNumbersString = sharedPreferences.getString(context.getString(R.string.key_blocked_numbers), "");
-        final List<String> blockedEntries = PhoneNumberUtils.splitList(blockedNumbersString);
-
-        // Pro: forward only matching messages, custom format. Ignored if Pro lapses (forward everything, default format).
-        final boolean pro = Billing.isPro(context);
-        final boolean enableFilter = pro && sharedPreferences.getBoolean(context.getString(R.string.key_enable_filter), false);
-        final List<String> filterKeywords = PhoneNumberUtils.splitList(sharedPreferences.getString(context.getString(R.string.key_filter_keywords), ""));
-        final List<String> filterSenders = PhoneNumberUtils.splitList(sharedPreferences.getString(context.getString(R.string.key_filter_senders), ""));
-        final String template = pro ? sharedPreferences.getString(context.getString(R.string.key_template), "").trim() : "";
-
-        if (!enableSMS && !enableTelegram && !enableWeb) return;
+        final List<String> targetNumbers = PhoneNumberUtils.parsePhoneNumbers(
+                sharedPreferences.getString(context.getString(R.string.key_target_sms), ""));
 
         // Reply/forward on the SIM that received the message (matters on dual-SIM phones).
         final int subId = intent.getIntExtra(SubscriptionManager.EXTRA_SUBSCRIPTION_INDEX, SubscriptionManager.INVALID_SUBSCRIPTION_ID);
@@ -85,12 +65,6 @@ public class SMSReceiver extends BroadcastReceiver {
             String senderNumber = entry.getKey();
             String rawMessageContent = entry.getValue().toString();
 
-            // Check if sender is blocked
-            if (enableBlocklist && PhoneNumberUtils.isSenderBlocked(senderNumber, blockedEntries)) {
-                Log.d(TAG, "Message from blocked sender will not be forwarded");
-                continue;
-            }
-
             // A message from a target number is never forwarded (prevents loops); it may be a reverse message.
             if (PhoneNumberUtils.isSenderInTargetList(senderNumber, targetNumbers)) {
                 Matcher reverse = REVERSE_FORMAT.matcher(rawMessageContent);
@@ -105,46 +79,8 @@ public class SMSReceiver extends BroadcastReceiver {
                 continue;
             }
 
-            if (enableFilter && !MessageRules.matchesFilter(senderNumber, rawMessageContent, filterKeywords, filterSenders)) {
-                Log.d(TAG, "Message doesn't match the filter, not forwarded");
-                continue;
-            }
-
-            String senderNames = lookupContactName(context, senderNumber);
-            String senderLabel = (senderNames.isEmpty() ? "" : senderNames + " ") + "(" + senderNumber + ")";
-            String smsText = MessageRules.format(template.isEmpty() ? MessageRules.DEFAULT_SMS_FORMAT : template,
-                    senderLabel, senderNumber, senderNames, rawMessageContent);
-            String telegramText = MessageRules.format(template.isEmpty() ? MessageRules.DEFAULT_TELEGRAM_FORMAT : template,
-                    senderLabel, senderNumber, senderNames, rawMessageContent);
-
-            if (enableSMS) {
-                // Free forwards to the first number; the full list still guards against loops above.
-                for (String targetNumber : forwardTargets(pro, targetNumbers)) {
-                    boolean sent = Forwarder.forwardViaSMS(subId, smsText, targetNumber);
-                    ForwardLog.add(context, ForwardLog.SMS, targetNumber, senderLabel, rawMessageContent, smsText,
-                            sent ? ForwardLog.SENT : ForwardLog.FAILED);
-                }
-            }
-            // Network sends run in a worker: the broadcast has a time limit, and the worker retries when offline.
-            for (String channel : ForwardWorker.CHANNELS) {
-                String destination = Forwarder.destination(context, channel);
-                if (destination.isEmpty()) continue;
-                long logId = ForwardLog.add(context, channel, destination, senderLabel, rawMessageContent, telegramText, ForwardLog.QUEUED);
-                Operation queued = ForwardWorker.enqueue(context, channel, destination, senderLabel, rawMessageContent, telegramText, logId);
-                // WorkManager persists asynchronously; finishing the broadcast first could let Android kill the process and drop it.
-                try {
-                    if (queued != null) queued.getResult().get();
-                } catch (ExecutionException | InterruptedException e) {
-                    Log.e(TAG, "Couldn't queue forward", e);
-                    ForwardLog.setStatus(context, logId, ForwardLog.FAILED);
-                }
-            }
+            Dispatcher.dispatch(context, senderNumber, lookupContactName(context, senderNumber), rawMessageContent, subId);
         }
-    }
-
-    /** Free forwards to the first number only; Pro to all. */
-    static List<String> forwardTargets(boolean pro, List<String> targetNumbers) {
-        return pro ? targetNumbers : targetNumbers.subList(0, Math.min(1, targetNumbers.size()));
     }
 
     private String lookupContactName(Context context, String phoneNumber) {

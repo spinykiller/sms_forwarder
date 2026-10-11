@@ -28,6 +28,42 @@
     <string name="target_title_web">Target Web URL</string>
     <string name="target_summary_web">Example: https://site.com/api (https only)\nThis app will send POST request on receive SMS, request body example:\n{ \"from\": \"10000\", \"message\": \"Hello\" }</string>
 
+    <string name="key_web_format">key_web_format</string>
+    <string name="title_web_format">Format</string>
+    <string-array name="web_format_entries">
+        <item>JSON {from, message}</item>
+        <item>Slack webhook</item>
+        <item>Discord webhook</item>
+        <item>Microsoft Teams webhook</item>
+    </string-array>
+    <string-array name="web_format_values" translatable="false">
+        <item>json</item>
+        <item>slack</item>
+        <item>discord</item>
+        <item>teams</item>
+    </string-array>
+
+    <!-- Pause -->
+    <string name="key_paused">key_paused</string>
+    <string name="title_paused">Pause forwarding</string>
+    <string name="summary_paused">Nothing is forwarded while paused. Also in Quick Settings and as a home-screen widget</string>
+    <string name="status_paused">Forwarding is paused</string>
+    <string name="tile_label">SMS Forward</string>
+    <string name="widget_on">Forwarding on</string>
+    <string name="widget_paused">Paused</string>
+    <string name="widget_description">Pause or resume forwarding</string>
+
+    <!-- Backup -->
+    <string name="key_export">key_export</string>
+    <string name="title_export">Export settings</string>
+    <string name="summary_export">Save settings to a file (includes your Telegram bot token — keep it private)</string>
+    <string name="key_import">key_import</string>
+    <string name="title_import">Import settings</string>
+    <string name="summary_import">Restore settings from an exported file</string>
+    <string name="export_done">Settings exported</string>
+    <string name="import_done">Settings imported</string>
+    <string name="backup_failed">That didn\'t work: %s</string>
+
     <!-- Blocklist -->
     <string name="header_blocklist">Blocklist Settings</string>
     <string name="key_enable_blocklist">key_enable_blocklist</string>
