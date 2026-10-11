@@ -65,6 +65,11 @@ public class SMSReceiver extends BroadcastReceiver {
             String senderNumber = entry.getKey();
             String rawMessageContent = entry.getValue().toString();
 
+            // Blocked senders can't forward or send reverse messages
+            if (sharedPreferences.getBoolean(context.getString(R.string.key_enable_blocklist), false)
+                    && PhoneNumberUtils.isSenderBlocked(senderNumber,
+                            PhoneNumberUtils.splitList(sharedPreferences.getString(context.getString(R.string.key_blocked_numbers), "")))) continue;
+
             // A message from a target number is never forwarded (prevents loops); it may be a reverse message.
             if (PhoneNumberUtils.isSenderInTargetList(senderNumber, targetNumbers)) {
                 Matcher reverse = REVERSE_FORMAT.matcher(rawMessageContent);

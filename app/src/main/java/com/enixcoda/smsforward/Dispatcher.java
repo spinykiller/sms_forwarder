@@ -32,15 +32,23 @@ final class Dispatcher {
     private Dispatcher() {
     }
 
-    /** True if the text is (part of) something we forwarded recently; short texts only on an exact match. */
+    /**
+     * True if the text is one of our recent forwards as another app shows it: the whole forward, its start
+     * (a truncated preview, at least 10 chars) or containing it. A message that merely repeats the original
+     * body doesn't count, since forwards always start with the sender label.
+     */
     static boolean wasRecentlySent(String text) {
         String t = text.trim();
         synchronized (recentTexts) {
             for (String sent : recentTexts.keySet()) {
-                if (sent.equals(t) || (t.length() >= 10 && sent.contains(t))) return true;
+                if (sent.equals(t) || t.contains(sent) || (t.length() >= 10 && sent.startsWith(t))) return true;
             }
         }
         return false;
+    }
+
+    static void remember(String forwardedText) {
+        recentTexts.put(forwardedText.trim(), true);
     }
 
     static boolean isPaused(Context context) {
@@ -85,8 +93,8 @@ final class Dispatcher {
         String senderLabel = (name.isEmpty() ? "" : name + " ") + "(" + sender + ")";
         String smsText = MessageRules.format(template.isEmpty() ? MessageRules.DEFAULT_SMS_FORMAT : template, senderLabel, sender, name, body);
         String text = MessageRules.format(template.isEmpty() ? MessageRules.DEFAULT_TELEGRAM_FORMAT : template, senderLabel, sender, name, body);
-        recentTexts.put(smsText.trim(), true);
-        recentTexts.put(text.trim(), true);
+        remember(smsText);
+        remember(text);
 
         // Pro quiet hours: hold everything until they end
         Calendar now = Calendar.getInstance();

@@ -78,7 +78,7 @@
     <!-- Backup -->
     <string name="key_export" translatable="false">key_export</string>
     <string name="title_export">Export settings</string>
-    <string name="summary_export">Save settings to a file (includes your Telegram bot token — keep it private)</string>
+    <string name="summary_export">Save settings to a file (includes your Telegram bot token and email password — keep it private)</string>
     <string name="key_import" translatable="false">key_import</string>
     <string name="title_import">Import settings</string>
     <string name="summary_import">Restore settings from an exported file</string>

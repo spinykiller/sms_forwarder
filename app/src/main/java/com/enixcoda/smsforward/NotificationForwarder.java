@@ -25,7 +25,7 @@ public class NotificationForwarder extends NotificationListenerService {
     private static final int SKIP_FLAGS = Notification.FLAG_ONGOING_EVENT | Notification.FLAG_GROUP_SUMMARY | Notification.FLAG_FOREGROUND_SERVICE;
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
-    // Last text forwarded per notification: apps re-post the same notification on every update
+    // Last title + text forwarded per notification: apps re-post the same notification on every update
     private final Map<String, String> lastTextByKey = new LinkedHashMap<String, String>(16, 0.75f, true) {
         @Override
         protected boolean removeEldestEntry(Map.Entry<String, String> eldest) {
@@ -52,13 +52,24 @@ public class NotificationForwarder extends NotificationListenerService {
         if (text == null) text = extras.getCharSequence(Notification.EXTRA_TEXT);
         if (text == null || text.toString().trim().isEmpty()) return;
         String body = text.toString();
-        if (body.equals(lastTextByKey.put(sbn.getKey(), body))) return;
+        String seen = title + "\n" + body;
+        synchronized (lastTextByKey) {
+            if (seen.equals(lastTextByKey.put(sbn.getKey(), seen))) return;
+        }
         // Our own forward showing up as a notification (e.g. Telegram picked here and as a destination): don't loop
         if (Dispatcher.wasRecentlySent(body)) return;
 
         String app = appLabel(sbn.getPackageName());
         String sender = title != null && !title.toString().trim().isEmpty() ? title.toString() : app;
         executor.execute(() -> Dispatcher.dispatch(this, sender, app, body, SubscriptionManager.INVALID_SUBSCRIPTION_ID));
+    }
+
+    // A new notification may reuse the key of a removed one: it must not count as a re-post
+    @Override
+    public void onNotificationRemoved(StatusBarNotification sbn) {
+        synchronized (lastTextByKey) {
+            lastTextByKey.remove(sbn.getKey());
+        }
     }
 
     private String appLabel(String packageName) {

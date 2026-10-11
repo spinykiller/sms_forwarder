@@ -44,7 +44,7 @@
     <string name="widget_paused">Dijeda</string>
     <string name="widget_description">Jeda atau lanjutkan penerusan</string>
     <string name="title_export">Ekspor setelan</string>
-    <string name="summary_export">Simpan setelan ke file (termasuk token bot Telegram Anda — jaga kerahasiaannya)</string>
+    <string name="summary_export">Simpan setelan ke file (termasuk token bot Telegram dan kata sandi email Anda — jaga kerahasiaannya)</string>
     <string name="title_import">Impor setelan</string>
     <string name="summary_import">Pulihkan setelan dari file ekspor</string>
     <string name="export_done">Setelan diekspor</string>

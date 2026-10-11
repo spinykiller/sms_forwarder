@@ -44,7 +44,7 @@
     <string name="widget_paused">На паузе</string>
     <string name="widget_description">Приостановить или возобновить пересылку</string>
     <string name="title_export">Экспорт настроек</string>
-    <string name="summary_export">Сохранить настройки в файл (включая токен бота Telegram — храните его в тайне)</string>
+    <string name="summary_export">Сохранить настройки в файл (включая токен бота Telegram и пароль почты — храните его в тайне)</string>
     <string name="title_import">Импорт настроек</string>
     <string name="summary_import">Восстановить настройки из экспортированного файла</string>
     <string name="export_done">Настройки экспортированы</string>

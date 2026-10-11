@@ -44,7 +44,7 @@
     <string name="widget_paused">रुका हुआ</string>
     <string name="widget_description">फ़ॉरवर्डिंग रोकें या फिर शुरू करें</string>
     <string name="title_export">सेटिंग्स एक्सपोर्ट करें</string>
-    <string name="summary_export">सेटिंग्स फ़ाइल में सेव करें (इसमें आपका Telegram बॉट टोकन भी है — इसे निजी रखें)</string>
+    <string name="summary_export">सेटिंग्स फ़ाइल में सेव करें (इसमें आपका Telegram बॉट टोकन और ईमेल पासवर्ड भी है — इसे निजी रखें)</string>
     <string name="title_import">सेटिंग्स इंपोर्ट करें</string>
     <string name="summary_import">एक्सपोर्ट की गई फ़ाइल से सेटिंग्स वापस लाएँ</string>
     <string name="export_done">सेटिंग्स एक्सपोर्ट हो गईं</string>

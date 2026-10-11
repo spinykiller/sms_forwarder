@@ -44,7 +44,7 @@
     <string name="widget_paused">Pausado</string>
     <string name="widget_description">Pausar ou retomar o encaminhamento</string>
     <string name="title_export">Exportar configurações</string>
-    <string name="summary_export">Salva as configurações em um arquivo (inclui o token do seu bot do Telegram: mantenha em sigilo)</string>
+    <string name="summary_export">Salva as configurações em um arquivo (inclui o token do seu bot do Telegram e a senha do e-mail: mantenha em sigilo)</string>
     <string name="title_import">Importar configurações</string>
     <string name="summary_import">Restaura as configurações de um arquivo exportado</string>
     <string name="export_done">Configurações exportadas</string>

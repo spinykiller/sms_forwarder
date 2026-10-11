@@ -44,7 +44,7 @@
     <string name="widget_paused">En pausa</string>
     <string name="widget_description">Pausar o reanudar el reenvío</string>
     <string name="title_export">Exportar ajustes</string>
-    <string name="summary_export">Guarda los ajustes en un archivo (incluye el token de tu bot de Telegram: mantenlo privado)</string>
+    <string name="summary_export">Guarda los ajustes en un archivo (incluye el token de tu bot de Telegram y la contraseña del correo: mantenlo privado)</string>
     <string name="title_import">Importar ajustes</string>
     <string name="summary_import">Restaura los ajustes desde un archivo exportado</string>
     <string name="export_done">Ajustes exportados</string>

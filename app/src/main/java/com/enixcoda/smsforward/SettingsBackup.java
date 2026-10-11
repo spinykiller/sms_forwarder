@@ -53,6 +53,10 @@ final class SettingsBackup {
         JSONObject json = new JSONObject(read(context, uri));
         Map<String, Class<?>> types = settingTypes(context);
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+        // The backup is the whole configuration: a setting it doesn't have goes back to its default
+        for (String key : types.keySet()) {
+            if (!json.has(key)) editor.remove(key);
+        }
         for (Iterator<String> keys = json.keys(); keys.hasNext(); ) {
             String key = keys.next();
             Object v = json.get(key);
