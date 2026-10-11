@@ -62,3 +62,9 @@
     public static int d(...);
     public static int e(...);
 }
+
+# JavaMail loads its SMTP provider and handlers by reflection
+-keep class com.sun.mail.** { *; }
+-keep class javax.mail.** { *; }
+-keep class javax.activation.** { *; }
+-keep class myjava.awt.datatransfer.** { *; }

@@ -43,6 +43,28 @@
         <item>teams</item>
     </string-array>
 
+    <!-- Email -->
+    <string name="header_email">Forward via Email</string>
+    <string name="key_enable_email">key_enable_email</string>
+    <string name="enable_email">Enable Email</string>
+    <string name="key_email_to">key_email_to</string>
+    <string name="title_email_to">Send to</string>
+    <string name="summary_email_to">Email address (several with Pro, comma-separated)</string>
+    <string name="key_smtp_host">key_smtp_host</string>
+    <string name="title_smtp_host">SMTP server</string>
+    <string name="key_smtp_port">key_smtp_port</string>
+    <string name="title_smtp_port">SMTP port (465 SSL or 587 STARTTLS)</string>
+    <string name="key_smtp_user">key_smtp_user</string>
+    <string name="title_smtp_user">Your email (sender)</string>
+    <string name="summary_smtp_user">The account that sends the forwards</string>
+    <string name="key_smtp_password">key_smtp_password</string>
+    <string name="title_smtp_password">Password</string>
+    <string name="summary_smtp_password">Gmail: create an App Password (Google Account → Security → 2-Step Verification → App passwords). Stored only on this phone.</string>
+    <string name="email_subject">SMS from %s</string>
+    <string name="invalid_email">Enter email addresses separated by commas</string>
+    <string name="invalid_port">Enter a port number, e.g. 465 or 587</string>
+    <string name="free_one_email">The free version emails one address. Get Pro to email several.</string>
+
     <!-- Pause -->
     <string name="key_paused">key_paused</string>
     <string name="title_paused">Pause forwarding</string>

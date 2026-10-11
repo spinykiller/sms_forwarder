@@ -19,6 +19,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 public class Forwarder {
     private static final String TAG = "Forwarder";
@@ -48,12 +49,29 @@ public class Forwarder {
         }
     }
 
-    /** The configured Telegram chat ID or webhook URL, or "" when the method is off or not set up. */
+    /** Display name of a method. */
+    static String label(String channel) {
+        return ForwardLog.SMS.equals(channel) ? "SMS" : ForwardWorker.TELEGRAM.equals(channel) ? "Telegram"
+                : ForwardWorker.WEB.equals(channel) ? "Web" : "Email";
+    }
+
+    /**
+     * The configured Telegram chat ID, webhook URL or email address(es), or "" when the method is off or not set up.
+     * Free users email one address.
+     */
     static String destination(Context context, String channel) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        boolean telegram = ForwardWorker.TELEGRAM.equals(channel);
-        if (!prefs.getBoolean(context.getString(telegram ? R.string.key_enable_telegram : R.string.key_enable_web), false)) return "";
-        return prefs.getString(context.getString(telegram ? R.string.key_target_telegram : R.string.key_target_web), "").trim();
+        int enableKey = ForwardWorker.TELEGRAM.equals(channel) ? R.string.key_enable_telegram
+                : ForwardWorker.WEB.equals(channel) ? R.string.key_enable_web : R.string.key_enable_email;
+        int targetKey = ForwardWorker.TELEGRAM.equals(channel) ? R.string.key_target_telegram
+                : ForwardWorker.WEB.equals(channel) ? R.string.key_target_web : R.string.key_email_to;
+        if (!prefs.getBoolean(context.getString(enableKey), false)) return "";
+        String target = prefs.getString(context.getString(targetKey), "").trim();
+        if (ForwardWorker.EMAIL.equals(channel) && !Billing.isPro(context)) {
+            List<String> addresses = PhoneNumberUtils.splitList(target);
+            return addresses.isEmpty() ? "" : addresses.get(0);
+        }
+        return target;
     }
 
     /**
@@ -63,6 +81,9 @@ public class Forwarder {
      */
     static int send(Context context, String channel, String destination, String senderLabel, String message, String text) {
         if (destination(context, channel).isEmpty()) return FAIL;
+        if (ForwardWorker.EMAIL.equals(channel)) {
+            return Mailer.send(context, destination, context.getString(R.string.email_subject, senderLabel), text);
+        }
         if (ForwardWorker.TELEGRAM.equals(channel)) {
             String token = PreferenceManager.getDefaultSharedPreferences(context)
                     .getString(context.getString(R.string.key_telegram_apikey), "").trim();

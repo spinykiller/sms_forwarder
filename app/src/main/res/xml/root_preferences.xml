@@ -92,6 +92,47 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        app:title="@string/header_email"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreferenceCompat
+            android:key="@string/key_enable_email"
+            app:iconSpaceReserved="false"
+            app:title="@string/enable_email" />
+        <EditTextPreference
+            android:defaultValue=""
+            android:key="@string/key_email_to"
+            android:title="@string/title_email_to"
+            android:summary="@string/summary_email_to"
+            app:iconSpaceReserved="false" />
+        <EditTextPreference
+            android:defaultValue="smtp.gmail.com"
+            android:key="@string/key_smtp_host"
+            android:title="@string/title_smtp_host"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false" />
+        <EditTextPreference
+            android:defaultValue="465"
+            android:key="@string/key_smtp_port"
+            android:title="@string/title_smtp_port"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false" />
+        <EditTextPreference
+            android:defaultValue=""
+            android:key="@string/key_smtp_user"
+            android:title="@string/title_smtp_user"
+            android:summary="@string/summary_smtp_user"
+            app:iconSpaceReserved="false" />
+        <EditTextPreference
+            android:defaultValue=""
+            android:key="@string/key_smtp_password"
+            android:title="@string/title_smtp_password"
+            android:summary="@string/summary_smtp_password"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
         app:title="@string/header_blocklist"
         app:iconSpaceReserved="false">
 

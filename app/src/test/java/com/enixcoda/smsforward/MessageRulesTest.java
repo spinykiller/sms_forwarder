@@ -35,6 +35,24 @@ public class MessageRulesTest {
     }
 
     @Test
+    public void matchesFilter_regexKeywords() {
+        List<String> keywords = MessageRules.splitKeywords("/\\b\\d{6}\\b/, invoice");
+        assertEquals(Arrays.asList("/\\b\\d{6}\\b/", "invoice"), keywords);
+        assertTrue(MessageRules.matchesFilter("x", "Code 123456", keywords, NONE));
+        assertTrue(MessageRules.matchesFilter("x", "Your INVOICE", keywords, NONE));
+        assertFalse(MessageRules.matchesFilter("x", "Code 1234", keywords, NONE));
+        assertEquals("/[/", MessageRules.invalidRegex(Arrays.asList("ok", "/[/")));
+    }
+
+    @Test
+    public void isOtp_needsCodeAndWord() {
+        assertTrue(MessageRules.isOtp("Your OTP is 482913. Do not share."));
+        assertTrue(MessageRules.isOtp("G-123456 is your Google verification code"));
+        assertFalse(MessageRules.isOtp("Meet at 1830 near the station"));
+        assertFalse(MessageRules.isOtp("Your code will arrive soon"));
+    }
+
+    @Test
     public void format_defaultsMatchPreviousOutput() {
         assertEquals("From Mom (+1555):\nhi",
                 MessageRules.format(MessageRules.DEFAULT_SMS_FORMAT, "Mom (+1555)", "+1555", "Mom", "hi"));

@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.telephony.SubscriptionManager;
 import android.text.InputType;
+import android.util.Patterns;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -135,6 +136,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         addMethod(methods, prefs, R.string.key_enable_sms, "SMS", R.string.key_target_sms);
         addMethod(methods, prefs, R.string.key_enable_telegram, "Telegram", R.string.key_target_telegram, R.string.key_telegram_apikey);
         addMethod(methods, prefs, R.string.key_enable_web, "Web", R.string.key_target_web);
+        addMethod(methods, prefs, R.string.key_enable_email, "Email", R.string.key_email_to,
+                R.string.key_smtp_host, R.string.key_smtp_port, R.string.key_smtp_user, R.string.key_smtp_password);
         statusText.setText(methods.isEmpty()
                 ? getString(R.string.status_off)
                 : getString(R.string.status_forwarding, String.join(", ", methods)));
@@ -228,16 +231,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             // Every target number must contain digits (entries without any would be silently dropped)
             bindText(R.string.key_target_sms, R.string.target_summary_sms, InputType.TYPE_CLASS_PHONE, false,
                     v -> PhoneNumberUtils.splitList(v).size() == PhoneNumberUtils.parsePhoneNumbers(v).size(), R.string.invalid_numbers);
-            // Free forwards to one number; checked after the format check above
-            EditTextPreference targets = findPreference(getString(R.string.key_target_sms));
-            Preference.OnPreferenceChangeListener formatCheck = targets.getOnPreferenceChangeListener();
-            targets.setOnPreferenceChangeListener((p, newValue) -> {
-                if (!formatCheck.onPreferenceChange(p, newValue)) return false;
-                if (Billing.isPro(requireContext()) || PhoneNumberUtils.parsePhoneNumbers((String) newValue).size() <= 1) return true;
-                Toast.makeText(requireContext(), R.string.free_one_number, Toast.LENGTH_LONG).show();
-                startActivity(new Intent(requireContext(), ProActivity.class));
-                return false;
-            });
+            limitForFree(R.string.key_target_sms, v -> PhoneNumberUtils.parsePhoneNumbers(v).size() <= 1, R.string.free_one_number);
             bindText(R.string.key_target_telegram, R.string.target_summary_telegram, InputType.TYPE_CLASS_TEXT, false,
                     v -> v.matches("-?\\d+|@\\w+"), R.string.invalid_chat_id);
             bindText(R.string.key_telegram_apikey, R.string.summary_telegram_apikey,
@@ -246,6 +240,21 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             bindText(R.string.key_target_web, R.string.target_summary_web,
                     InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI, false,
                     v -> "https".equalsIgnoreCase(Uri.parse(v).getScheme()) && Uri.parse(v).getHost() != null, R.string.invalid_url);
+            bindText(R.string.key_email_to, R.string.summary_email_to,
+                    InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS, false,
+                    v -> allEmails(v), R.string.invalid_email);
+            limitForFree(R.string.key_email_to, v -> PhoneNumberUtils.splitList(v).size() <= 1, R.string.free_one_email);
+            bindText(R.string.key_smtp_user, R.string.summary_smtp_user,
+                    InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS, false,
+                    v -> allEmails(v) && PhoneNumberUtils.splitList(v).size() == 1, R.string.invalid_email);
+            bindText(R.string.key_smtp_password, R.string.summary_smtp_password,
+                    InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD, true, v -> true, 0);
+            ((EditTextPreference) findPreference(getString(R.string.key_smtp_port))).setOnBindEditTextListener(e -> e.setInputType(InputType.TYPE_CLASS_NUMBER));
+            findPreference(getString(R.string.key_smtp_port)).setOnPreferenceChangeListener((p, v) -> {
+                if (((String) v).matches("\\d{1,5}")) return true;
+                Toast.makeText(requireContext(), R.string.invalid_port, Toast.LENGTH_LONG).show();
+                return false;
+            });
             bindText(R.string.key_blocked_numbers, R.string.summary_blocked_numbers, InputType.TYPE_CLASS_TEXT, false,
                     v -> true, 0);
             bindText(R.string.key_filter_keywords, R.string.summary_filter_keywords, InputType.TYPE_CLASS_TEXT, false,
@@ -335,6 +344,27 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             findPreference(getString(R.string.key_privacy_choices)).setVisible(Ads.privacyOptionsRequired(context));
         }
 
+        /** Adds a free-tier limit after the setting's format check: over the limit shows why and opens the Pro screen. */
+        private void limitForFree(int keyRes, Predicate<String> freeAllows, int messageRes) {
+            Preference preference = findPreference(getString(keyRes));
+            Preference.OnPreferenceChangeListener formatCheck = preference.getOnPreferenceChangeListener();
+            preference.setOnPreferenceChangeListener((p, newValue) -> {
+                if (formatCheck != null && !formatCheck.onPreferenceChange(p, newValue)) return false;
+                if (Billing.isPro(requireContext()) || freeAllows.test((String) newValue)) return true;
+                Toast.makeText(requireContext(), messageRes, Toast.LENGTH_LONG).show();
+                startActivity(new Intent(requireContext(), ProActivity.class));
+                return false;
+            });
+        }
+
+        private static boolean allEmails(String value) {
+            List<String> addresses = PhoneNumberUtils.splitList(value);
+            for (String address : addresses) {
+                if (!Patterns.EMAIL_ADDRESS.matcher(address).matches()) return false;
+            }
+            return !addresses.isEmpty();
+        }
+
         /** Shows the current value as the summary (help text when empty), sets the keyboard and rejects invalid input. */
         private void bindText(int keyRes, int helpRes, int inputType, boolean secret, Predicate<String> isValid, int errorRes) {
             EditTextPreference preference = findPreference(getString(keyRes));
@@ -361,7 +391,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             boolean sms = prefs.getBoolean(getString(R.string.key_enable_sms), false);
             boolean telegram = prefs.getBoolean(getString(R.string.key_enable_telegram), false);
             boolean web = prefs.getBoolean(getString(R.string.key_enable_web), false);
-            if (!sms && !telegram && !web) {
+            boolean email = prefs.getBoolean(getString(R.string.key_enable_email), false);
+            if (!sms && !telegram && !web && !email) {
                 Toast.makeText(context, R.string.test_none_enabled, Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -385,8 +416,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 String telegramText = MessageRules.format(MessageRules.DEFAULT_TELEGRAM_FORMAT, sender, sender, "", message);
                 for (String channel : ForwardWorker.CHANNELS) {
                     String destination = Forwarder.destination(context, channel);
-                    if (!(ForwardWorker.TELEGRAM.equals(channel) ? telegram : web)) continue;
-                    results.add(describe(context, ForwardWorker.TELEGRAM.equals(channel) ? "Telegram" : "Web",
+                    if (!(ForwardWorker.TELEGRAM.equals(channel) ? telegram : ForwardWorker.WEB.equals(channel) ? web : email)) continue;
+                    results.add(describe(context, Forwarder.label(channel),
                             destination.isEmpty() ? Forwarder.FAIL : Forwarder.send(context, channel, destination, sender, message, telegramText)));
                 }
                 if (getActivity() == null) return;

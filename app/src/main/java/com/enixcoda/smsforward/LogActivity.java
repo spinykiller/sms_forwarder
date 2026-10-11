@@ -63,7 +63,7 @@ public class LogActivity extends AppCompatActivity {
     }
 
     private String channelLabel(ForwardLog.Entry e) {
-        return (ForwardLog.SMS.equals(e.channel) ? "SMS" : ForwardWorker.TELEGRAM.equals(e.channel) ? "Telegram" : "Web") + " → " + e.target;
+        return Forwarder.label(e.channel) + " → " + e.target;
     }
 
     private String statusLabel(String status) {

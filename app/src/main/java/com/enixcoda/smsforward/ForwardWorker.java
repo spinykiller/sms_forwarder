@@ -33,7 +33,8 @@ public class ForwardWorker extends Worker {
     private static final String TAG = "ForwardWorker";
     static final String TELEGRAM = "telegram";
     static final String WEB = "web";
-    static final String[] CHANNELS = {TELEGRAM, WEB};
+    static final String EMAIL = "email";
+    static final String[] CHANNELS = {TELEGRAM, WEB, EMAIL};
 
     // The message lives in a file, not in WorkManager's Data (10 KB limit; a long SMS can exceed it).
     private static final String KEY_PAYLOAD = "payload";
