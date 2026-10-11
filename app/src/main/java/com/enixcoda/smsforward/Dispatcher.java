@@ -105,7 +105,7 @@ final class Dispatcher {
 
         if (prefs.getBoolean(context.getString(R.string.key_enable_sms), false) && (routes == null || routes.contains(ForwardLog.SMS))) {
             int smsSubId = pro ? chosenSim(context, subId) : subId;
-            if (pro && prefs.getBoolean(context.getString(R.string.key_pause_roaming), false) && isRoaming(context, smsSubId)) {
+            if (roamingPaused(context, smsSubId)) {
                 Log.d(TAG, "Roaming: SMS forwarding paused");
             } else {
                 List<String> targets = PhoneNumberUtils.parsePhoneNumbers(prefs.getString(context.getString(R.string.key_target_sms), ""));
@@ -148,6 +148,13 @@ final class Dispatcher {
         } catch (NumberFormatException e) {
             return receivedOn;
         }
+    }
+
+    /** Pro "Pause SMS forwarding while roaming" is on and the sending SIM is roaming now. */
+    static boolean roamingPaused(Context context, int subId) {
+        return Billing.isPro(context)
+                && PreferenceManager.getDefaultSharedPreferences(context).getBoolean(context.getString(R.string.key_pause_roaming), false)
+                && isRoaming(context, subId);
     }
 
     private static boolean isRoaming(Context context, int subId) {

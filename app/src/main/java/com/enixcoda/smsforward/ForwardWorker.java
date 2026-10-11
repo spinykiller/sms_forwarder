@@ -27,6 +27,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /** Sends a Telegram/Web forward off the SMS broadcast, retrying transient failures once the network is back. */
@@ -95,9 +96,14 @@ public class ForwardWorker extends Worker {
         long logId = getInputData().getLong(KEY_LOG_ID, -1);
         String payloadPath = getInputData().getString(KEY_PAYLOAD);
         if (Dispatcher.isPaused(context)) {
-            // "Nothing is forwarded while paused": hold it, and send once forwarding resumes
-            schedule(context, payloadPath, logId, getInputData().getBoolean(KEY_SMS, false), PAUSED_RECHECK_MS);
-            return Result.success();
+            // "Nothing is forwarded while paused": hold it, and send once forwarding resumes.
+            // The replacement must be saved before this job completes, or a killed process would lose the forward.
+            try {
+                schedule(context, payloadPath, logId, getInputData().getBoolean(KEY_SMS, false), PAUSED_RECHECK_MS).getResult().get();
+                return Result.success();
+            } catch (ExecutionException | InterruptedException e) {
+                return Result.retry();
+            }
         }
         File payload = new File(payloadPath);
         int result;
@@ -107,9 +113,11 @@ public class ForwardWorker extends Worker {
             in.readFully(bytes);
             JSONObject p = new JSONObject(new String(bytes, StandardCharsets.UTF_8));
             sms = ForwardLog.SMS.equals(p.getString("channel"));
-            result = sms
-                    ? (Forwarder.forwardViaSMS(context, p.optInt("subId", SubscriptionManager.INVALID_SUBSCRIPTION_ID),
-                            p.getString("text"), p.getString("destination"), logId) ? Forwarder.OK : Forwarder.FAIL)
+            int subId = p.optInt("subId", SubscriptionManager.INVALID_SUBSCRIPTION_ID);
+            // Held SMS (quiet hours) may now be leaving from a roaming SIM
+            result = sms && Dispatcher.roamingPaused(context, subId) ? Forwarder.FAIL
+                    : sms
+                    ? (Forwarder.forwardViaSMS(context, subId, p.getString("text"), p.getString("destination"), logId) ? Forwarder.OK : Forwarder.FAIL)
                     : Forwarder.send(context, p.getString("channel"), p.getString("destination"),
                             p.getString("from"), p.getString("message"), p.getString("text"));
         } catch (IOException | JSONException e) {

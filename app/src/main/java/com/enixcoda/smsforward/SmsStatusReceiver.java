@@ -48,7 +48,14 @@ public class SmsStatusReceiver extends BroadcastReceiver {
         } else if (ACTION_DELIVERED.equals(intent.getAction())) {
             byte[] pdu = intent.getByteArrayExtra("pdu");
             SmsMessage report = pdu == null ? null : SmsMessage.createFromPdu(pdu, intent.getStringExtra("format"));
-            if (report == null || report.getStatus() != Telephony.Sms.STATUS_COMPLETE) return;
+            if (report == null) return;
+            // GSM report status: complete, still trying (pending), or a permanent failure (>= STATUS_FAILED)
+            if (report.getStatus() >= Telephony.Sms.STATUS_FAILED) {
+                ForwardLog.setStatus(context, logId, ForwardLog.FAILED);
+                context.getSharedPreferences(COUNTS, Context.MODE_PRIVATE).edit().remove(String.valueOf(logId)).apply();
+                return;
+            }
+            if (report.getStatus() != Telephony.Sms.STATUS_COMPLETE) return;
             SharedPreferences counts = context.getSharedPreferences(COUNTS, Context.MODE_PRIVATE);
             String key = String.valueOf(logId);
             int delivered = counts.getInt(key, 0) + 1;

@@ -47,6 +47,11 @@ public class SMSReceiver extends BroadcastReceiver {
 
     private void handle(Context context, Intent intent) {
         if (Dispatcher.isPaused(context)) return;
+        // Everything off: don't act on reverse commands either (they send chargeable SMS)
+        boolean anyEnabled = false;
+        for (int key : new int[]{R.string.key_enable_sms, R.string.key_enable_telegram, R.string.key_enable_web, R.string.key_enable_email})
+            anyEnabled |= PreferenceManager.getDefaultSharedPreferences(context).getBoolean(context.getString(key), false);
+        if (!anyEnabled) return;
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         final List<String> targetNumbers = PhoneNumberUtils.parsePhoneNumbers(
                 sharedPreferences.getString(context.getString(R.string.key_target_sms), ""));

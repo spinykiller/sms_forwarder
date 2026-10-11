@@ -15,3 +15,26 @@
 | 3 | P2 7-digit suffix match treats strangers as targets | Valid | Suffix match only `+international` vs ≥9-digit local |
 
 3 rounds done (max); round-3 fixes verified by unit tests, lint and release build.
+
+# Codex review trail (gpt-6-sol, high) — new features, `cb62bdc...HEAD`
+
+`gpt-6.1-sol` was requested but Codex rejects it for ChatGPT-account logins; `gpt-6-sol` is the newest Sol available.
+
+| Round | Finding | Verdict | Fix |
+|---|---|---|---|
+| 1 | P1 App lock only on the settings screen; log readable after relock time | Valid | `LockedActivity` base for every screen, app-wide started-screen count |
+| 1 | P1 Import writes wrong-typed values → crashes reads | Valid | Only known settings with their expected type (from the settings XML) |
+| 1 | P1 Queued forwards still sent while paused | Valid | Worker re-schedules itself while paused |
+| 1 | P2 Multipart SMS status from last part only | Valid | Per-part reports; any failure sticks; delivered when all parts are |
+| 1 | P2 Apps sharing a label collapse in the picker | Valid | Keyed by package, sorted by label |
+| 2 | P1 Import keeps settings absent from the backup | Valid | Known settings missing from the file are reset |
+| 2 | P2 Blocked target can still trigger reverse SMS | Valid | Blocklist checked before reverse commands |
+| 2 | P2 Reused notification key with same text never forwarded | Valid | Forget on removal; compare title + text |
+| 2 | P2 Export warning omits the SMTP password | Valid | Warning updated in all languages |
+| — | (found while verifying) echo guard blocked genuine repeats | Fixed | Only our own forwarded text counts as an echo (unit-tested) |
+| 3 | P1 Reverse SMS sent with every method off | Valid | Receiver returns early when all methods are off |
+| 3 | P2 Held SMS sent while roaming | Valid | Roaming re-checked at send time |
+| 3 | P2 Carrier delivery failures ignored | Valid | Permanent-failure reports mark the row failed |
+| 3 | P2 Paused hold could lose the forward | Valid | Replacement job awaited before completing |
+
+3 rounds done (max). Final: unit tests 14/14, lint 0 errors, debug + R8 release build, emulator regression (forward, all-off, pause hold, app lock, notifications).
