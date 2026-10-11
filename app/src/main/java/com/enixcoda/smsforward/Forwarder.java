@@ -1,5 +1,6 @@
 package com.enixcoda.smsforward;
 
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.telephony.SmsManager;
@@ -19,6 +20,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Forwarder {
@@ -29,19 +32,32 @@ public class Forwarder {
     static final int RETRY = 1; // transient (offline, timeout, 408/429/5xx): queue and try again
     static final int FAIL = 2;  // disabled, misconfigured or rejected (4xx): retrying won't help
 
-    /** Sends on the given SIM (the one that received the message), or the default SIM if unknown. */
-    public static void sendSMS(int subId, String number, String content) {
+    /**
+     * Sends on the given SIM (the one that received the message), or the default SIM if unknown.
+     * logId: forward-log row that gets sent/delivered reports, or -1.
+     */
+    public static void sendSMS(Context context, int subId, String number, String content, long logId) {
         SmsManager smsManager = subId == SubscriptionManager.INVALID_SUBSCRIPTION_ID
                 ? SmsManager.getDefault()
                 : SmsManager.getSmsManagerForSubscriptionId(subId);
         // Android splits long text into a linked multipart SMS; a single part is sent as a normal SMS.
-        smsManager.sendMultipartTextMessage(number, null, smsManager.divideMessage(content), null, null);
+        ArrayList<String> parts = smsManager.divideMessage(content);
+        ArrayList<PendingIntent> sent = null;
+        ArrayList<PendingIntent> delivered = null;
+        if (logId >= 0) {
+            // Reports for the last part stand for the whole message
+            sent = new ArrayList<>(Collections.nCopies(parts.size(), (PendingIntent) null));
+            delivered = new ArrayList<>(Collections.nCopies(parts.size(), (PendingIntent) null));
+            sent.set(parts.size() - 1, SmsStatusReceiver.sent(context, logId));
+            delivered.set(parts.size() - 1, SmsStatusReceiver.delivered(context, logId));
+        }
+        smsManager.sendMultipartTextMessage(number, null, parts, sent, delivered);
     }
 
     /** False if the SMS couldn't be handed to the carrier. */
-    public static boolean forwardViaSMS(int subId, String text, String forwardNumber) {
+    public static boolean forwardViaSMS(Context context, int subId, String text, String forwardNumber, long logId) {
         try {
-            sendSMS(subId, forwardNumber, text);
+            sendSMS(context, subId, forwardNumber, text, logId);
             return true;
         } catch (RuntimeException e) {
             Log.e(TAG, "Error forwarding SMS: " + e, e);

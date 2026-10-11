@@ -169,6 +169,38 @@
     <string name="summary_template">Text sent by SMS and Telegram. Placeholders: {from}, {sender}, {name}, {message}\nDefault: From {from}: {message}</string>
     <string name="invalid_template">The format must include {message}</string>
 
+    <!-- Pro: schedule and safety -->
+    <string name="header_pro_safety">Pro: schedule and safety</string>
+    <string name="key_quiet_hours">key_quiet_hours</string>
+    <string name="title_quiet_hours">Quiet hours</string>
+    <string name="summary_quiet_hours">Hold forwards during these hours and send them when they end</string>
+    <string name="key_quiet_start">key_quiet_start</string>
+    <string name="title_quiet_start">Quiet from (HH:mm)</string>
+    <string name="key_quiet_end">key_quiet_end</string>
+    <string name="title_quiet_end">Quiet until (HH:mm)</string>
+    <string name="invalid_time">Enter a time like 22:00</string>
+    <string name="key_pause_roaming">key_pause_roaming</string>
+    <string name="title_pause_roaming">Pause SMS forwarding while roaming</string>
+    <string name="summary_pause_roaming">Avoid roaming SMS charges; Telegram, Web and Email keep working</string>
+    <string name="key_send_sim">key_send_sim</string>
+    <string name="title_send_sim">Send SMS from</string>
+    <string name="sim_same">The SIM that received it</string>
+    <string name="sim_entry">SIM %1$d · %2$s</string>
+    <string name="sim_needs_permission">Allow phone access to list your SIMs</string>
+    <string name="key_heartbeat">key_heartbeat</string>
+    <string name="title_heartbeat">Daily \"still running\" message</string>
+    <string name="summary_heartbeat">Once a day to Telegram/Web/Email, so you notice if forwarding stops</string>
+    <string name="key_low_battery">key_low_battery</string>
+    <string name="title_low_battery">Low-battery alert</string>
+    <string name="summary_low_battery">Alert on Telegram/Web/Email when this phone drops to 15%</string>
+    <string name="health_heartbeat">✅ SMS Forward is running on %1$s · battery %2$d%%</string>
+    <string name="health_low_battery">🔋 Battery low on %1$s: %2$d%% — forwarding stops if it dies</string>
+    <string name="key_app_lock">key_app_lock</string>
+    <string name="title_app_lock">App lock</string>
+    <string name="summary_app_lock">Require fingerprint, face or screen lock to open the app</string>
+    <string name="app_lock_needs_screen_lock">Set a screen lock on this phone first</string>
+    <string name="unlock_title">Unlock SMS Forward</string>
+
     <!-- System -->
     <string name="header_system">System Settings</string>
     <string name="key_theme">key_theme</string>

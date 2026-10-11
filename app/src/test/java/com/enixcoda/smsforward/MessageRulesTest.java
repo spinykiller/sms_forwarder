@@ -45,6 +45,17 @@ public class MessageRulesTest {
     }
 
     @Test
+    public void quietDelay_overnightWindow() {
+        assertEquals(0, MessageRules.quietDelayMs(21 * 60, "22:00", "07:00"));
+        assertEquals(9 * 60 * 60_000L, MessageRules.quietDelayMs(22 * 60, "22:00", "07:00"));
+        assertEquals(60 * 60_000L, MessageRules.quietDelayMs(6 * 60, "22:00", "07:00"));
+        assertEquals(0, MessageRules.quietDelayMs(7 * 60, "22:00", "07:00"));
+        assertEquals(30 * 60_000L, MessageRules.quietDelayMs(13 * 60 + 30, "13:00", "14:00"));
+        assertEquals(0, MessageRules.quietDelayMs(13 * 60, "25:00", "07:00"));
+        assertEquals(-1, MessageRules.minutesOf("7pm"));
+    }
+
+    @Test
     public void isOtp_needsCodeAndWord() {
         assertTrue(MessageRules.isOtp("Your OTP is 482913. Do not share."));
         assertTrue(MessageRules.isOtp("G-123456 is your Google verification code"));

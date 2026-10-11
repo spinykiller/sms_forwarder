@@ -2,11 +2,14 @@ package com.enixcoda.smsforward;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.telephony.SubscriptionManager;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import androidx.preference.PreferenceManager;
 import androidx.work.Operation;
 
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -85,12 +88,28 @@ final class Dispatcher {
         recentTexts.put(smsText.trim(), true);
         recentTexts.put(text.trim(), true);
 
+        // Pro quiet hours: hold everything until they end
+        Calendar now = Calendar.getInstance();
+        long delayMs = pro && prefs.getBoolean(context.getString(R.string.key_quiet_hours), false)
+                ? MessageRules.quietDelayMs(now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE),
+                        prefs.getString(context.getString(R.string.key_quiet_start), ""), prefs.getString(context.getString(R.string.key_quiet_end), ""))
+                : 0;
+
         if (prefs.getBoolean(context.getString(R.string.key_enable_sms), false) && (routes == null || routes.contains(ForwardLog.SMS))) {
-            List<String> targets = PhoneNumberUtils.parsePhoneNumbers(prefs.getString(context.getString(R.string.key_target_sms), ""));
-            // Free forwards to the first number
-            for (String target : forwardTargets(pro, targets)) {
-                boolean sent = Forwarder.forwardViaSMS(subId, smsText, target);
-                ForwardLog.add(context, ForwardLog.SMS, target, senderLabel, body, smsText, sent ? ForwardLog.SENT : ForwardLog.FAILED);
+            int smsSubId = pro ? chosenSim(context, subId) : subId;
+            if (pro && prefs.getBoolean(context.getString(R.string.key_pause_roaming), false) && isRoaming(context, smsSubId)) {
+                Log.d(TAG, "Roaming: SMS forwarding paused");
+            } else {
+                List<String> targets = PhoneNumberUtils.parsePhoneNumbers(prefs.getString(context.getString(R.string.key_target_sms), ""));
+                // Free forwards to the first number
+                for (String target : forwardTargets(pro, targets)) {
+                    long logId = ForwardLog.add(context, ForwardLog.SMS, target, senderLabel, body, smsText, delayMs > 0 ? ForwardLog.QUEUED : ForwardLog.SENT);
+                    if (delayMs > 0) {
+                        await(context, ForwardWorker.enqueue(context, ForwardLog.SMS, target, senderLabel, body, smsText, logId, smsSubId, delayMs), logId);
+                    } else if (!Forwarder.forwardViaSMS(context, smsSubId, smsText, target, logId)) {
+                        ForwardLog.setStatus(context, logId, ForwardLog.FAILED);
+                    }
+                }
             }
         }
         // Network sends run in a worker: the broadcast has a time limit, and the worker retries when offline.
@@ -98,15 +117,35 @@ final class Dispatcher {
             String destination = Forwarder.destination(context, channel);
             if (destination.isEmpty() || (routes != null && !routes.contains(channel))) continue;
             long logId = ForwardLog.add(context, channel, destination, senderLabel, body, text, ForwardLog.QUEUED);
-            Operation queued = ForwardWorker.enqueue(context, channel, destination, senderLabel, body, text, logId);
-            // WorkManager persists asynchronously; finishing the broadcast first could let Android kill the process and drop it.
-            try {
-                if (queued != null) queued.getResult().get();
-            } catch (ExecutionException | InterruptedException e) {
-                Log.e(TAG, "Couldn't queue forward", e);
-                ForwardLog.setStatus(context, logId, ForwardLog.FAILED);
-            }
+            await(context, ForwardWorker.enqueue(context, channel, destination, senderLabel, body, text, logId,
+                    SubscriptionManager.INVALID_SUBSCRIPTION_ID, delayMs), logId);
         }
+    }
+
+    // WorkManager persists asynchronously; finishing the broadcast first could let Android kill the process and drop it.
+    private static void await(Context context, Operation queued, long logId) {
+        try {
+            if (queued != null) queued.getResult().get();
+        } catch (ExecutionException | InterruptedException e) {
+            Log.e(TAG, "Couldn't queue forward", e);
+            ForwardLog.setStatus(context, logId, ForwardLog.FAILED);
+        }
+    }
+
+    /** Pro "Send from" SIM: the receiving SIM unless the user picked one. */
+    private static int chosenSim(Context context, int receivedOn) {
+        String choice = PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.key_send_sim), "same");
+        try {
+            return "same".equals(choice) ? receivedOn : Integer.parseInt(choice);
+        } catch (NumberFormatException e) {
+            return receivedOn;
+        }
+    }
+
+    private static boolean isRoaming(Context context, int subId) {
+        TelephonyManager telephony = context.getSystemService(TelephonyManager.class);
+        if (subId != SubscriptionManager.INVALID_SUBSCRIPTION_ID) telephony = telephony.createForSubscriptionId(subId);
+        return telephony.isNetworkRoaming();
     }
 
     /** Free forwards to the first number only; Pro to all. */

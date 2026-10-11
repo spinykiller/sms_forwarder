@@ -7,6 +7,8 @@
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <!-- Pro "Send SMS from" picker lists the phone's SIMs; asked only when the user opens it -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <!-- Lists launchable apps for picking which apps' notifications to forward -->
     <queries>
@@ -69,6 +71,10 @@
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
         </service>
+
+        <receiver
+            android:name=".SmsStatusReceiver"
+            android:exported="false" />
 
         <receiver
             android:name=".PauseWidget"

@@ -33,6 +33,24 @@ final class MessageRules {
         return keywordMatch && (senders.isEmpty() || PhoneNumberUtils.senderMatchesAny(sender, senders));
     }
 
+    /**
+     * How long to hold a message that arrives at nowMinutes (minutes since midnight) during quiet hours
+     * start–end ("HH:mm", may wrap past midnight); 0 outside them or if either time is invalid.
+     */
+    static long quietDelayMs(int nowMinutes, String start, String end) {
+        int s = minutesOf(start);
+        int e = minutesOf(end);
+        if (s < 0 || e < 0 || s == e) return 0;
+        boolean inside = s < e ? nowMinutes >= s && nowMinutes < e : nowMinutes >= s || nowMinutes < e;
+        return inside ? ((e - nowMinutes + 1440) % 1440) * 60_000L : 0;
+    }
+
+    /** Minutes since midnight for "HH:mm", or -1 if invalid. */
+    static int minutesOf(String hhmm) {
+        java.util.regex.Matcher m = Pattern.compile("([01]?\\d|2[0-3]):([0-5]\\d)").matcher(hhmm.trim());
+        return m.matches() ? Integer.parseInt(m.group(1)) * 60 + Integer.parseInt(m.group(2)) : -1;
+    }
+
     static boolean isOtp(String body) {
         return OTP_CODE.matcher(body).find() && OTP_WORD.matcher(body).find();
     }

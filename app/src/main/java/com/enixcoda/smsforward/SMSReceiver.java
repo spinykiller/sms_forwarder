@@ -71,7 +71,7 @@ public class SMSReceiver extends BroadcastReceiver {
                 // Prevent sending to the same number
                 if (reverse.matches() && !PhoneNumberUtils.numbersMatch(reverse.group(1), senderNumber)) {
                     try {
-                        Forwarder.sendSMS(subId, reverse.group(1), reverse.group(2));
+                        Forwarder.sendSMS(context, subId, reverse.group(1), reverse.group(2), -1);
                     } catch (RuntimeException e) {
                         Log.e(TAG, "Error sending reverse message: " + e, e);
                     }

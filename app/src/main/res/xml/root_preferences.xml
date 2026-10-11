@@ -228,6 +228,55 @@
 
     </PreferenceCategory>
 
+    <!-- Pro: disabled for free users (the unlock entry is in Pro features) -->
+    <PreferenceCategory
+        app:title="@string/header_pro_safety"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreferenceCompat
+            android:key="@string/key_quiet_hours"
+            android:title="@string/title_quiet_hours"
+            android:summary="@string/summary_quiet_hours"
+            app:iconSpaceReserved="false" />
+        <EditTextPreference
+            android:defaultValue="22:00"
+            android:key="@string/key_quiet_start"
+            android:title="@string/title_quiet_start"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false" />
+        <EditTextPreference
+            android:defaultValue="07:00"
+            android:key="@string/key_quiet_end"
+            android:title="@string/title_quiet_end"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false" />
+        <SwitchPreferenceCompat
+            android:key="@string/key_pause_roaming"
+            android:title="@string/title_pause_roaming"
+            android:summary="@string/summary_pause_roaming"
+            app:iconSpaceReserved="false" />
+        <Preference
+            android:key="@string/key_send_sim"
+            android:title="@string/title_send_sim"
+            app:iconSpaceReserved="false" />
+        <SwitchPreferenceCompat
+            android:key="@string/key_heartbeat"
+            android:title="@string/title_heartbeat"
+            android:summary="@string/summary_heartbeat"
+            app:iconSpaceReserved="false" />
+        <SwitchPreferenceCompat
+            android:key="@string/key_low_battery"
+            android:title="@string/title_low_battery"
+            android:summary="@string/summary_low_battery"
+            app:iconSpaceReserved="false" />
+        <SwitchPreferenceCompat
+            android:key="@string/key_app_lock"
+            android:title="@string/title_app_lock"
+            android:summary="@string/summary_app_lock"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
     <PreferenceCategory
         app:title="@string/header_system"
         app:iconSpaceReserved="false">

@@ -1,6 +1,7 @@
 package com.enixcoda.smsforward;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -9,8 +10,10 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.provider.Telephony;
+import android.telephony.SubscriptionInfo;
 import android.telephony.SubscriptionManager;
 import android.text.InputType;
 import android.util.Patterns;
@@ -26,6 +29,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.biometric.BiometricManager;
+import androidx.biometric.BiometricPrompt;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.EditTextPreference;
 import androidx.preference.MultiSelectListPreference;
@@ -46,6 +51,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private static final int PERMISSION_REQUEST_CODE = 100;
     // Battery optimization is explained once; afterwards it's under System Settings.
     private static final String KEY_BATTERY_PROMPTED = "battery_prompted";
+
+    // App lock: unlocked for the rest of the process once authenticated, until the app has been in the background a minute
+    private static final long RELOCK_AFTER_MS = 60_000;
+    private static long unlockedUntil = 0; // SystemClock.elapsedRealtime(); 0 = locked
+    private boolean unlocking;
 
     private TextView statusText;
     private View adSlot;
@@ -81,6 +91,49 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         super.onStart();
         Billing.get(this).refresh();
         Ads.onStart(this, this::bindAd);
+        HealthWorker.schedule(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (!isChangingConfigurations() && unlockedUntil == Long.MAX_VALUE)
+            unlockedUntil = SystemClock.elapsedRealtime() + RELOCK_AFTER_MS;
+    }
+
+    static boolean canLock(Context context) {
+        return BiometricManager.from(context).canAuthenticate(LOCK_AUTHENTICATORS) == BiometricManager.BIOMETRIC_SUCCESS;
+    }
+
+    private static final int LOCK_AUTHENTICATORS = BiometricManager.Authenticators.BIOMETRIC_WEAK | BiometricManager.Authenticators.DEVICE_CREDENTIAL;
+
+    /** Hides the settings (they hold tokens and the log holds SMS text) until the user authenticates. */
+    private void lockIfNeeded() {
+        boolean enabled = Billing.isPro(this)
+                && PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.key_app_lock), false);
+        // No screen lock any more (removed after enabling): don't lock the user out of their own settings
+        if (!enabled || !canLock(this) || SystemClock.elapsedRealtime() <= unlockedUntil) return;
+        View content = findViewById(android.R.id.content);
+        content.setVisibility(View.INVISIBLE);
+        if (unlocking) return;
+        unlocking = true;
+        new BiometricPrompt(this, ContextCompat.getMainExecutor(this), new BiometricPrompt.AuthenticationCallback() {
+            @Override
+            public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
+                unlocking = false;
+                unlockedUntil = Long.MAX_VALUE;
+                content.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
+                unlocking = false;
+                finish(); // cancelled or locked out: leave rather than show the settings
+            }
+        }).authenticate(new BiometricPrompt.PromptInfo.Builder()
+                .setTitle(getString(R.string.unlock_title))
+                .setAllowedAuthenticators(LOCK_AUTHENTICATORS)
+                .build());
     }
 
     @Override
@@ -98,6 +151,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         super.onResume();
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
         updateStatus();
+        lockIfNeeded();
     }
 
     @Override
@@ -111,6 +165,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         updateStatus();
         bindAd(); // Pro status is cached in prefs
         if (getString(R.string.key_paused).equals(key)) Pause.refresh(this);
+        if (getString(R.string.key_heartbeat).equals(key) || getString(R.string.key_low_battery).equals(key) || Billing.KEY_PRO.equals(key))
+            HealthWorker.schedule(this);
         if (Billing.KEY_PRO.equals(key)) {
             SettingsFragment settings = (SettingsFragment) getSupportFragmentManager().findFragmentById(R.id.settings);
             if (settings != null && settings.isResumed()) settings.refresh();
@@ -211,6 +267,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
+        private final ActivityResultLauncher<String> phonePermission = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(), granted -> {
+                    if (granted) pickSim();
+                    else Toast.makeText(requireContext(), R.string.sim_needs_permission, Toast.LENGTH_LONG).show();
+                });
         private final ActivityResultLauncher<String> exportLauncher = registerForActivityResult(
                 new ActivityResultContracts.CreateDocument("application/json"), uri -> backup(uri, true));
         private final ActivityResultLauncher<String[]> importLauncher = registerForActivityResult(
@@ -270,6 +331,24 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE, false,
                     v -> v.contains("{message}"), R.string.invalid_template);
 
+            for (int key : new int[]{R.string.key_quiet_start, R.string.key_quiet_end}) {
+                findPreference(getString(key)).setOnPreferenceChangeListener((p, v) -> {
+                    if (MessageRules.minutesOf((String) v) >= 0) return true;
+                    Toast.makeText(requireContext(), R.string.invalid_time, Toast.LENGTH_LONG).show();
+                    return false;
+                });
+            }
+            findPreference(getString(R.string.key_app_lock)).setOnPreferenceChangeListener((p, on) -> {
+                if (!(Boolean) on || canLock(requireContext())) return true;
+                Toast.makeText(requireContext(), R.string.app_lock_needs_screen_lock, Toast.LENGTH_LONG).show();
+                return false;
+            });
+            findPreference(getString(R.string.key_send_sim)).setOnPreferenceClickListener(p -> {
+                if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED)
+                    pickSim();
+                else phonePermission.launch(Manifest.permission.READ_PHONE_STATE);
+                return true;
+            });
             findPreference(getString(R.string.key_rules)).setOnPreferenceClickListener(preference -> {
                 startActivity(new Intent(requireContext(), RulesActivity.class));
                 return true;
@@ -359,9 +438,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             findPreference(getString(R.string.key_pro_unlock)).setVisible(!pro);
             for (int key : new int[]{R.string.key_forward_log, R.string.key_rules, R.string.key_rules_unmatched, R.string.key_otp_only,
                     R.string.key_enable_notifications, R.string.key_notification_apps,
-                    R.string.key_enable_filter, R.string.key_filter_keywords, R.string.key_filter_senders, R.string.key_template}) {
+                    R.string.key_enable_filter, R.string.key_filter_keywords, R.string.key_filter_senders, R.string.key_template,
+                    R.string.key_quiet_hours, R.string.key_quiet_start, R.string.key_quiet_end, R.string.key_pause_roaming,
+                    R.string.key_send_sim, R.string.key_heartbeat, R.string.key_low_battery, R.string.key_app_lock}) {
                 findPreference(getString(key)).setEnabled(pro);
             }
+            findPreference(getString(R.string.key_send_sim)).setSummary("same".equals(PreferenceManager.getDefaultSharedPreferences(context)
+                    .getString(getString(R.string.key_send_sim), "same")) ? getString(R.string.sim_same) : getString(R.string.title_send_sim));
             findPreference(getString(R.string.key_rules)).setSummary(Rules.load(context).isEmpty()
                     ? getString(R.string.summary_rules) : getString(R.string.rules_count, Rules.load(context).size()));
             findPreference(getString(R.string.key_enable_notifications)).setSummary(NotificationForwarder.hasAccess(context)
@@ -386,6 +469,32 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             apps.setEntries(appsByLabel.keySet().toArray(new CharSequence[0]));
             apps.setEntryValues(appsByLabel.values().toArray(new CharSequence[0]));
             apps.setSummaryProvider(p -> getString(R.string.summary_notification_apps, ((MultiSelectListPreference) p).getValues().size()));
+        }
+
+        @SuppressLint("MissingPermission") // checked by the caller
+        private void pickSim() {
+            Context context = requireContext();
+            List<SubscriptionInfo> sims = context.getSystemService(SubscriptionManager.class).getActiveSubscriptionInfoList();
+            List<String> labels = new ArrayList<>();
+            List<String> values = new ArrayList<>();
+            labels.add(getString(R.string.sim_same));
+            values.add("same");
+            if (sims != null) {
+                for (SubscriptionInfo sim : sims) {
+                    labels.add(getString(R.string.sim_entry, sim.getSimSlotIndex() + 1, sim.getDisplayName()));
+                    values.add(String.valueOf(sim.getSubscriptionId()));
+                }
+            }
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            int checked = Math.max(0, values.indexOf(prefs.getString(getString(R.string.key_send_sim), "same")));
+            new AlertDialog.Builder(context)
+                    .setTitle(R.string.title_send_sim)
+                    .setSingleChoiceItems(labels.toArray(new String[0]), checked, (d, which) -> {
+                        prefs.edit().putString(getString(R.string.key_send_sim), values.get(which)).apply();
+                        findPreference(getString(R.string.key_send_sim)).setSummary(labels.get(which));
+                        d.dismiss();
+                    })
+                    .show();
         }
 
         // Prominent disclosure before the system screen (Play policy for notification access)
@@ -460,8 +569,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                             PhoneNumberUtils.parsePhoneNumbers(prefs.getString(context.getString(R.string.key_target_sms), "")));
                     int sent = 0;
                     for (String target : targets) {
-                        if (Forwarder.forwardViaSMS(SubscriptionManager.INVALID_SUBSCRIPTION_ID,
-                                MessageRules.format(MessageRules.DEFAULT_SMS_FORMAT, sender, sender, "", message), target)) sent++;
+                        if (Forwarder.forwardViaSMS(context, SubscriptionManager.INVALID_SUBSCRIPTION_ID,
+                                MessageRules.format(MessageRules.DEFAULT_SMS_FORMAT, sender, sender, "", message), target, -1)) sent++;
                     }
                     results.add(targets.isEmpty() ? context.getString(R.string.test_sms_no_numbers)
                             : sent == targets.size() ? context.getString(R.string.test_sms_sent, sent)

@@ -106,6 +106,9 @@ dependencies {
     implementation 'com.google.android.ump:user-messaging-platform:3.1.0'
     implementation 'com.android.billingclient:billing:8.0.0'
 
+    // Pro app lock (fingerprint/face or screen lock)
+    implementation 'androidx.biometric:biometric:1.1.0'
+
     // Email forwarding over SMTP (e.g. Gmail with an app password)
     implementation 'com.sun.mail:android-mail:1.6.7'
     implementation 'com.sun.mail:android-activation:1.6.7'

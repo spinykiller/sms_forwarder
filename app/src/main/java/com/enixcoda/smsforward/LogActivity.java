@@ -2,6 +2,7 @@ package com.enixcoda.smsforward;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.telephony.SubscriptionManager;
 import android.text.format.DateUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -82,7 +83,7 @@ public class LogActivity extends AppCompatActivity {
                 .setMessage(getString(R.string.log_retry_confirm, channelLabel(e)))
                 .setPositiveButton(R.string.log_retry, (dialog, which) -> {
                     ForwardLog.setStatus(this, e.id, ForwardLog.QUEUED);
-                    ForwardWorker.enqueue(this, e.channel, e.target, e.sender, e.message, e.text, e.id);
+                    ForwardWorker.enqueue(this, e.channel, e.target, e.sender, e.message, e.text, e.id, SubscriptionManager.INVALID_SUBSCRIPTION_ID, 0);
                     load();
                 })
                 .setNegativeButton(android.R.string.cancel, null)
