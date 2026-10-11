@@ -2,6 +2,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:iconSpaceReserved="false">
 
+    <SwitchPreferenceCompat
+        android:key="@string/key_paused"
+        android:title="@string/title_paused"
+        android:summary="@string/summary_paused"
+        app:iconSpaceReserved="false" />
+
     <Preference
         android:key="@string/key_pro"
         android:title="@string/title_pro"
@@ -74,6 +80,56 @@
             android:summary="@string/target_summary_web"
             app:iconSpaceReserved="false" />
 
+        <ListPreference
+            android:key="@string/key_web_format"
+            android:title="@string/title_web_format"
+            android:defaultValue="json"
+            android:entries="@array/web_format_entries"
+            android:entryValues="@array/web_format_values"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:title="@string/header_email"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreferenceCompat
+            android:key="@string/key_enable_email"
+            app:iconSpaceReserved="false"
+            app:title="@string/enable_email" />
+        <EditTextPreference
+            android:defaultValue=""
+            android:key="@string/key_email_to"
+            android:title="@string/title_email_to"
+            android:summary="@string/summary_email_to"
+            app:iconSpaceReserved="false" />
+        <EditTextPreference
+            android:defaultValue="smtp.gmail.com"
+            android:key="@string/key_smtp_host"
+            android:title="@string/title_smtp_host"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false" />
+        <EditTextPreference
+            android:defaultValue="465"
+            android:key="@string/key_smtp_port"
+            android:title="@string/title_smtp_port"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false" />
+        <EditTextPreference
+            android:defaultValue=""
+            android:key="@string/key_smtp_user"
+            android:title="@string/title_smtp_user"
+            android:summary="@string/summary_smtp_user"
+            app:iconSpaceReserved="false" />
+        <EditTextPreference
+            android:defaultValue=""
+            android:key="@string/key_smtp_password"
+            android:title="@string/title_smtp_password"
+            android:summary="@string/summary_smtp_password"
+            app:iconSpaceReserved="false" />
+
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -113,6 +169,37 @@
             android:summary="@string/summary_forward_log"
             app:iconSpaceReserved="false" />
 
+        <Preference
+            android:key="@string/key_rules"
+            android:title="@string/title_rules"
+            android:summary="@string/summary_rules"
+            app:iconSpaceReserved="false" />
+
+        <ListPreference
+            android:key="@string/key_rules_unmatched"
+            android:title="@string/title_rules_unmatched"
+            android:defaultValue="all"
+            android:entries="@array/rules_unmatched_entries"
+            android:entryValues="@array/rules_unmatched_values"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:key="@string/key_otp_only"
+            android:title="@string/title_otp_only"
+            android:summary="@string/summary_otp_only"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:key="@string/key_enable_notifications"
+            android:title="@string/title_enable_notifications"
+            app:iconSpaceReserved="false" />
+
+        <MultiSelectListPreference
+            android:key="@string/key_notification_apps"
+            android:title="@string/title_notification_apps"
+            app:iconSpaceReserved="false" />
+
         <SwitchPreferenceCompat
             android:key="@string/key_enable_filter"
             app:iconSpaceReserved="false"
@@ -141,6 +228,55 @@
 
     </PreferenceCategory>
 
+    <!-- Pro: disabled for free users (the unlock entry is in Pro features) -->
+    <PreferenceCategory
+        app:title="@string/header_pro_safety"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreferenceCompat
+            android:key="@string/key_quiet_hours"
+            android:title="@string/title_quiet_hours"
+            android:summary="@string/summary_quiet_hours"
+            app:iconSpaceReserved="false" />
+        <EditTextPreference
+            android:defaultValue="22:00"
+            android:key="@string/key_quiet_start"
+            android:title="@string/title_quiet_start"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false" />
+        <EditTextPreference
+            android:defaultValue="07:00"
+            android:key="@string/key_quiet_end"
+            android:title="@string/title_quiet_end"
+            app:useSimpleSummaryProvider="true"
+            app:iconSpaceReserved="false" />
+        <SwitchPreferenceCompat
+            android:key="@string/key_pause_roaming"
+            android:title="@string/title_pause_roaming"
+            android:summary="@string/summary_pause_roaming"
+            app:iconSpaceReserved="false" />
+        <Preference
+            android:key="@string/key_send_sim"
+            android:title="@string/title_send_sim"
+            app:iconSpaceReserved="false" />
+        <SwitchPreferenceCompat
+            android:key="@string/key_heartbeat"
+            android:title="@string/title_heartbeat"
+            android:summary="@string/summary_heartbeat"
+            app:iconSpaceReserved="false" />
+        <SwitchPreferenceCompat
+            android:key="@string/key_low_battery"
+            android:title="@string/title_low_battery"
+            android:summary="@string/summary_low_battery"
+            app:iconSpaceReserved="false" />
+        <SwitchPreferenceCompat
+            android:key="@string/key_app_lock"
+            android:title="@string/title_app_lock"
+            android:summary="@string/summary_app_lock"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
     <PreferenceCategory
         app:title="@string/header_system"
         app:iconSpaceReserved="false">
@@ -149,6 +285,24 @@
             android:key="@string/key_send_test"
             android:title="@string/title_send_test"
             android:summary="@string/summary_send_test"
+            app:iconSpaceReserved="false" />
+
+        <ListPreference
+            android:key="@string/key_language"
+            android:title="@string/title_language"
+            android:defaultValue=""
+            android:entries="@array/language_entries"
+            android:entryValues="@array/language_values"
+            android:persistent="false"
+            app:iconSpaceReserved="false" />
+
+        <ListPreference
+            android:key="@string/key_theme"
+            android:title="@string/title_theme"
+            android:defaultValue="system"
+            android:entries="@array/theme_entries"
+            android:entryValues="@array/theme_values"
+            app:useSimpleSummaryProvider="true"
             app:iconSpaceReserved="false" />
 
         <Preference
@@ -167,6 +321,18 @@
             android:key="@string/key_autostart_settings"
             android:title="@string/title_autostart_settings"
             android:summary="@string/summary_autostart_settings"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            android:key="@string/key_export"
+            android:title="@string/title_export"
+            android:summary="@string/summary_export"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            android:key="@string/key_import"
+            android:title="@string/title_import"
+            android:summary="@string/summary_import"
             app:iconSpaceReserved="false" />
 
         <Preference

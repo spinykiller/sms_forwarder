@@ -15,8 +15,8 @@ A lightweight Android application that automatically forwards SMS messages to mu
 - **Dual SIM**: Forwards and replies on the SIM that received the message
 
 ### 💎 Free with ads, or Pro
-- Free: SMS (one number), Telegram and webhook forwarding, blocklist, reverse messaging — with one banner on the settings screen
-- Pro (yearly with free trial, monthly, or lifetime): no ads, multiple target numbers, keyword/sender filters, custom message format, forward log
+- Free: SMS (one number), Telegram, webhook (plain/Slack/Discord/Teams) and email (one address) forwarding, blocklist, reverse messaging, pause switch with Quick Settings tile and widget, settings export/import, light/dark theme, 6 languages — with one banner on the settings screen
+- Pro (yearly with free trial, monthly, or lifetime): no ads, app notification forwarding, routing rules, OTP-only mode, keyword (incl. /regex/) and sender filters, custom message format, multiple numbers and email addresses, forward log with delivery reports and retry, quiet hours, roaming pause, SIM choice, daily health check and low-battery alert, app lock
 
 ### 🔋 Battery & Performance Optimized
 - **No Background Service**: Android wakes the app only when an SMS arrives — no persistent notification, no polling

@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SMS Forward</string>
+    <string name="header_sms">SMS से फ़ॉरवर्ड करें</string>
+    <string name="enable_sms">SMS चालू करें</string>
+    <string name="target_title_sms">जिन नंबरों पर भेजना है</string>
+    <string name="target_summary_sms">कई नंबर कॉमा से अलग करें (Pro; मुफ़्त वर्शन एक नंबर पर भेजता है)\nउदाहरण: +91 9876543210, +1 5551234567</string>
+    <string name="header_telegram">Telegram से फ़ॉरवर्ड करें</string>
+    <string name="enable_telegram">Telegram चालू करें</string>
+    <string name="target_title_telegram">Telegram चैट ID</string>
+    <string name="target_summary_telegram">चैट ID (नंबर) या ग्रुप/चैनल के लिए @username\nउदाहरण: 123456789 या @mygroup</string>
+    <string name="title_telegram_apikey">Telegram बॉट टोकन</string>
+    <string name="summary_telegram_apikey">Telegram पर @BotFather से पाएँ\nउदाहरण: 110201543:AAH4eZxxxxxxxxxxxxxxxxxxxxxP4U</string>
+    <string name="header_web">वेब से फ़ॉरवर्ड करें</string>
+    <string name="enable_web">वेब चालू करें</string>
+    <string name="target_title_web">वेब URL</string>
+    <string name="target_summary_web">उदाहरण: https://site.com/api (सिर्फ़ https)\nSMS आने पर ऐप POST अनुरोध भेजता है, बॉडी का उदाहरण:\n{ \"from\": \"10000\", \"message\": \"Hello\" }</string>
+    <string name="title_web_format">फ़ॉर्मैट</string>
+    <string-array name="web_format_entries">
+        <item>JSON {from, message}</item>
+        <item>Slack वेबहुक</item>
+        <item>Discord वेबहुक</item>
+        <item>Microsoft Teams वेबहुक</item>
+    </string-array>
+    <string name="header_email">ईमेल से फ़ॉरवर्ड करें</string>
+    <string name="enable_email">ईमेल चालू करें</string>
+    <string name="title_email_to">किसे भेजें</string>
+    <string name="summary_email_to">ईमेल पता (Pro में कई, कॉमा से अलग)</string>
+    <string name="title_smtp_host">SMTP सर्वर</string>
+    <string name="title_smtp_port">SMTP पोर्ट (465 SSL या 587 STARTTLS)</string>
+    <string name="title_smtp_user">आपका ईमेल (भेजने वाला)</string>
+    <string name="summary_smtp_user">वह अकाउंट जो फ़ॉरवर्ड भेजता है</string>
+    <string name="title_smtp_password">पासवर्ड</string>
+    <string name="summary_smtp_password">Gmail: ऐप पासवर्ड बनाएँ (Google खाता → सुरक्षा → 2-स्टेप वेरिफ़िकेशन → ऐप पासवर्ड)। यह सिर्फ़ इसी फ़ोन में रहता है।</string>
+    <string name="email_subject">%s से SMS</string>
+    <string name="invalid_email">कॉमा से अलग ईमेल पते डालें</string>
+    <string name="invalid_port">पोर्ट नंबर डालें, जैसे 465 या 587</string>
+    <string name="free_one_email">मुफ़्त वर्शन एक पते पर ईमेल भेजता है। कई पतों के लिए Pro लें।</string>
+    <string name="title_paused">फ़ॉरवर्डिंग रोकें</string>
+    <string name="summary_paused">रुके रहने पर कुछ भी फ़ॉरवर्ड नहीं होता। क्विक सेटिंग्स और होम-स्क्रीन विजेट में भी</string>
+    <string name="status_paused">फ़ॉरवर्डिंग रुकी हुई है</string>
+    <string name="tile_label">SMS Forward</string>
+    <string name="widget_on">फ़ॉरवर्डिंग चालू</string>
+    <string name="widget_paused">रुका हुआ</string>
+    <string name="widget_description">फ़ॉरवर्डिंग रोकें या फिर शुरू करें</string>
+    <string name="title_export">सेटिंग्स एक्सपोर्ट करें</string>
+    <string name="summary_export">सेटिंग्स फ़ाइल में सेव करें (इसमें आपका Telegram बॉट टोकन और ईमेल पासवर्ड भी है — इसे निजी रखें)</string>
+    <string name="title_import">सेटिंग्स इंपोर्ट करें</string>
+    <string name="summary_import">एक्सपोर्ट की गई फ़ाइल से सेटिंग्स वापस लाएँ</string>
+    <string name="export_done">सेटिंग्स एक्सपोर्ट हो गईं</string>
+    <string name="import_done">सेटिंग्स इंपोर्ट हो गईं</string>
+    <string name="backup_failed">नहीं हो पाया: %s</string>
+    <string name="header_blocklist">ब्लॉकलिस्ट</string>
+    <string name="enable_blocklist">ब्लॉकलिस्ट चालू करें</string>
+    <string name="title_blocked_numbers">ब्लॉक किए गए नंबर</string>
+    <string name="summary_blocked_numbers">इन नंबरों के मैसेज फ़ॉरवर्ड नहीं होंगे\nकई नंबर कॉमा से अलग करें\nउदाहरण: +91 9876543210, HDFCBK</string>
+    <string name="header_pro_features">Pro सुविधाएँ</string>
+    <string name="title_pro_unlock">Pro से अनलॉक करें</string>
+    <string name="summary_pro_unlock">ऐप नोटिफ़िकेशन फ़ॉरवर्ड, रूटिंग नियम, फ़िल्टर, सिर्फ़ OTP, अपना टेक्स्ट और फ़ॉरवर्ड लॉग</string>
+    <string name="title_forward_log">फ़ॉरवर्ड लॉग</string>
+    <string name="summary_forward_log">हाल के फ़ॉरवर्ड और उनकी स्थिति (आख़िरी 100, इसी फ़ोन में)</string>
+    <string name="log_empty">अभी तक कोई फ़ॉरवर्ड नहीं</string>
+    <string name="log_clear">लॉग साफ़ करें</string>
+    <string name="log_clear_confirm">इस फ़ोन से फ़ॉरवर्ड लॉग मिटाएँ?</string>
+    <string name="log_row_title">%1$s · %2$s · %3$s</string>
+    <string name="log_row_body">%1$s: %2$s</string>
+    <string name="log_delivered">✓ पहुँच गया</string>
+    <string name="log_sent">✓ भेजा गया</string>
+    <string name="log_queued">⏳ कतार में</string>
+    <string name="log_failed">✗ विफल — फिर से भेजने के लिए टैप करें</string>
+    <string name="log_retry">फिर से भेजें</string>
+    <string name="log_retry_confirm">यह मैसेज %s पर फिर से भेजें?</string>
+    <string name="title_rules">रूटिंग नियम</string>
+    <string name="summary_rules">अलग-अलग मैसेज अलग-अलग जगह भेजें</string>
+    <plurals name="rules_count">
+        <item quantity="one">%d नियम</item>
+        <item quantity="other">%d नियम</item>
+    </plurals>
+    <string name="rules_explainer">मैसेज हर उस नियम के तरीक़ों पर जाता है जिससे वह मेल खाता है</string>
+    <string name="rules_empty">कोई नियम नहीं: हर मैसेज हर चालू तरीक़े पर जाता है।\nनियम जोड़ें, जैसे बैंक कोड → सिर्फ़ Telegram।</string>
+    <string name="rules_add">नियम जोड़ें</string>
+    <string name="rule_edit">नियम बदलें</string>
+    <string name="rule_save">सेव करें</string>
+    <string name="rule_delete">मिटाएँ</string>
+    <string name="rule_name">नाम (जैसे बैंक कोड)</string>
+    <string name="rule_senders">भेजने वाले (नंबर या नाम; ख़ाली = कोई भी)</string>
+    <string name="rule_keywords">जिनमें हो (शब्द या /regex/; ख़ाली = कुछ भी)</string>
+    <string name="rule_send_to">कहाँ भेजें</string>
+    <string name="rule_no_methods">कम से कम एक तरीक़ा चुनें</string>
+    <string name="rule_default_name">नियम %d</string>
+    <string name="rule_row_title">%1$s → %2$s</string>
+    <string name="rule_row_body">भेजने वाले: %1$s · जिनमें हो: %2$s</string>
+    <string name="rule_any">कोई भी</string>
+    <string name="invalid_regex">अमान्य रेगुलर एक्सप्रेशन: %s</string>
+    <string name="invalid_regex_generic">कोई /regex/ कीवर्ड अमान्य है</string>
+    <string name="title_rules_unmatched">जो मैसेज किसी नियम से मेल न खाएँ</string>
+    <string-array name="rules_unmatched_entries">
+        <item>हर चालू तरीक़े पर भेजें</item>
+        <item>फ़ॉरवर्ड न करें</item>
+    </string-array>
+    <string name="title_otp_only">सिर्फ़ वेरिफ़िकेशन कोड</string>
+    <string name="summary_otp_only">सिर्फ़ वन-टाइम कोड वाले मैसेज फ़ॉरवर्ड करें (OTP, वेरिफ़िकेशन कोड, PIN)</string>
+    <string name="title_enable_notifications">ऐप नोटिफ़िकेशन फ़ॉरवर्ड करें</string>
+    <string name="summary_notifications_on">नीचे दिए ऐप्स के नोटिफ़िकेशन फ़ॉरवर्ड हो रहे हैं</string>
+    <string name="summary_notifications_access">नोटिफ़िकेशन ऐक्सेस बंद है — अनुमति देने के लिए टैप करें</string>
+    <string name="title_notification_apps">ऐप्स</string>
+    <plurals name="summary_notification_apps">
+        <item quantity="one">%d ऐप चुना गया</item>
+        <item quantity="other">%d ऐप्स चुने गए</item>
+    </plurals>
+    <string name="notification_access_title">नोटिफ़िकेशन ऐक्सेस दें</string>
+    <string name="notification_access_message">नोटिफ़िकेशन फ़ॉरवर्ड करने के लिए SMS Forward सिर्फ़ यहाँ चुने गए ऐप्स के नोटिफ़िकेशन पढ़ता है — और कुछ नहीं — और उनका टाइटल व टेक्स्ट सिर्फ़ आपकी अपनी जगहों पर भेजता है। Android नोटिफ़िकेशन ऐक्सेस स्क्रीन खोलेगा: वहाँ SMS Forward चालू करें।\n\nऐसा ऐप न चुनें जिस पर आप फ़ॉरवर्ड भी करते हैं (जैसे Telegram), नहीं तो फ़ॉरवर्ड दो बार आएँगे।</string>
+    <string name="enable_filter">सिर्फ़ मेल खाने वाले मैसेज फ़ॉरवर्ड करें</string>
+    <string name="title_filter_keywords">कीवर्ड</string>
+    <string name="summary_filter_keywords">सिर्फ़ वे मैसेज फ़ॉरवर्ड करें जिनमें इनमें से कोई शब्द हो (कॉमा से अलग, छोटे-बड़े अक्षर एक समान)\nउदाहरण: OTP, code</string>
+    <string name="title_filter_senders">भेजने वाले</string>
+    <string name="summary_filter_senders">…और सिर्फ़ इन नंबरों या नामों से (दोनों भरे हों तो दोनों मेल खाने चाहिए)\nउदाहरण: HDFCBK, +91 9876543210</string>
+    <string name="title_template">मैसेज का फ़ॉर्मैट</string>
+    <string name="summary_template">SMS और Telegram से भेजा जाने वाला टेक्स्ट। प्लेसहोल्डर: {from}, {sender}, {name}, {message}\nडिफ़ॉल्ट: From {from}: {message}</string>
+    <string name="invalid_template">फ़ॉर्मैट में {message} होना ज़रूरी है</string>
+    <string name="header_pro_safety">Pro: समय और सुरक्षा</string>
+    <string name="title_quiet_hours">शांत समय</string>
+    <string name="summary_quiet_hours">इस समय में फ़ॉरवर्ड रोककर रखें और समय ख़त्म होने पर भेजें</string>
+    <string name="title_quiet_start">शांत समय शुरू (HH:mm)</string>
+    <string name="title_quiet_end">शांत समय ख़त्म (HH:mm)</string>
+    <string name="invalid_time">समय ऐसे डालें: 22:00</string>
+    <string name="title_pause_roaming">रोमिंग में SMS फ़ॉरवर्डिंग रोकें</string>
+    <string name="summary_pause_roaming">रोमिंग SMS ख़र्च से बचें; Telegram, वेब और ईमेल चलते रहेंगे</string>
+    <string name="title_send_sim">SMS किस SIM से भेजें</string>
+    <string name="sim_same">जिस SIM पर मैसेज आया</string>
+    <string name="sim_entry">SIM %1$d · %2$s</string>
+    <string name="sim_needs_permission">SIM की सूची देखने के लिए फ़ोन ऐक्सेस दें</string>
+    <string name="title_heartbeat">रोज़ \"चालू है\" मैसेज</string>
+    <string name="summary_heartbeat">दिन में एक बार Telegram/वेब/ईमेल पर, ताकि फ़ॉरवर्डिंग रुकने पर पता चल जाए</string>
+    <string name="title_low_battery">कम बैटरी अलर्ट</string>
+    <string name="summary_low_battery">फ़ोन की बैटरी 15% पर आने पर Telegram/वेब/ईमेल पर अलर्ट</string>
+    <string name="health_heartbeat">✅ SMS Forward %1$s पर चल रहा है · बैटरी %2$d%%</string>
+    <string name="health_low_battery">🔋 %1$s पर बैटरी कम: %2$d%% — बैटरी ख़त्म होने पर फ़ॉरवर्डिंग रुक जाएगी</string>
+    <string name="title_app_lock">ऐप लॉक</string>
+    <string name="summary_app_lock">ऐप खोलने के लिए फ़िंगरप्रिंट, चेहरा या स्क्रीन लॉक माँगे</string>
+    <string name="app_lock_needs_screen_lock">पहले इस फ़ोन पर स्क्रीन लॉक सेट करें</string>
+    <string name="unlock_title">SMS Forward अनलॉक करें</string>
+    <string name="title_language">भाषा</string>
+    <string name="battery_dialog_title">बैटरी ऑप्टिमाइज़ेशन चालू है</string>
+    <string name="battery_help_miui">Poco/Xiaomi फ़ोन के लिए:\n\n1. सेटिंग्स &gt; ऐप्स &gt; ऐप्स मैनेज करें &gt; SMS Forward पर जाएँ\n2. \'ऑटोस्टार्ट\' अनुमति चालू करें\n3. सेटिंग्स &gt; बैटरी और परफ़ॉर्मेंस &gt; बैटरी सेवर पर जाएँ\n4. SMS Forward को \'कोई पाबंदी नहीं\' पर रखें\n5. सेटिंग्स &gt; ऐप्स &gt; अनुमतियाँ &gt; SMS Forward पर जाएँ\n6. सभी SMS अनुमतियाँ चालू करें\n\nइससे ऐप बैकग्राउंड में चलता रहता है।</string>
+    <string name="battery_help_generic">SMS फ़ॉरवर्डिंग भरोसे से चलाने के लिए:\n\n1. सेटिंग्स &gt; ऐप्स &gt; SMS Forward पर जाएँ\n2. बैटरी ऑप्टिमाइज़ेशन बंद करें\n3. बैकग्राउंड गतिविधि की अनुमति दें\n4. सभी ज़रूरी अनुमतियाँ दें\n\nइससे सिस्टम ऐप को बंद नहीं करता।</string>
+    <string name="autostart_help_miui">Poco/Xiaomi फ़ोन के लिए:\n\n1. सेटिंग्स &gt; ऐप्स &gt; ऐप्स मैनेज करें &gt; SMS Forward पर जाएँ\n2. \'ऑटोस्टार्ट\' पर टैप करके चालू करें\n3. सेटिंग्स &gt; बैटरी और परफ़ॉर्मेंस &gt; बैटरी सेवर पर जाएँ\n4. SMS Forward को \'कोई पाबंदी नहीं\' पर रखें\n5. सेटिंग्स &gt; ऐप्स &gt; अनुमतियाँ &gt; SMS Forward पर जाएँ\n6. सभी SMS अनुमतियाँ चालू करें\n\nइससे फ़ोन रीस्टार्ट होने पर ऐप अपने आप चालू हो जाता है।</string>
+    <string name="autostart_help_emui">Huawei/Honor फ़ोन के लिए:\n\n1. सेटिंग्स &gt; ऐप्स &gt; SMS Forward पर जाएँ\n2. \'ऑटोस्टार्ट\' पर टैप करके चालू करें\n3. सेटिंग्स &gt; बैटरी &gt; ऐप लॉन्च पर जाएँ\n4. SMS Forward को \'मैन्युअल\' पर रखें\n5. सभी ज़रूरी अनुमतियाँ चालू करें\n\nइससे फ़ोन रीस्टार्ट होने पर ऐप अपने आप चालू हो जाता है।</string>
+    <string name="autostart_help_coloros">OPPO/OnePlus फ़ोन के लिए:\n\n1. सेटिंग्स &gt; ऐप्स &gt; SMS Forward पर जाएँ\n2. \'ऑटोस्टार्ट\' पर टैप करके चालू करें\n3. सेटिंग्स &gt; बैटरी &gt; बैकग्राउंड ऐप मैनेजमेंट पर जाएँ\n4. SMS Forward को \'अनुमति दें\' पर रखें\n5. सभी ज़रूरी अनुमतियाँ चालू करें\n\nइससे फ़ोन रीस्टार्ट होने पर ऐप अपने आप चालू हो जाता है।</string>
+    <string name="autostart_help_vivo">Vivo फ़ोन के लिए:\n\n1. सेटिंग्स &gt; ऐप्स &gt; SMS Forward पर जाएँ\n2. \'ऑटोस्टार्ट\' पर टैप करके चालू करें\n3. सेटिंग्स &gt; बैटरी &gt; बैकग्राउंड ऐप मैनेजमेंट पर जाएँ\n4. SMS Forward को \'अनुमति दें\' पर रखें\n5. सभी ज़रूरी अनुमतियाँ चालू करें\n\nइससे फ़ोन रीस्टार्ट होने पर ऐप अपने आप चालू हो जाता है।</string>
+    <string name="autostart_help_generic">रीस्टार्ट के बाद भी फ़ॉरवर्डिंग चलाने के लिए:\n\n1. सेटिंग्स &gt; ऐप्स &gt; SMS Forward पर जाएँ\n2. \'बैकग्राउंड गतिविधि की अनुमति दें\' चालू करें\n3. बैटरी ऑप्टिमाइज़ेशन बंद करें\n4. सभी ज़रूरी अनुमतियाँ चालू करें\n\nइससे सिस्टम ऐप को बंद नहीं करता।</string>
+    <string name="header_system">सिस्टम सेटिंग्स</string>
+    <string name="title_theme">थीम</string>
+    <string-array name="theme_entries">
+        <item>सिस्टम के अनुसार</item>
+        <item>लाइट</item>
+        <item>डार्क</item>
+    </string-array>
+    <string name="title_permission_status">अनुमतियों की स्थिति</string>
+    <string name="summary_permission_status">ऐप की अनुमतियाँ देखें और बदलें</string>
+    <string name="title_battery_optimization">बैटरी ऑप्टिमाइज़ेशन</string>
+    <string name="summary_battery_optimization">भरोसेमंद SMS फ़ॉरवर्डिंग के लिए बैटरी ऑप्टिमाइज़ेशन बंद करें</string>
+    <string name="title_autostart_settings">ऑटोस्टार्ट</string>
+    <string name="summary_autostart_settings">MIUI/Poco फ़ोन पर ऑटोस्टार्ट चालू करें</string>
+    <string name="title_send_test">टेस्ट मैसेज भेजें</string>
+    <string name="summary_send_test">हर चालू तरीक़े से टेस्ट भेजता है (आपके प्लान के अनुसार SMS का ख़र्च लग सकता है)</string>
+    <string name="title_privacy_choices">निजता विकल्प</string>
+    <string name="summary_privacy_choices">विज्ञापन की सहमति बदलें</string>
+    <string name="title_pro">SMS Forward Pro</string>
+    <string name="summary_pro">विज्ञापन हटाएँ</string>
+    <string name="remove_ads">विज्ञापन हटाएँ</string>
+    <string name="pro_title">SMS Forward Pro</string>
+    <string name="pro_features">• कोई विज्ञापन नहीं\n• ऐप नोटिफ़िकेशन फ़ॉरवर्ड करें (WhatsApp, बैंक ऐप्स, …)\n• रूटिंग नियम: अलग-अलग मैसेज अलग-अलग जगह\n• सिर्फ़ वेरिफ़िकेशन कोड (OTP) मोड\n• कई नंबरों और ईमेल पतों पर फ़ॉरवर्ड करें\n• सिर्फ़ कीवर्ड या भेजने वाले से मेल खाने वाले मैसेज फ़ॉरवर्ड करें\n• अपना मैसेज फ़ॉर्मैट\n• दोबारा भेजने वाला फ़ॉरवर्ड लॉग\n• डेवलपमेंट में मदद</string>
+    <string name="pro_plan_annual">सालाना — %s</string>
+    <string name="pro_plan_annual_trial">सालाना — मुफ़्त ट्रायल, फिर %s</string>
+    <string name="pro_plan_monthly">मासिक — %s</string>
+    <string name="pro_plan_lifetime">लाइफ़टाइम — %s, एक बार भुगतान</string>
+    <string name="pro_terms_subscription">रद्द करने तक %s पर अपने आप रिन्यू होता है। Google Play में कभी भी रद्द करें।</string>
+    <string name="pro_terms_trial">ट्रायल में मुफ़्त, फिर %s प्रति वर्ष, रद्द करने तक रिन्यू। ट्रायल ख़त्म होने से पहले रद्द करें तो कोई शुल्क नहीं।</string>
+    <string name="pro_terms_lifetime">एक बार भुगतान। कोई सब्सक्रिप्शन नहीं।</string>
+    <string name="pro_buy">जारी रखें</string>
+    <string name="pro_restore">ख़रीदारी वापस लाएँ</string>
+    <string name="pro_restoring">आपकी ख़रीदारी जाँची जा रही है…</string>
+    <string name="pro_manage">सब्सक्रिप्शन मैनेज करें</string>
+    <string name="pro_active">Pro चालू है ✓</string>
+    <string name="pro_pending">भुगतान बाक़ी — पूरा होने पर Pro चालू होगा</string>
+    <string name="pro_store_unavailable">Google Play बिलिंग अभी उपलब्ध नहीं है। देखें कि आप Play में साइन इन हैं और इंटरनेट चालू है।</string>
+    <string name="status_permission_missing">SMS अनुमति चाहिए — देने के लिए टैप करें</string>
+    <string name="status_off">फ़ॉरवर्डिंग बंद है — नीचे कोई तरीक़ा चालू करें</string>
+    <string name="status_forwarding">%s से फ़ॉरवर्ड हो रहा है</string>
+    <string name="status_not_set_up">%s (सेट नहीं)</string>
+    <string name="battery_optimized">बैटरी ऑप्टिमाइज़ेशन चालू है — फ़ॉरवर्डिंग देर से हो सकती है या रुक सकती है। ठीक करने के लिए टैप करें</string>
+    <string name="battery_ok">बैटरी ऑप्टिमाइज़ नहीं ✓</string>
+    <string name="permissions_ok">सभी अनुमतियाँ मिल गईं ✓</string>
+    <string name="permissions_sms_missing">SMS अनुमति नहीं है — ठीक करने के लिए टैप करें</string>
+    <string name="permissions_contacts_missing">कॉन्टैक्ट्स की अनुमति नहीं (वैकल्पिक: भेजने वाले के नाम नहीं दिखेंगे)</string>
+    <string name="permission_title">SMS ऐक्सेस दें</string>
+    <string name="permission_message">SMS Forward आने वाले मैसेज सिर्फ़ उन्हें आपके सेट किए नंबरों, Telegram चैट या वेब पते पर भेजने के लिए पढ़ता है। कहीं और कुछ नहीं भेजा जाता।\n\n• SMS: मैसेज पाना और SMS से फ़ॉरवर्ड करना\n• कॉन्टैक्ट्स (वैकल्पिक): भेजने वाले का नाम दिखाना</string>
+    <string name="permission_denied_title">SMS अनुमति नहीं मिली</string>
+    <string name="permission_denied_message">SMS ऐक्सेस के बिना फ़ॉरवर्डिंग नहीं हो सकती। ऐप की सेटिंग्स में अनुमतियाँ में जाकर दें।</string>
+    <string name="open_settings">सेटिंग्स खोलें</string>
+    <string name="continue_">जारी रखें</string>
+    <string name="not_now">अभी नहीं</string>
+    <string name="later">बाद में</string>
+    <string name="invalid_numbers">कॉमा से अलग फ़ोन नंबर डालें</string>
+    <string name="free_one_number">मुफ़्त वर्शन एक नंबर पर फ़ॉरवर्ड करता है। कई नंबरों के लिए Pro लें।</string>
+    <string name="invalid_chat_id">नंबर वाली चैट ID या @username डालें</string>
+    <string name="invalid_token">यह बॉट टोकन जैसा नहीं दिखता (123456:ABC…)</string>
+    <string name="invalid_url">पूरा https:// URL डालें</string>
+    <string name="test_none_enabled">पहले कोई फ़ॉरवर्डिंग तरीक़ा चालू करें</string>
+    <string name="test_sender">SMS Forward (टेस्ट)</string>
+    <string name="test_message">यह SMS Forward का टेस्ट मैसेज है।</string>
+    <string name="test_sending">टेस्ट भेजा जा रहा है…</string>
+    <string name="test_result_title">टेस्ट के नतीजे</string>
+    <plurals name="test_sms_sent">
+        <item quantity="one">SMS: %d नंबर पर भेजा गया</item>
+        <item quantity="other">SMS: %d नंबरों पर भेजा गया</item>
+    </plurals>
+    <plurals name="test_sms_failed">
+        <item quantity="one">SMS: %d नंबर विफल — SMS अनुमति जाँचें</item>
+        <item quantity="other">SMS: %d नंबर विफल — SMS अनुमति जाँचें</item>
+    </plurals>
+    <string name="test_sms_no_numbers">SMS: कोई नंबर सेट नहीं</string>
+    <string name="test_ok">%s: पहुँच गया ✓</string>
+    <string name="test_retry">%s: नेटवर्क या सर्वर की गड़बड़ी — फिर से कोशिश करें</string>
+    <string name="test_fail">%s: अस्वीकार — सेटिंग्स जाँचें</string>
+</resources>

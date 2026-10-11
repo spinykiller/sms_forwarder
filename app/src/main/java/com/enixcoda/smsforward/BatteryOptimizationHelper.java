@@ -149,22 +149,6 @@ public class BatteryOptimizationHelper {
      * @return Instructions string
      */
     public static String getBatteryOptimizationInstructions(Context context) {
-        if (isMIUIDevice(context)) {
-            return "For Poco/Xiaomi devices:\n\n" +
-                   "1. Go to Settings > Apps > Manage apps > SMS Forward\n" +
-                   "2. Enable 'Autostart' permission\n" +
-                   "3. Go to Settings > Battery & performance > Battery saver\n" +
-                   "4. Add SMS Forward to 'No restrictions'\n" +
-                   "5. Go to Settings > Apps > Permissions > SMS Forward\n" +
-                   "6. Enable all SMS permissions\n\n" +
-                   "This ensures the app stays running in background.";
-        } else {
-            return "To ensure SMS forwarding works reliably:\n\n" +
-                   "1. Go to Settings > Apps > SMS Forward\n" +
-                   "2. Disable battery optimization\n" +
-                   "3. Enable background activity\n" +
-                   "4. Grant all required permissions\n\n" +
-                   "This prevents the system from killing the app.";
-        }
+        return context.getString(isMIUIDevice(context) ? R.string.battery_help_miui : R.string.battery_help_generic);
     }
 }

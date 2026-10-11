@@ -82,6 +82,14 @@ final class ForwardLog extends SQLiteOpenHelper {
         get(context).getWritableDatabase().update("log", values, "_id = ?", new String[]{String.valueOf(id)});
     }
 
+    /** For carrier reports: a failed part keeps the message failed even if a later report says otherwise. */
+    static void setStatusUnlessFailed(Context context, long id, String status) {
+        if (id < 0) return;
+        ContentValues values = new ContentValues();
+        values.put("status", status);
+        get(context).getWritableDatabase().update("log", values, "_id = ? AND status != ?", new String[]{String.valueOf(id), FAILED});
+    }
+
     static List<Entry> recent(Context context) {
         List<Entry> entries = new ArrayList<>();
         try (Cursor c = get(context).getReadableDatabase().query("log",

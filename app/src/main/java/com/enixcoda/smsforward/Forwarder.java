@@ -1,5 +1,6 @@
 package com.enixcoda.smsforward;
 
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.telephony.SmsManager;
@@ -19,6 +20,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Forwarder {
     private static final String TAG = "Forwarder";
@@ -28,19 +31,34 @@ public class Forwarder {
     static final int RETRY = 1; // transient (offline, timeout, 408/429/5xx): queue and try again
     static final int FAIL = 2;  // disabled, misconfigured or rejected (4xx): retrying won't help
 
-    /** Sends on the given SIM (the one that received the message), or the default SIM if unknown. */
-    public static void sendSMS(int subId, String number, String content) {
+    /**
+     * Sends on the given SIM (the one that received the message), or the default SIM if unknown.
+     * logId: forward-log row that gets sent/delivered reports, or -1.
+     */
+    public static void sendSMS(Context context, int subId, String number, String content, long logId) {
         SmsManager smsManager = subId == SubscriptionManager.INVALID_SUBSCRIPTION_ID
                 ? SmsManager.getDefault()
                 : SmsManager.getSmsManagerForSubscriptionId(subId);
         // Android splits long text into a linked multipart SMS; a single part is sent as a normal SMS.
-        smsManager.sendMultipartTextMessage(number, null, smsManager.divideMessage(content), null, null);
+        ArrayList<String> parts = smsManager.divideMessage(content);
+        ArrayList<PendingIntent> sent = null;
+        ArrayList<PendingIntent> delivered = null;
+        if (logId >= 0) {
+            // A report per part: the message counts as delivered only when every part is
+            sent = new ArrayList<>();
+            delivered = new ArrayList<>();
+            for (int part = 0; part < parts.size(); part++) {
+                sent.add(SmsStatusReceiver.sent(context, logId, part));
+                delivered.add(SmsStatusReceiver.delivered(context, logId, part, parts.size()));
+            }
+        }
+        smsManager.sendMultipartTextMessage(number, null, parts, sent, delivered);
     }
 
     /** False if the SMS couldn't be handed to the carrier. */
-    public static boolean forwardViaSMS(int subId, String text, String forwardNumber) {
+    public static boolean forwardViaSMS(Context context, int subId, String text, String forwardNumber, long logId) {
         try {
-            sendSMS(subId, forwardNumber, text);
+            sendSMS(context, subId, forwardNumber, text, logId);
             return true;
         } catch (RuntimeException e) {
             Log.e(TAG, "Error forwarding SMS: " + e, e);
@@ -48,12 +66,29 @@ public class Forwarder {
         }
     }
 
-    /** The configured Telegram chat ID or webhook URL, or "" when the method is off or not set up. */
+    /** Display name of a method. */
+    static String label(String channel) {
+        return ForwardLog.SMS.equals(channel) ? "SMS" : ForwardWorker.TELEGRAM.equals(channel) ? "Telegram"
+                : ForwardWorker.WEB.equals(channel) ? "Web" : "Email";
+    }
+
+    /**
+     * The configured Telegram chat ID, webhook URL or email address(es), or "" when the method is off or not set up.
+     * Free users email one address.
+     */
     static String destination(Context context, String channel) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        boolean telegram = ForwardWorker.TELEGRAM.equals(channel);
-        if (!prefs.getBoolean(context.getString(telegram ? R.string.key_enable_telegram : R.string.key_enable_web), false)) return "";
-        return prefs.getString(context.getString(telegram ? R.string.key_target_telegram : R.string.key_target_web), "").trim();
+        int enableKey = ForwardWorker.TELEGRAM.equals(channel) ? R.string.key_enable_telegram
+                : ForwardWorker.WEB.equals(channel) ? R.string.key_enable_web : R.string.key_enable_email;
+        int targetKey = ForwardWorker.TELEGRAM.equals(channel) ? R.string.key_target_telegram
+                : ForwardWorker.WEB.equals(channel) ? R.string.key_target_web : R.string.key_email_to;
+        if (!prefs.getBoolean(context.getString(enableKey), false)) return "";
+        String target = prefs.getString(context.getString(targetKey), "").trim();
+        if (ForwardWorker.EMAIL.equals(channel) && !Billing.isPro(context)) {
+            List<String> addresses = PhoneNumberUtils.splitList(target);
+            return addresses.isEmpty() ? "" : addresses.get(0);
+        }
+        return target;
     }
 
     /**
@@ -63,6 +98,9 @@ public class Forwarder {
      */
     static int send(Context context, String channel, String destination, String senderLabel, String message, String text) {
         if (destination(context, channel).isEmpty()) return FAIL;
+        if (ForwardWorker.EMAIL.equals(channel)) {
+            return Mailer.send(context, destination, context.getString(R.string.email_subject, senderLabel), text);
+        }
         if (ForwardWorker.TELEGRAM.equals(channel)) {
             String token = PreferenceManager.getDefaultSharedPreferences(context)
                     .getString(context.getString(R.string.key_telegram_apikey), "").trim();
@@ -72,10 +110,26 @@ public class Forwarder {
                     "chat_id=" + encode(destination) + "&text=" + encode(text));
         }
         try {
-            JSONObject body = new JSONObject().put("from", senderLabel).put("message", message);
-            return post(destination, "application/json; charset=utf-8", body.toString());
+            return post(destination, "application/json; charset=utf-8", webBody(context, senderLabel, message, text).toString());
         } catch (JSONException e) {
             return FAIL;
+        }
+    }
+
+    // Discord rejects longer content
+    private static final int DISCORD_MAX_CHARS = 2000;
+
+    /** JSON per the chosen webhook format: plain {from, message}, or Slack/Teams {text} / Discord {content} with the formatted text. */
+    private static JSONObject webBody(Context context, String senderLabel, String message, String text) throws JSONException {
+        String format = PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.key_web_format), "json");
+        switch (format) {
+            case "slack":
+            case "teams":
+                return new JSONObject().put("text", text);
+            case "discord":
+                return new JSONObject().put("content", text.length() > DISCORD_MAX_CHARS ? text.substring(0, DISCORD_MAX_CHARS - 1) + "…" : text);
+            default:
+                return new JSONObject().put("from", senderLabel).put("message", message);
         }
     }
 

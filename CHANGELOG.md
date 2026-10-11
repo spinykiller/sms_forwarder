@@ -17,12 +17,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 💎 Free and Pro
 - Free: one banner ad on the settings screen (with GDPR consent and "Privacy choices"); SMS forwarding to one number
-- Pro (yearly with free trial, monthly, or lifetime): no ads, multiple target numbers, keyword/sender filters, custom message format, forward log with retry
+- Pro (yearly with free trial, monthly, or lifetime): no ads, multiple target numbers and email addresses, keyword/sender filters, custom message format, forward log with retry
+- Pro: forward app notifications; routing rules (senders/keywords → methods); OTP-only mode; /regex/ keywords
+- Pro: quiet hours, pause SMS while roaming, choose the sending SIM, SMS delivery reports in the log, daily health check and low-battery alert, app lock
 
 ### ✨ Improvements
 - Telegram/webhook forwards that fail while offline are retried automatically
 - No background service, persistent notification or alarms — the app runs only when an SMS arrives
 - Live status header, validated settings, "Send test message"
+- Light, dark or follow-system theme (Settings → Theme)
+- Email forwarding through your own SMTP account; webhook presets for Slack, Discord and Teams
+- Pause switch in settings, Quick Settings tile and home-screen widget; export/import settings
+- Hindi, Indonesian, Portuguese, Spanish and Russian, with an in-app language picker
 - Targets Android 16 (API 36); webhooks must use https
 
 ### ⚠️ Breaking

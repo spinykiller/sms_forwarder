@@ -2,6 +2,7 @@ package com.enixcoda.smsforward;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.telephony.SubscriptionManager;
 import android.text.format.DateUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,12 +11,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.List;
 
 /** Pro: recent forwards with their status; a failed Telegram/Web forward can be retried. Pro-only, so no ad. */
-public class LogActivity extends AppCompatActivity {
+public class LogActivity extends LockedActivity {
     private ListView list;
     private View empty;
 
@@ -63,7 +63,7 @@ public class LogActivity extends AppCompatActivity {
     }
 
     private String channelLabel(ForwardLog.Entry e) {
-        return (ForwardLog.SMS.equals(e.channel) ? "SMS" : ForwardWorker.TELEGRAM.equals(e.channel) ? "Telegram" : "Web") + " → " + e.target;
+        return Forwarder.label(e.channel) + " → " + e.target;
     }
 
     private String statusLabel(String status) {
@@ -82,7 +82,7 @@ public class LogActivity extends AppCompatActivity {
                 .setMessage(getString(R.string.log_retry_confirm, channelLabel(e)))
                 .setPositiveButton(R.string.log_retry, (dialog, which) -> {
                     ForwardLog.setStatus(this, e.id, ForwardLog.QUEUED);
-                    ForwardWorker.enqueue(this, e.channel, e.target, e.sender, e.message, e.text, e.id);
+                    ForwardWorker.enqueue(this, e.channel, e.target, e.sender, e.message, e.text, e.id, SubscriptionManager.INVALID_SUBSCRIPTION_ID, 0);
                     load();
                 })
                 .setNegativeButton(android.R.string.cancel, null)

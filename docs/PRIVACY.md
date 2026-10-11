@@ -8,9 +8,12 @@ SMS Forward ("the app") forwards text messages you receive to destinations **you
 
 | Data | Why | Where it goes |
 |---|---|---|
-| Incoming SMS (sender, text) | The app's only function: forwarding | Only to the destinations you set: phone numbers (by SMS), your Telegram bot/chat (via `api.telegram.org`), and/or your webhook URL (https) |
+| Incoming SMS (sender, text) | The app's main function: forwarding | Only to the destinations you set: phone numbers (by SMS), your Telegram bot/chat (via `api.telegram.org`), your webhook URL (https; plain, Slack, Discord or Teams format), and/or email addresses (sent through **your own** SMTP account) |
+| Notifications of apps you pick (Pro, optional; needs notification access you grant) | Forward app notifications | Title and text only, to the same destinations you set. Apps you don't pick are never read |
 | Contacts (optional) | Show the sender's name in forwarded messages | Name is included in the forwarded message only; contacts are never uploaded |
-| Settings (target numbers, Telegram chat ID and bot token, webhook URL, blocklist) | Needed to forward | Stored on your device only. Android may include them in your device backup if backup is on |
+| SIM list (Pro, optional; phone permission asked only when you open "Send SMS from") | Let you choose which SIM sends forwards | Stays on the phone |
+| Battery level and device name (Pro, only if you turn on the health check) | Daily "still running" message and low-battery alert | Sent only to your Telegram/Web/Email destinations |
+| Settings (target numbers, Telegram chat ID and bot token, webhook URL, email address and SMTP password, rules, filters) | Needed to forward | Stored on your device only. Android may include them in your device backup if backup is on. "Export settings" writes them to a file you choose |
 
 The free version does not store a history of your messages. With Pro, the optional **forward log** keeps your last 100 forwards (sender, text, status) on this phone only; clear it anytime from the log screen. A forward that fails because you are offline is kept on the device until it is delivered or retries end (about a day), then deleted.
 

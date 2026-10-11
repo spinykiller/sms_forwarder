@@ -258,46 +258,11 @@ public class AutoStartHelper {
      * @return Instructions string
      */
     public static String getAutoStartInstructions(Context context) {
-        if (isMIUIDevice(context)) {
-            return "For Poco/Xiaomi devices:\n\n" +
-                   "1. Go to Settings > Apps > Manage apps > SMS Forward\n" +
-                   "2. Tap on 'Autostart' and enable it\n" +
-                   "3. Go to Settings > Battery & performance > Battery saver\n" +
-                   "4. Add SMS Forward to 'No restrictions'\n" +
-                   "5. Go to Settings > Apps > Permissions > SMS Forward\n" +
-                   "6. Enable all SMS permissions\n\n" +
-                   "This ensures the app starts automatically after reboot.";
-        } else if (isEMUIDevice(context)) {
-            return "For Huawei/Honor devices:\n\n" +
-                   "1. Go to Settings > Apps > SMS Forward\n" +
-                   "2. Tap on 'Autostart' and enable it\n" +
-                   "3. Go to Settings > Battery > App launch\n" +
-                   "4. Set SMS Forward to 'Manual'\n" +
-                   "5. Enable all required permissions\n\n" +
-                   "This ensures the app starts automatically after reboot.";
-        } else if (isColorOSDevice(context)) {
-            return "For OPPO/OnePlus devices:\n\n" +
-                   "1. Go to Settings > Apps > SMS Forward\n" +
-                   "2. Tap on 'Autostart' and enable it\n" +
-                   "3. Go to Settings > Battery > Background app management\n" +
-                   "4. Set SMS Forward to 'Allow'\n" +
-                   "5. Enable all required permissions\n\n" +
-                   "This ensures the app starts automatically after reboot.";
-        } else if (isFuntouchOSDevice(context)) {
-            return "For Vivo devices:\n\n" +
-                   "1. Go to Settings > Apps > SMS Forward\n" +
-                   "2. Tap on 'Autostart' and enable it\n" +
-                   "3. Go to Settings > Battery > Background app management\n" +
-                   "4. Set SMS Forward to 'Allow'\n" +
-                   "5. Enable all required permissions\n\n" +
-                   "This ensures the app starts automatically after reboot.";
-        } else {
-            return "To ensure SMS forwarding works after reboot:\n\n" +
-                   "1. Go to Settings > Apps > SMS Forward\n" +
-                   "2. Enable 'Allow background activity'\n" +
-                   "3. Disable battery optimization\n" +
-                   "4. Enable all required permissions\n\n" +
-                   "This prevents the system from killing the app.";
-        }
+        int help = isMIUIDevice(context) ? R.string.autostart_help_miui
+                : isEMUIDevice(context) ? R.string.autostart_help_emui
+                : isColorOSDevice(context) ? R.string.autostart_help_coloros
+                : isFuntouchOSDevice(context) ? R.string.autostart_help_vivo
+                : R.string.autostart_help_generic;
+        return context.getString(help);
     }
 }

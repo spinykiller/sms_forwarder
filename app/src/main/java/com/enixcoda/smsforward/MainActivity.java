@@ -1,36 +1,52 @@
 package com.enixcoda.smsforward;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.provider.Telephony;
+import android.telephony.SubscriptionInfo;
 import android.telephony.SubscriptionManager;
 import android.text.InputType;
+import android.util.Patterns;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.os.LocaleListCompat;
 import androidx.preference.EditTextPreference;
+import androidx.preference.ListPreference;
+import androidx.preference.MultiSelectListPreference;
+import androidx.preference.SwitchPreferenceCompat;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 
+import org.json.JSONException;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Predicate;
 
-public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class MainActivity extends LockedActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final int PERMISSION_REQUEST_CODE = 100;
     // Battery optimization is explained once; afterwards it's under System Settings.
     private static final String KEY_BATTERY_PROMPTED = "battery_prompted";
@@ -41,6 +57,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Before super: the chosen theme applies to every screen for the rest of the process.
+        applyTheme(PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.key_theme), "system"));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         SystemBars.apply(this, findViewById(R.id.header));
@@ -67,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         super.onStart();
         Billing.get(this).refresh();
         Ads.onStart(this, this::bindAd);
+        HealthWorker.schedule(this);
     }
 
     @Override
@@ -96,10 +115,18 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         updateStatus();
         bindAd(); // Pro status is cached in prefs
+        if (getString(R.string.key_paused).equals(key)) Pause.refresh(this);
+        if (getString(R.string.key_heartbeat).equals(key) || getString(R.string.key_low_battery).equals(key) || Billing.KEY_PRO.equals(key))
+            HealthWorker.schedule(this);
         if (Billing.KEY_PRO.equals(key)) {
             SettingsFragment settings = (SettingsFragment) getSupportFragmentManager().findFragmentById(R.id.settings);
             if (settings != null && settings.isResumed()) settings.refresh();
         }
+    }
+
+    static void applyTheme(String value) {
+        AppCompatDelegate.setDefaultNightMode("light".equals(value) ? AppCompatDelegate.MODE_NIGHT_NO
+                : "dark".equals(value) ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
     }
 
     static boolean hasSmsPermissions(Context context) {
@@ -112,11 +139,17 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             statusText.setText(R.string.status_permission_missing);
             return;
         }
+        if (Dispatcher.isPaused(this)) {
+            statusText.setText(R.string.status_paused);
+            return;
+        }
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         List<String> methods = new ArrayList<>();
         addMethod(methods, prefs, R.string.key_enable_sms, "SMS", R.string.key_target_sms);
         addMethod(methods, prefs, R.string.key_enable_telegram, "Telegram", R.string.key_target_telegram, R.string.key_telegram_apikey);
         addMethod(methods, prefs, R.string.key_enable_web, "Web", R.string.key_target_web);
+        addMethod(methods, prefs, R.string.key_enable_email, "Email", R.string.key_email_to,
+                R.string.key_smtp_host, R.string.key_smtp_port, R.string.key_smtp_user, R.string.key_smtp_password);
         statusText.setText(methods.isEmpty()
                 ? getString(R.string.status_off)
                 : getString(R.string.status_forwarding, String.join(", ", methods)));
@@ -177,7 +210,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         if (!BatteryOptimizationHelper.isBatteryOptimized(this) || prefs.getBoolean(KEY_BATTERY_PROMPTED, false)) return;
         prefs.edit().putBoolean(KEY_BATTERY_PROMPTED, true).apply();
         new AlertDialog.Builder(this)
-            .setTitle("Battery Optimization Detected")
+            .setTitle(R.string.battery_dialog_title)
             .setMessage(BatteryOptimizationHelper.getBatteryOptimizationInstructions(this))
             .setPositiveButton(R.string.open_settings, (dialog, which) -> BatteryOptimizationHelper.openBatteryOptimizationSettings(this))
             .setNegativeButton(R.string.later, null)
@@ -185,6 +218,29 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
+        private final ActivityResultLauncher<String> phonePermission = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(), granted -> {
+                    if (granted) pickSim();
+                    else Toast.makeText(requireContext(), R.string.sim_needs_permission, Toast.LENGTH_LONG).show();
+                });
+        private final ActivityResultLauncher<String> exportLauncher = registerForActivityResult(
+                new ActivityResultContracts.CreateDocument("application/json"), uri -> backup(uri, true));
+        private final ActivityResultLauncher<String[]> importLauncher = registerForActivityResult(
+                new ActivityResultContracts.OpenDocument(), uri -> backup(uri, false));
+
+        private void backup(Uri uri, boolean export) {
+            if (uri == null) return; // picker cancelled
+            Context context = requireContext();
+            try {
+                if (export) SettingsBackup.export(context, uri);
+                else SettingsBackup.restore(context, uri);
+                Toast.makeText(context, export ? R.string.export_done : R.string.import_done, Toast.LENGTH_SHORT).show();
+                if (!export) requireActivity().recreate(); // show the imported values
+            } catch (IOException | JSONException | SecurityException e) {
+                Toast.makeText(context, getString(R.string.backup_failed, e.getMessage()), Toast.LENGTH_LONG).show();
+            }
+        }
+
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
@@ -192,16 +248,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             // Every target number must contain digits (entries without any would be silently dropped)
             bindText(R.string.key_target_sms, R.string.target_summary_sms, InputType.TYPE_CLASS_PHONE, false,
                     v -> PhoneNumberUtils.splitList(v).size() == PhoneNumberUtils.parsePhoneNumbers(v).size(), R.string.invalid_numbers);
-            // Free forwards to one number; checked after the format check above
-            EditTextPreference targets = findPreference(getString(R.string.key_target_sms));
-            Preference.OnPreferenceChangeListener formatCheck = targets.getOnPreferenceChangeListener();
-            targets.setOnPreferenceChangeListener((p, newValue) -> {
-                if (!formatCheck.onPreferenceChange(p, newValue)) return false;
-                if (Billing.isPro(requireContext()) || PhoneNumberUtils.parsePhoneNumbers((String) newValue).size() <= 1) return true;
-                Toast.makeText(requireContext(), R.string.free_one_number, Toast.LENGTH_LONG).show();
-                startActivity(new Intent(requireContext(), ProActivity.class));
-                return false;
-            });
+            limitForFree(R.string.key_target_sms, v -> PhoneNumberUtils.parsePhoneNumbers(v).size() <= 1, R.string.free_one_number);
             bindText(R.string.key_target_telegram, R.string.target_summary_telegram, InputType.TYPE_CLASS_TEXT, false,
                     v -> v.matches("-?\\d+|@\\w+"), R.string.invalid_chat_id);
             bindText(R.string.key_telegram_apikey, R.string.summary_telegram_apikey,
@@ -210,16 +257,63 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             bindText(R.string.key_target_web, R.string.target_summary_web,
                     InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI, false,
                     v -> "https".equalsIgnoreCase(Uri.parse(v).getScheme()) && Uri.parse(v).getHost() != null, R.string.invalid_url);
+            bindText(R.string.key_email_to, R.string.summary_email_to,
+                    InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS, false,
+                    v -> allEmails(v), R.string.invalid_email);
+            limitForFree(R.string.key_email_to, v -> PhoneNumberUtils.splitList(v).size() <= 1, R.string.free_one_email);
+            bindText(R.string.key_smtp_user, R.string.summary_smtp_user,
+                    InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS, false,
+                    v -> allEmails(v) && PhoneNumberUtils.splitList(v).size() == 1, R.string.invalid_email);
+            bindText(R.string.key_smtp_password, R.string.summary_smtp_password,
+                    InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD, true, v -> true, 0);
+            ((EditTextPreference) findPreference(getString(R.string.key_smtp_port))).setOnBindEditTextListener(e -> e.setInputType(InputType.TYPE_CLASS_NUMBER));
+            findPreference(getString(R.string.key_smtp_port)).setOnPreferenceChangeListener((p, v) -> {
+                if (((String) v).matches("\\d{1,5}")) return true;
+                Toast.makeText(requireContext(), R.string.invalid_port, Toast.LENGTH_LONG).show();
+                return false;
+            });
             bindText(R.string.key_blocked_numbers, R.string.summary_blocked_numbers, InputType.TYPE_CLASS_TEXT, false,
                     v -> true, 0);
             bindText(R.string.key_filter_keywords, R.string.summary_filter_keywords, InputType.TYPE_CLASS_TEXT, false,
-                    v -> true, 0);
+                    v -> MessageRules.invalidRegex(MessageRules.splitKeywords(v)) == null, R.string.invalid_regex_generic);
             bindText(R.string.key_filter_senders, R.string.summary_filter_senders, InputType.TYPE_CLASS_TEXT, false,
                     v -> true, 0);
             bindText(R.string.key_template, R.string.summary_template,
                     InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE, false,
                     v -> v.contains("{message}"), R.string.invalid_template);
 
+            for (int key : new int[]{R.string.key_quiet_start, R.string.key_quiet_end}) {
+                findPreference(getString(key)).setOnPreferenceChangeListener((p, v) -> {
+                    if (MessageRules.minutesOf((String) v) >= 0) return true;
+                    Toast.makeText(requireContext(), R.string.invalid_time, Toast.LENGTH_LONG).show();
+                    return false;
+                });
+            }
+            findPreference(getString(R.string.key_app_lock)).setOnPreferenceChangeListener((p, on) -> {
+                if (!(Boolean) on || canLock(requireContext())) return true;
+                Toast.makeText(requireContext(), R.string.app_lock_needs_screen_lock, Toast.LENGTH_LONG).show();
+                return false;
+            });
+            findPreference(getString(R.string.key_send_sim)).setOnPreferenceClickListener(p -> {
+                if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED)
+                    pickSim();
+                else phonePermission.launch(Manifest.permission.READ_PHONE_STATE);
+                return true;
+            });
+            findPreference(getString(R.string.key_rules)).setOnPreferenceClickListener(preference -> {
+                startActivity(new Intent(requireContext(), RulesActivity.class));
+                return true;
+            });
+            bindNotificationApps();
+            findPreference(getString(R.string.key_enable_notifications)).setOnPreferenceChangeListener((preference, on) -> {
+                if ((Boolean) on && !NotificationForwarder.hasAccess(requireContext())) askNotificationAccess();
+                return true;
+            });
+            findPreference(getString(R.string.key_enable_notifications)).setOnPreferenceClickListener(preference -> {
+                // Tapping while on but without access (e.g. revoked later) asks again
+                if (((SwitchPreferenceCompat) preference).isChecked() && !NotificationForwarder.hasAccess(requireContext())) askNotificationAccess();
+                return false;
+            });
             findPreference(getString(R.string.key_forward_log)).setOnPreferenceClickListener(preference -> {
                 startActivity(new Intent(requireContext(), LogActivity.class));
                 return true;
@@ -236,6 +330,27 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             findPreference(getString(R.string.key_privacy_choices)).setOnPreferenceClickListener(preference -> {
                 MainActivity activity = (MainActivity) requireActivity();
                 Ads.showPrivacyOptions(activity, activity::bindAd);
+                return true;
+            });
+            // Per-app language (AppCompat persists it); the setting shows the current one rather than storing it
+            ListPreference language = findPreference(getString(R.string.key_language));
+            language.setValue(AppCompatDelegate.getApplicationLocales().toLanguageTags());
+            language.setSummary(language.getEntry());
+            language.setOnPreferenceChangeListener((preference, value) -> {
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags((String) value));
+                return true;
+            });
+            // Recreates open screens in the new theme
+            findPreference(getString(R.string.key_theme)).setOnPreferenceChangeListener((preference, value) -> {
+                applyTheme((String) value);
+                return true;
+            });
+            findPreference(getString(R.string.key_export)).setOnPreferenceClickListener(preference -> {
+                exportLauncher.launch("sms-forward-settings.json");
+                return true;
+            });
+            findPreference(getString(R.string.key_import)).setOnPreferenceClickListener(preference -> {
+                importLauncher.launch(new String[]{"application/json", "text/plain", "application/octet-stream"});
                 return true;
             });
             findPreference(getString(R.string.key_send_test)).setOnPreferenceClickListener(preference -> {
@@ -280,10 +395,104 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             boolean pro = Billing.isPro(context);
             findPreference(getString(R.string.key_pro)).setSummary(pro ? R.string.pro_active : R.string.summary_pro);
             findPreference(getString(R.string.key_pro_unlock)).setVisible(!pro);
-            for (int key : new int[]{R.string.key_forward_log, R.string.key_enable_filter, R.string.key_filter_keywords, R.string.key_filter_senders, R.string.key_template}) {
+            for (int key : new int[]{R.string.key_forward_log, R.string.key_rules, R.string.key_rules_unmatched, R.string.key_otp_only,
+                    R.string.key_enable_notifications, R.string.key_notification_apps,
+                    R.string.key_enable_filter, R.string.key_filter_keywords, R.string.key_filter_senders, R.string.key_template,
+                    R.string.key_quiet_hours, R.string.key_quiet_start, R.string.key_quiet_end, R.string.key_pause_roaming,
+                    R.string.key_send_sim, R.string.key_heartbeat, R.string.key_low_battery, R.string.key_app_lock}) {
                 findPreference(getString(key)).setEnabled(pro);
             }
+            findPreference(getString(R.string.key_send_sim)).setSummary("same".equals(PreferenceManager.getDefaultSharedPreferences(context)
+                    .getString(getString(R.string.key_send_sim), "same")) ? getString(R.string.sim_same) : getString(R.string.title_send_sim));
+            findPreference(getString(R.string.key_rules)).setSummary(Rules.load(context).isEmpty()
+                    ? getString(R.string.summary_rules) : getResources().getQuantityString(R.plurals.rules_count, Rules.load(context).size(), Rules.load(context).size()));
+            findPreference(getString(R.string.key_enable_notifications)).setSummary(NotificationForwarder.hasAccess(context)
+                    ? R.string.summary_notifications_on : R.string.summary_notifications_access);
             findPreference(getString(R.string.key_privacy_choices)).setVisible(Ads.privacyOptionsRequired(context));
+        }
+
+        // ponytail: lists launchable apps on the main thread (~100 ms); move off-thread if it shows up as jank
+        private void bindNotificationApps() {
+            Context context = requireContext();
+            PackageManager pm = context.getPackageManager();
+            // The SMS app is excluded: its notifications duplicate the SMS forwarding
+            String smsApp = Telephony.Sms.getDefaultSmsPackage(context);
+            List<ResolveInfo> launchable = pm.queryIntentActivities(new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER), 0);
+            // Package → label, sorted by label; two apps may share a label, so the package stays the key
+            Map<String, String> labels = new HashMap<>();
+            for (ResolveInfo info : launchable) {
+                String pkg = info.activityInfo.packageName;
+                if (pkg.equals(context.getPackageName()) || pkg.equals(smsApp)) continue;
+                labels.put(pkg, info.loadLabel(pm).toString());
+            }
+            List<String> packages = new ArrayList<>(labels.keySet());
+            packages.sort((a, b) -> String.CASE_INSENSITIVE_ORDER.compare(labels.get(a), labels.get(b)));
+            CharSequence[] entries = new CharSequence[packages.size()];
+            for (int i = 0; i < entries.length; i++) entries[i] = labels.get(packages.get(i));
+            MultiSelectListPreference apps = findPreference(getString(R.string.key_notification_apps));
+            apps.setEntries(entries);
+            apps.setEntryValues(packages.toArray(new CharSequence[0]));
+            apps.setSummaryProvider(p -> {
+                int n = ((MultiSelectListPreference) p).getValues().size();
+                return getResources().getQuantityString(R.plurals.summary_notification_apps, n, n);
+            });
+        }
+
+        @SuppressLint("MissingPermission") // checked by the caller
+        private void pickSim() {
+            Context context = requireContext();
+            List<SubscriptionInfo> sims = context.getSystemService(SubscriptionManager.class).getActiveSubscriptionInfoList();
+            List<String> labels = new ArrayList<>();
+            List<String> values = new ArrayList<>();
+            labels.add(getString(R.string.sim_same));
+            values.add("same");
+            if (sims != null) {
+                for (SubscriptionInfo sim : sims) {
+                    labels.add(getString(R.string.sim_entry, sim.getSimSlotIndex() + 1, sim.getDisplayName()));
+                    values.add(String.valueOf(sim.getSubscriptionId()));
+                }
+            }
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            int checked = Math.max(0, values.indexOf(prefs.getString(getString(R.string.key_send_sim), "same")));
+            new AlertDialog.Builder(context)
+                    .setTitle(R.string.title_send_sim)
+                    .setSingleChoiceItems(labels.toArray(new String[0]), checked, (d, which) -> {
+                        prefs.edit().putString(getString(R.string.key_send_sim), values.get(which)).apply();
+                        findPreference(getString(R.string.key_send_sim)).setSummary(labels.get(which));
+                        d.dismiss();
+                    })
+                    .show();
+        }
+
+        // Prominent disclosure before the system screen (Play policy for notification access)
+        private void askNotificationAccess() {
+            new AlertDialog.Builder(requireContext())
+                    .setTitle(R.string.notification_access_title)
+                    .setMessage(R.string.notification_access_message)
+                    .setPositiveButton(R.string.open_settings, (d, w) -> startActivity(new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)))
+                    .setNegativeButton(R.string.not_now, null)
+                    .show();
+        }
+
+        /** Adds a free-tier limit after the setting's format check: over the limit shows why and opens the Pro screen. */
+        private void limitForFree(int keyRes, Predicate<String> freeAllows, int messageRes) {
+            Preference preference = findPreference(getString(keyRes));
+            Preference.OnPreferenceChangeListener formatCheck = preference.getOnPreferenceChangeListener();
+            preference.setOnPreferenceChangeListener((p, newValue) -> {
+                if (formatCheck != null && !formatCheck.onPreferenceChange(p, newValue)) return false;
+                if (Billing.isPro(requireContext()) || freeAllows.test((String) newValue)) return true;
+                Toast.makeText(requireContext(), messageRes, Toast.LENGTH_LONG).show();
+                startActivity(new Intent(requireContext(), ProActivity.class));
+                return false;
+            });
+        }
+
+        private static boolean allEmails(String value) {
+            List<String> addresses = PhoneNumberUtils.splitList(value);
+            for (String address : addresses) {
+                if (!Patterns.EMAIL_ADDRESS.matcher(address).matches()) return false;
+            }
+            return !addresses.isEmpty();
         }
 
         /** Shows the current value as the summary (help text when empty), sets the keyboard and rejects invalid input. */
@@ -312,7 +521,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             boolean sms = prefs.getBoolean(getString(R.string.key_enable_sms), false);
             boolean telegram = prefs.getBoolean(getString(R.string.key_enable_telegram), false);
             boolean web = prefs.getBoolean(getString(R.string.key_enable_web), false);
-            if (!sms && !telegram && !web) {
+            boolean email = prefs.getBoolean(getString(R.string.key_enable_email), false);
+            if (!sms && !telegram && !web && !email) {
                 Toast.makeText(context, R.string.test_none_enabled, Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -322,22 +532,22 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             new Thread(() -> {
                 List<String> results = new ArrayList<>();
                 if (sms) {
-                    List<String> targets = SMSReceiver.forwardTargets(Billing.isPro(context),
+                    List<String> targets = Dispatcher.forwardTargets(Billing.isPro(context),
                             PhoneNumberUtils.parsePhoneNumbers(prefs.getString(context.getString(R.string.key_target_sms), "")));
                     int sent = 0;
                     for (String target : targets) {
-                        if (Forwarder.forwardViaSMS(SubscriptionManager.INVALID_SUBSCRIPTION_ID,
-                                MessageRules.format(MessageRules.DEFAULT_SMS_FORMAT, sender, sender, "", message), target)) sent++;
+                        if (Forwarder.forwardViaSMS(context, SubscriptionManager.INVALID_SUBSCRIPTION_ID,
+                                MessageRules.format(MessageRules.DEFAULT_SMS_FORMAT, sender, sender, "", message), target, -1)) sent++;
                     }
                     results.add(targets.isEmpty() ? context.getString(R.string.test_sms_no_numbers)
-                            : sent == targets.size() ? context.getString(R.string.test_sms_sent, sent)
-                            : context.getString(R.string.test_sms_failed, targets.size() - sent));
+                            : sent == targets.size() ? context.getResources().getQuantityString(R.plurals.test_sms_sent, sent, sent)
+                            : context.getResources().getQuantityString(R.plurals.test_sms_failed, targets.size() - sent, targets.size() - sent));
                 }
                 String telegramText = MessageRules.format(MessageRules.DEFAULT_TELEGRAM_FORMAT, sender, sender, "", message);
                 for (String channel : ForwardWorker.CHANNELS) {
                     String destination = Forwarder.destination(context, channel);
-                    if (!(ForwardWorker.TELEGRAM.equals(channel) ? telegram : web)) continue;
-                    results.add(describe(context, ForwardWorker.TELEGRAM.equals(channel) ? "Telegram" : "Web",
+                    if (!(ForwardWorker.TELEGRAM.equals(channel) ? telegram : ForwardWorker.WEB.equals(channel) ? web : email)) continue;
+                    results.add(describe(context, Forwarder.label(channel),
                             destination.isEmpty() ? Forwarder.FAIL : Forwarder.send(context, channel, destination, sender, message, telegramText)));
                 }
                 if (getActivity() == null) return;
