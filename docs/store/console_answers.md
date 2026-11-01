@@ -33,3 +33,19 @@ Sources: https://support.google.com/googleplay/android-developer/answer/10208820
 - SMS declaration video URL: [Paste the unlisted YouTube URL after recording and upload.]
 
 Google's data safety definitions distinguish collection from sharing and exclude certain user-directed transfers from the definition of sharing. Confirm the exact form answers for each configured destination and every integrated SDK; do not assume all user-directed transfers are automatically exempt. See https://support.google.com/googleplay/android-developer/answer/10787469.
+
+### Data safety form: working selections
+
+| Question | Working answer |
+|---|---|
+| Does the app collect or share required user data? | Yes; include the advertising SDK. |
+| SMS or MMS messages | Sender and SMS text leave the device for configured destinations, for app functionality. Collection/sharing classifications require the Console definition review above. |
+| Contacts | Optional sender-name lookup; a name may leave the device as part of a forward. App functionality. |
+| Other in-app messages | Optional selected notification titles and text leave the device for configured destinations. App functionality. Confirm the Console data-type mapping. |
+| Device or other IDs | AdMob: collected and shared, for advertising, analytics and fraud prevention; check SDK version and options. |
+| Approximate location | AdMob may derive it from IP address; review Google SDK disclosures and configuration. |
+| App interactions and diagnostics | AdMob: collected and shared, for advertising, analytics and fraud prevention; check SDK version and options. |
+| Encrypted in transit | HTTPS webhooks and TLS SMTP; AdMob uses TLS per Google's current SDK disclosure. SMS uses the carrier. Review Play's user-directed-transfer guidance before selecting the form answer. |
+| Can users request data deletion? | Clear app storage or uninstall for locally stored settings and logs; recipients and third-party services have their own deletion procedures. No developer account exists. |
+
+Google's [Mobile Ads disclosure](https://developers.google.com/admob/android/privacy/play-data-disclosure) describes the latest SDK; this app uses an older SDK (23.5.0), so verify its applicable disclosures before submitting.
