@@ -2,18 +2,9 @@
 
 Package: `com.spinykiller.smsforward` · target API 36 · min API 25
 
-## 1. Upload key (once)
-```bash
-keytool -genkeypair -v -keystore upload-keystore.jks -alias upload -keyalg RSA -keysize 2048 -validity 10000
-```
-Create `keystore.properties` in the repo root (gitignored):
-```
-storeFile=upload-keystore.jks
-storePassword=…
-keyAlias=upload
-keyPassword=…
-```
-Back up both files outside the repo. Enroll in Play App Signing when creating the app.
+## 1. Upload key
+
+The existing upload key is `upload.keystore`; `keystore.properties` references it. Keep both files private and backed up outside the repo. Do not regenerate or overwrite the key. Enroll in Play App Signing when creating the app.
 
 ## 2. AdMob
 AdMob app IDs are per app; MemoryMedic's can't be reused. In AdMob (account `pub-5969937375579820`): **Apps → Add app** (Android, `com.spinykiller.smsforward`) → **Ad units → Banner**. Put both IDs in `gradle.properties`:
@@ -33,12 +24,13 @@ Bump `versionCode` in `app/build.gradle` for every upload.
 - **Privacy policy URL:** https://github.com/spinykiller/sms_forwarder/blob/master/docs/PRIVACY.md
 - **Permissions declaration (SMS):** required, or the app is rejected. Core functionality: *SMS forwarding to the user's other devices/services*. Closest permitted use: **cross-device synchronization or transfer of SMS** (forwarding to the user's own phone, Telegram or server). Explain: the user configures destinations; no data goes to the developer; SMS data is never used for ads. Provide a demo video showing setup → incoming SMS → forwarded copy.
   - Risk: Google decides SMS exceptions case by case. Rejection is possible; the GitHub APK remains the fallback.
-- **Data safety:** SMS/MMS messages and Contacts are *processed* to provide app functionality and *shared* only at the user's direction (to destinations they set); encrypted in transit (https; SMS is carrier-transmitted); deletable by clearing app data. Plus the AdMob SDK: *Device or other IDs*, *Approximate location*, *App interactions*, *Diagnostics* — collected and shared for Advertising/Analytics/Fraud prevention. Declare **Contains ads: yes** and the `AD_ID` permission use (advertising). Pro notification forwarding processes *Other in-app messages* the same way (user-directed sharing, not collected by the developer).
+- **Data safety:** Review `docs/store/console_answers.md` and the current Google SDK disclosures. SMS and optional contact names and selected notifications are sent to user-configured destinations for app functionality; determine collection and sharing under Play's current definitions. Webhooks use HTTPS and SMTP uses TLS; SMS is carrier-transmitted. AdMob may collect device IDs, approximate location, interactions and diagnostics. Declare ads and advertising ID use.
 - **Notification access** (`NotificationListenerService`): no declaration form, but review checks the prominent disclosure shown before the system screen (in the app) and the privacy policy line; show it in the demo video.
 - **READ_PHONE_STATE**: requested only from the Pro "Send SMS from" picker to list SIMs; mention it in the SMS declaration's description.
 - **In-app products** (IDs must match `Billing.java`):
   - Subscription `pro` with base plans `annual` (+ offer `trial`, e.g. 7-day free trial, new customers) and `monthly`.
   - One-time product `pro_lifetime`.
+  - Monthly: USD 1.99 / INR 99; annual: USD 9.99 / INR 499; lifetime: USD 19.99 / INR 999. Convert other regions from USD; enable new regions. Annual offer `trial`: 7 days free for customers who have never had `pro`.
   - Add license testers (Setup → License testing) and test purchases on the internal track; the emulator without Play Store shows "billing isn't available".
 - **Content rating:** questionnaire (utility, no user-generated content shared publicly).
 - **Target audience:** 18+.

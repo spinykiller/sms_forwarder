@@ -85,3 +85,6 @@ lint/tmp/
 
 # Android Profiling
 *.hprof
+# Release evidence and local build logs
+/build-logs/
+/docs/store/demo.mp4
