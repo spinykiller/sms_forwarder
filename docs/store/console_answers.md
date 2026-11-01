@@ -6,7 +6,7 @@
 
 The optional Pro SIM picker requests READ_PHONE_STATE to list available SIMs for outgoing SMS. Optional Pro notification forwarding requests notification access after an in-app disclosure; it forwards content only from apps selected by the user.
 
-Demo video: show destination setup, an incoming SMS and the forwarded copy, then the notification-access disclosure and system access screen. Video still required.
+Demo video: the local `demo.mp4` is a draft only. Replace it with a recording showing installation, permission request, destination setup, the same incoming SMS and forwarded copy, and the notification-access disclosure before submitting.
 
 ## Data safety
 
@@ -20,3 +20,16 @@ Review the final app and SDK disclosures in Play Console before submitting; thes
 - Contains ads: yes. Advertising ID: advertising.
 
 Sources: https://support.google.com/googleplay/android-developer/answer/10208820 and https://support.google.com/googleplay/android-developer/answer/10787469
+
+## Other Console forms
+
+- App category: Tools. Suggested tags: select only applicable SMS and utility tags available in Console.
+- App access: All functionality is accessible without an account; paid Pro features use Google Play purchases.
+- Ads: Yes. Advertising ID: Yes, used for advertising.
+- Target audience: 18 and over only.
+- Government apps: No. Financial features: None. Health features: None.
+- Content rating: Answer the questionnaire for a utility app with no app-provided public user-generated content, violence, sexual content, gambling or controlled-substance content. Messages and notification content are user-supplied; answer any questions about user interaction and unrestricted access according to the exact wording in Console.
+- Privacy policy: https://github.com/spinykiller/sms_forwarder/blob/master/docs/PRIVACY.md
+- SMS declaration video URL: [Paste the unlisted YouTube URL after recording and upload.]
+
+Google's data safety definitions distinguish collection from sharing and exclude certain user-directed transfers from the definition of sharing. Confirm the exact form answers for each configured destination and every integrated SDK; do not assume all user-directed transfers are automatically exempt. See https://support.google.com/googleplay/android-developer/answer/10787469.

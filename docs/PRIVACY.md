@@ -19,10 +19,10 @@ The free version does not store a history of your messages. With Pro, the option
 
 ## What the app does not do
 - No collection of SMS or contact data by the developer.
-- SMS and contact data are never used for advertising, analytics or profiling, and never sold or shared with anyone other than the destinations you configure. The ad SDK has no access to them.
+- SMS and contact data are never used for advertising, analytics or profiling, and never sold or shared with anyone other than the destinations you configure. The app does not send SMS or contact data to the ad SDK.
 
 ## Ads (free version)
-The settings screen shows a banner from Google AdMob. AdMob may collect device identifiers (such as the advertising ID), IP-based approximate location and ad interaction data to serve and measure ads, and in some regions to personalize them. Where required (e.g. EEA/UK), the app asks for consent first, and you can change it anytime under **Settings → Privacy choices**. You can also reset or delete your advertising ID in Android settings. See [Google's privacy policy](https://policies.google.com/privacy) and [how Google uses data from partner apps](https://policies.google.com/technologies/partner-sites).
+The settings screen shows a banner from Google AdMob. AdMob may collect device identifiers (such as the advertising ID), IP-based approximate location and ad interaction data to serve and measure ads, and in some regions to personalize them. Where required (e.g. EEA/UK), Google’s User Messaging Platform (UMP) asks for consent first, and you can change it anytime under **Settings → Privacy choices**. You can also reset or delete your advertising ID in Android settings. See [Google's privacy policy](https://policies.google.com/privacy) and [how Google uses data from partner apps](https://policies.google.com/technologies/partner-sites).
 
 ## Purchases
 Pro purchases are handled by Google Play. The app only checks with Google Play whether you own Pro; it never sees your payment details.
