@@ -2,18 +2,9 @@
 
 Package: `com.spinykiller.smsforward` · target API 36 · min API 25
 
-## 1. Upload key (once)
-```bash
-keytool -genkeypair -v -keystore upload-keystore.jks -alias upload -keyalg RSA -keysize 2048 -validity 10000
-```
-Create `keystore.properties` in the repo root (gitignored):
-```
-storeFile=upload-keystore.jks
-storePassword=…
-keyAlias=upload
-keyPassword=…
-```
-Back up both files outside the repo. Enroll in Play App Signing when creating the app.
+## 1. Upload key
+
+The existing upload key is `upload.keystore`; `keystore.properties` references it. Keep both files private and backed up outside the repo. Do not regenerate or overwrite the key. Enroll in Play App Signing when creating the app.
 
 ## 2. AdMob
 AdMob app IDs are per app; MemoryMedic's can't be reused. In AdMob (account `pub-5969937375579820`): **Apps → Add app** (Android, `com.spinykiller.smsforward`) → **Ad units → Banner**. Put both IDs in `gradle.properties`:

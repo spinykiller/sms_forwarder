@@ -5,6 +5,14 @@ All notable changes to SMS Forwarder will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-11-01
+
+### Added
+- Light, dark and system themes; Hindi, Indonesian, Portuguese, Spanish and Russian translations
+- Email forwarding via SMTP, webhook presets, pause controls and settings export/import
+- Pro notification forwarding, routing rules, OTP-only mode and regex keyword filters
+- Pro quiet hours, roaming pause, SIM selection, delivery reports, health checks and app lock
+
 ## [1.1.0] - 2026-10-10
 
 ### 🐛 Bug Fixes
